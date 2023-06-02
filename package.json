@@ -1,0 +1,21 @@
+{
+  "name": "nazimdiscussionbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/Bot.ts",
+    "wipe-commands": "ts-node src/scripts/DeleteCommands.ts"
+  },
+  "author": "Michael Snead",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "mongoose": "^7.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  }
+}
