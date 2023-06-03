@@ -9,6 +9,9 @@ const course_schema = new mongoose.Schema({
         type: String,
         required: true
     }
+},
+{
+    versionKey: false
 });
 
 export default mongoose.model('COURSE', course_schema);
