@@ -7,7 +7,7 @@ export interface course extends Document {
 }
 
 //schema
-export const course_schema: Schema = new mongoose.Schema({
+const course_schema: Schema = new mongoose.Schema({
     INSTRUCTOR_ID: {
         type: String,
         required: true
