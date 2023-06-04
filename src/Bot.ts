@@ -1,7 +1,7 @@
 //secrets like database connection and discord token that are top secret and not put on github
 import { DISCORD_TOKEN, MONGODB_SRV } from "./secret";
 
-import { Client, ClientOptions, GatewayIntentBits, IntentsBitField, Partials } from "discord.js";
+import { Client, GatewayIntentBits, Partials } from "discord.js";
 
 //import event listeners
 import interactionCreate from "./listeners/interactionCreate";
