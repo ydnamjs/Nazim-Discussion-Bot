@@ -1,9 +1,9 @@
 import { CommandInteraction, Client, EmbedBuilder } from "discord.js";
 import { Command } from "../Command";
 
-import mongoose from "mongoose";
+import { course, course_model } from "../models/Course";
 
-import CourseSchema from "../schemas/CourseSchema";
+import mongoose from "mongoose";
 
 export const RegisterDiscussionCourse: Command = {
     name: "register-discussion-course",
@@ -17,29 +17,72 @@ export const RegisterDiscussionCourse: Command = {
     
     run: async (client: Client, interaction: CommandInteraction) => {
 
-        let content = "";
+        const newCourseName = interaction.options.get("course-name")?.value as string | undefined;
 
-        const courseName = interaction.options.get("course-name")?.value;
+        // if no course name was given tell the user they need to give one then return
+        if(!newCourseName) {
 
+            await interaction.followUp({
+                ephemeral: true,
+                content: "sorry, you need to specify a course name"
+            });
+
+            return;
+        }
+
+        // check to see if there already is a course with that name owned by instructor
+        let courseAlreadyExists = false;
         try {
-            await new CourseSchema({
+            const docs = await course_model.find({INSTRUCTOR_ID: interaction.user.id});
+            
+            const currentCourseNames: string[] = [];
+
+            docs.forEach((course: course) => {
+                currentCourseNames.push(course.COURSE_NAME);
+            })
+
+            courseAlreadyExists = (currentCourseNames.indexOf(newCourseName) !== -1);
+
+        }
+        catch(error: any) {
+            console.log(error);
+            await interaction.followUp({
+                ephemeral: true,
+                content: "database connection failed"
+            });
+            return;
+        }
+
+        // if there is already a course with that name owned by the insturctor tell the user it already exists and return
+        if(courseAlreadyExists) {
+            await interaction.followUp({
+                ephemeral: true,
+                content: "sorry, you already have a course with that name"
+            });
+
+            return;
+        }
+
+        // save the newly registered course
+        try {
+            await new course_model({
                 INSTRUCTOR_ID: interaction.user.id,
-                COURSE_NAME: courseName
+                COURSE_NAME: newCourseName
             }).save();
         }
-
         catch (error: any) {
             console.log(error);
-            content = "failed to register course"
+            await interaction.followUp({
+                ephemeral: true,
+                content: "database connection failed"
+            });
+            return;
         }
 
-        if(content === "") {
-            content = "Registered new course: " + courseName;
-        }
-
+        // confirm to the user that their course was successfully registered
         await interaction.followUp({
             ephemeral: true,
-            content
+            content: "Registered new course: " + newCourseName
         });
     }
 };
