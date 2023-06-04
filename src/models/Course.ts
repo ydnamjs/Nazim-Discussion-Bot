@@ -3,7 +3,8 @@ import mongoose, { Schema } from "mongoose";
 //interface
 export interface course extends Document {
     INSTRUCTOR_ID: string,
-    COURSE_NAME: string
+    COURSE_NAME: string,
+    PASSWORD: string
 }
 
 //schema
@@ -15,6 +16,10 @@ const course_schema: Schema = new mongoose.Schema({
     COURSE_NAME: {
         type: String,
         required: true
+    },
+    PASSWORD: {
+        type: String,
+        required: false
     }
 },
 {
