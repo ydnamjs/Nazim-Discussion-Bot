@@ -3,8 +3,6 @@ import { Command } from "../Command";
 
 import { course, course_model } from "../models/Course";
 
-import mongoose from "mongoose";
-
 export const RegisterDiscussionCourse: Command = {
     name: "register-discussion-course",
     description: "registers a discussion course with the name provided",
