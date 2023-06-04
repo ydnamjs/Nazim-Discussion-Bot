@@ -1,10 +1,13 @@
-import { CommandInteraction, Client, Interaction } from "discord.js";
+import { CommandInteraction, Client, Interaction, ButtonInteraction } from "discord.js";
 import { CommandList } from "../CommandList";
 
 export default (client: Client): void => {
     client.on("interactionCreate", async (interaction: Interaction) => {
         if (interaction.isCommand() || interaction.isContextMenuCommand()) {
             await handleSlashCommand(client, interaction);
+        }
+        else if(interaction.isButton()) {
+            await handleButtonPress(client, interaction);
         }
     });
 };
@@ -24,4 +27,9 @@ const handleSlashCommand = async (client: Client, interaction: CommandInteractio
     slashCommand.run(client, interaction);
 };
 
-//code taken from https://sabe.io/tutorials/how-to-build-discord-bot-typescript
+const handleButtonPress = async (client: Client, interaction: ButtonInteraction) => {
+    console.log(interaction.customId);
+    interaction.update({content: "Button was pressed", embeds: [], components: []});
+};
+
+//some code taken from https://sabe.io/tutorials/how-to-build-discord-bot-typescript
