@@ -1,6 +1,13 @@
 import { CommandInteraction, Client, Interaction, ButtonInteraction } from "discord.js";
 import { CommandList } from "../constants/CommandList";
 
+import buttonFunctions from "../menus/_buttonFunctions";
+
+// constants
+const COMMAND_NOT_FOUND_MESSAGE = "Error: Command Not Found"
+const BUTTON_FUNCTION_NOT_FOUND_MESSAGE = "sorry button behavior not yet defined or there was an error with the defined behavior";
+
+
 export default (client: Client): void => {
     client.on("interactionCreate", async (interaction: Interaction) => {
         if (interaction.isCommand() || interaction.isContextMenuCommand()) {
@@ -18,7 +25,7 @@ const handleSlashCommand = async (client: Client, interaction: CommandInteractio
 
     //if it doesnt exist there is an error and we return
     if (!slashCommand) {
-        interaction.followUp({ content: "Error: Command Not Found" });
+        interaction.followUp({ content: COMMAND_NOT_FOUND_MESSAGE });
         return;
     }
 
@@ -28,8 +35,22 @@ const handleSlashCommand = async (client: Client, interaction: CommandInteractio
 };
 
 const handleButtonPress = async (client: Client, interaction: ButtonInteraction) => {
-    //console.log(interaction.customId);
-    interaction.update({content: "Button was pressed", embeds: [], components: []});
+    
+    // find button functionality in list
+    const buttonFunction = buttonFunctions[interaction.customId];
+    
+    try {
+        buttonFunction(client, interaction);
+    }
+    catch (error: any) {
+        console.log(error);
+        await interaction.reply({
+            ephemeral: true,
+            content: BUTTON_FUNCTION_NOT_FOUND_MESSAGE
+        });
+        return;
+    }
+
 };
 
 //some code taken from https://sabe.io/tutorials/how-to-build-discord-bot-typescript
