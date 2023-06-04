@@ -7,14 +7,20 @@ const mainMenuEmbed = new EmbedBuilder({
 
 
 //buttons
-const testButton = new ButtonBuilder({
-    customId: "test-button",
+const studentMenuButton = new ButtonBuilder({
+    customId: "discussion_student_menu_button",
     style: ButtonStyle.Primary,
-    label: "test button text",
+    label: "student menu",
+});
+
+const instructorMenuButton = new ButtonBuilder({
+    customId: "discussion_instructor_menu_button",
+    style: ButtonStyle.Primary,
+    label: "instructor menu",
 });
 
 //row of buttons
-const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(testButton)
+const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents([studentMenuButton, instructorMenuButton])
 
 //main menu
-export default { content: "test content", embeds: [mainMenuEmbed], components: [buttonRow] }
+export default { embeds: [mainMenuEmbed], components: [buttonRow] }

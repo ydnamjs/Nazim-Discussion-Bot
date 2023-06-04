@@ -4,7 +4,13 @@ import { ButtonInteraction, Client } from "discord.js";
 // surely there has to be a better way to do this?
 const buttonFunctions: {[key: string]: (client: Client, interaction: ButtonInteraction) => void} = {
     
-    "test-button": (client: Client, interaction: ButtonInteraction) => {
+    // student menu
+    "discussion_student_menu_button": (client: Client, interaction: ButtonInteraction) => {
+        interaction.update({content: "Button was pressed", embeds: [], components: []});
+    },
+
+    // instructor menu
+    "discussion_instructor_menu_button": (client: Client, interaction: ButtonInteraction) => {
         interaction.update({content: "Button was pressed", embeds: [], components: []});
     },
 
