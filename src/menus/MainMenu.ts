@@ -1,13 +1,20 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 
-export const discussionMainMenu = new EmbedBuilder({
+//embed (text)
+const mainMenuEmbed = new EmbedBuilder({
     title: "Discussion Menu",
 }) 
 
+
+//buttons
 const testButton = new ButtonBuilder({
     customId: "test-button",
     style: ButtonStyle.Primary,
     label: "test button text",
 });
 
-export const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(testButton)
+//row of buttons
+const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(testButton)
+
+//main menu
+export default { content: "test content", embeds: [mainMenuEmbed], components: [buttonRow] }
