@@ -3,6 +3,17 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "disc
 //embed (text)
 const mainMenuEmbed = new EmbedBuilder({
     title: "Discussion Menu",
+    description: "Welcome to the discussion main menu!",
+    fields: [
+        {
+            name: "Student Menu",
+            value: "If you are a student click the button labeled student menu"
+        },
+        {
+            name: "Instructor Menu",
+            value: "If you are an instructor click the button labeled instructor menu"
+        },
+    ]
 }) 
 
 
