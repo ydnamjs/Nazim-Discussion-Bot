@@ -1,5 +1,5 @@
 import { CommandInteraction, Client, Interaction, ButtonInteraction } from "discord.js";
-import { CommandList } from "../CommandList";
+import { CommandList } from "../constants/CommandList";
 
 export default (client: Client): void => {
     client.on("interactionCreate", async (interaction: Interaction) => {
@@ -28,7 +28,7 @@ const handleSlashCommand = async (client: Client, interaction: CommandInteractio
 };
 
 const handleButtonPress = async (client: Client, interaction: ButtonInteraction) => {
-    console.log(interaction.customId);
+    //console.log(interaction.customId);
     interaction.update({content: "Button was pressed", embeds: [], components: []});
 };
 

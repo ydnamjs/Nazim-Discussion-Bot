@@ -1,5 +1,5 @@
 import { CommandInteraction, Client, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, MessageActionRowComponent, ComponentType, APIActionRowComponent } from "discord.js";
-import { Command } from "../Command";
+import { Command } from "../interfaces/Command";
 
 export const DiscussionMenu: Command = {
     name: "discussion-menu",
