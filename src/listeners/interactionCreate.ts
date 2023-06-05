@@ -32,26 +32,4 @@ const handleSlashCommand = async (client: Client, interaction: CommandInteractio
     slashCommand.run(client, interaction);
 };
 
-/*
-const handleButtonPress = async (client: Client, interaction: ButtonInteraction) => {
-    
-    // find button functionality in list
-    const buttonFunction = buttonFunctions[interaction.customId];
-    
-    // try to execute it. If it doesnt work let the user know
-    try {
-        buttonFunction(client, interaction);
-    }
-    catch (error: any) {
-        console.log(error);
-        await interaction.reply({
-            ephemeral: true,
-            content: BUTTON_FUNCTION_NOT_FOUND_MESSAGE
-        });
-        return;
-    }
-
-};
-*/
-
 //some code taken from https://sabe.io/tutorials/how-to-build-discord-bot-typescript
