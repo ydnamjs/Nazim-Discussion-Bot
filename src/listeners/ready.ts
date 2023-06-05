@@ -8,7 +8,7 @@ export default (client: Client): void => {
         }
 
         //registers the commands should be off unless commands need updated/added since discord limits how many can be registered in a day
-        //await client.application.commands.set(CommandList, "931758776372068402");
+        //await client.application.commands.set(CommandList, "1115297883017723934");
         console.log(`${client.user.username} is online!`);
     });
 };

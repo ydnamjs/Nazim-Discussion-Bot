@@ -1,6 +1,6 @@
 import { BaseInteraction, ButtonInteraction, CacheType, Client, Message, MessageComponentInteraction } from "discord.js";
 
-export interface ButtonBehavior {
+export interface ComponentBehavior {
     checkFunction: (customId: string) => boolean;
-    resultingAction: ( buttonInteraction: MessageComponentInteraction ) => void;
+    resultingAction: ( componentInteraction: MessageComponentInteraction ) => void;
 }
