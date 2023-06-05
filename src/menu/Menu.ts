@@ -1,6 +1,6 @@
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, Client, EmbedBuilder, Message, MessageCreateOptions } from "discord.js";
-import { ComponentBehavior } from "../interfaces/ComponentBehavior";
-import { MenuData } from "../interfaces/MenuData";
+import { ComponentBehavior } from "./ComponentBehavior";
+import { MenuData } from "./MenuData";
 
 // MENU CLASS
 export class Menu {

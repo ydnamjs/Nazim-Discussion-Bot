@@ -1,8 +1,7 @@
 import { CommandInteraction, Client, Interaction} from "discord.js";
-import { Command } from "../interfaces/Command";
-import { mainMenu } from "../constants/menus/DiscussionMainMenu";
-import { CourseStudentsMenu } from "../course/course-student/CourseStudentsMenu";
-import { CourseStudent } from "../course/course-student/CourseStudentInterface";
+import { Command } from "./Command";
+import { CourseStudentsMenu } from "../menu/course/course-student/CourseStudentsMenu";
+import { CourseStudent } from "../menu/course/course-student/CourseStudentInterface";
 
 // constants
 const MENU_SENT_MESSAGE = "CourseStudent menu was sent to your direct messages. Click Here: ";

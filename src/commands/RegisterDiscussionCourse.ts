@@ -1,5 +1,5 @@
 import { CommandInteraction, Client, EmbedBuilder } from "discord.js";
-import { Command } from "../interfaces/Command";
+import { Command } from "./Command";
 
 import { course, course_model } from "../models/Course";
 

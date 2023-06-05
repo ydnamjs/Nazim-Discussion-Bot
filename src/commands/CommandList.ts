@@ -1,5 +1,5 @@
 //command interface
-import { Command } from "../interfaces/Command";
+import { Command } from "./Command";
 
 //import command from its respective file
 import { DiscussionMenu } from "../commands/DiscussionMenu";

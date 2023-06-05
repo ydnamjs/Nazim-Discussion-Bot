@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonStyle, MessageComponentInteraction, StringSelectMenuBuilder, TextInputBuilder } from "discord.js";
-import { makeButtonRow } from "../../constants/functions/ButtonRowMaker";
+import { makeButtonRow } from "../../ButtonRowMaker";
 
 // CONSTANTS
 const MAIN_MENU_BUTTON_LABEL = "go to main menu";

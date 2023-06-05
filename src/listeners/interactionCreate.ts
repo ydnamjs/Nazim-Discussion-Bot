@@ -1,5 +1,5 @@
 import { CommandInteraction, Client, Interaction, ButtonInteraction } from "discord.js";
-import { CommandList } from "../constants/CommandList";
+import { CommandList } from "../commands/CommandList";
 
 // constants
 const COMMAND_NOT_FOUND_MESSAGE = "Error: Command Not Found"
