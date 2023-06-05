@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, CommandInteraction, EmbedBuilder, Interaction, Message } from "discord.js";
 import { MENU_EXPIRATION_TIME, MENU_EXPIRTATION_MESSAGE } from "../constants/MenuConstants";
-import instructorMenu from "./InstructorMenu";
+import { SetupInstructorViewButtonCollector, instructorMenu } from "./InstructorMenu";
 
 // CONSTANTS
 
@@ -66,7 +66,8 @@ export async function collectButtonInteraction(client: Client, interaction: Comm
 
         // Instructor-menu-button behavior
         else if (buttonPressed.customId === INSTRUCTOR_MENU_BUTTON_ID) {
-            buttonPressed.update(instructorMenu);
+            await buttonPressed.update(instructorMenu);
+            SetupInstructorViewButtonCollector(client, interaction, sentMenu);
         }
     }
     catch (error: any) {
