@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, CommandInteraction, EmbedBuilder, Interaction, Message } from "discord.js";
-import { MENU_EXPIRATION_TIME, MENU_EXPIRTATION_MESSAGE } from "../constants/MenuConstants";
-import { collectButtonInteraction, mainMenu } from "./MainMenu";
+//import { MENU_EXPIRATION_TIME, MENU_EXPIRTATION_MESSAGE } from "../constants/MenuConstants";
+//import { collectButtonInteraction, mainMenu } from "./MainMenu";
 
 // CONSTANTS
 const MAIN_MENU_BUTTON_LABEL = "main menu";
@@ -34,7 +34,7 @@ const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents([mainMenuB
 
 // Instruction menu (The whole menu that is sent to the user)
 export const instructorMenu = { embeds: [instructorMenuEmbed], components: [buttonRow] }
-
+/*
 // Collection function (Gives functionality to the buttons of the sent messages)
 export async function SetupInstructorViewButtonCollector(client: Client, interaction: CommandInteraction, sentMenu: Message ) { 
 
@@ -62,3 +62,4 @@ export async function SetupInstructorViewButtonCollector(client: Client, interac
         interaction.user.send(MENU_EXPIRTATION_MESSAGE)
     }
 }
+*/

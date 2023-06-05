@@ -1,6 +1,6 @@
 import { CommandInteraction, Client, Interaction} from "discord.js";
 import { Command } from "../interfaces/Command";
-import { mainMenu } from "../menus/MainMenuNew";
+import { mainMenu } from "../constants/menus/DiscussionMainMenu";
 //import { collectButtonInteraction, mainMenu } from "../menus/MainMenu";
 
 // constants

@@ -1,5 +1,6 @@
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, Client, EmbedBuilder, EmbedData, Message, MessageCreateOptions } from "discord.js";
-import { ButtonBehavior } from "src/interfaces/ButtonBehavior";
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, Client, EmbedBuilder, Message, MessageCreateOptions } from "discord.js";
+import { ButtonBehavior } from "../interfaces/ButtonBehavior";
+import { MenuData } from "../interfaces/MenuData";
 
 // CONSTANTS
 const MAX_BUTTON_ROWS = 5; // 5 is chosen because that is discord's current limit (as of 6/5/2023:MM/DD/YYYY) https://discord.com/developers/docs/interactions/message-components#action-rows
@@ -25,14 +26,14 @@ export class Menu {
     // Used in the collect function to specify what should happen when the id of a clicked button matches a certain format
     private buttonBehaviors: ButtonBehavior[];
 
-    constructor(embedData: EmbedData, buttonData?: Partial<ButtonComponentData>[], buttonBehaviors?: ButtonBehavior[]) {
+    constructor(menuData: MenuData) {
         
         // Warn developer if number of buttons exceeds limit
-        if(buttonData && buttonData.length > MAX_BUTTON_ROWS * BUTTONS_PER_ROW) {
+        if(menuData.buttonData && menuData.buttonData.length > MAX_BUTTON_ROWS * BUTTONS_PER_ROW) {
 
             // If the embed has a title we give the title in the warning to help track down the offending menu
-            if(embedData.title){
-                console.warn(MAX_BUTTONS_EXCEEDED_WARNING + MAX_BUTTONS_EXCEEDED_TITLE_PREFIX + embedData.title +"\"");
+            if(menuData.embedData.title){
+                console.warn(MAX_BUTTONS_EXCEEDED_WARNING + MAX_BUTTONS_EXCEEDED_TITLE_PREFIX + menuData.embedData.title +"\"");
             }
             else {
                 console.warn(MAX_BUTTONS_EXCEEDED_WARNING);
@@ -41,12 +42,12 @@ export class Menu {
         }
         
         // Embed
-        const embed = new EmbedBuilder(embedData)
+        const embed = new EmbedBuilder(menuData.embedData)
 
         // Buttons
         const buttons: ButtonBuilder[] = [];
-        if(buttonData) {
-            buttonData.forEach( item => {
+        if(menuData.buttonData) {
+            menuData.buttonData.forEach( item => {
                 const newButton = new ButtonBuilder(item);
                 buttons.push(newButton);
             });
@@ -76,8 +77,8 @@ export class Menu {
         
         // Button behavior array defaults to empty but if it is defined in the constructor than that overwrites it
         this.buttonBehaviors = [];
-        if(buttonBehaviors) {
-            this.buttonBehaviors = buttonBehaviors;
+        if(menuData.buttonBehaviors) {
+            this.buttonBehaviors = menuData.buttonBehaviors;
         }
     }
 
@@ -87,11 +88,11 @@ export class Menu {
         return this.messageComponent;
     }
 
-    // Creates a collector for 
+    // Collects button interaction for the menu
     async collectButtonInteraction(client: Client, interaction: BaseInteraction, message: Message ): Promise<void> {
         try {
             
-            // Filter function that checks if id of the button clicker matches the id of the menu reciever (should always be that way since DM but just in case)
+            // Filter function that checks if id of the button clicker matches the id of the menu reciever (should always be that way since menus are sent as a DM but just in case)
             const collectorFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
     
             // Get the button that was pressed if one was pressed before menu expires

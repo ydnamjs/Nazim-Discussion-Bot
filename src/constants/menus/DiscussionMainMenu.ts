@@ -1,6 +1,9 @@
-import { BaseInteraction, ButtonStyle, Client, Message, MessageComponentInteraction } from "discord.js";
-import { Menu } from "../classes/Menu";
-//import { SetupInstructorViewButtonCollector, instructorMenu } from "./InstructorMenu";
+import { ButtonStyle, MessageComponentInteraction } from "discord.js";
+import { Menu } from "../../classes/Menu";
+import { MenuData } from "../../interfaces/MenuData";
+
+// other menus
+import { instructorMenu } from "../../menus/InstructorMenu";
 
 // CONSTANTS
 
@@ -9,9 +12,9 @@ const INSTRUCTOR_MENU_BUTTON_LABEL = "instructor menu";
 
 const STUDENT_MENU_BUTTON_ID = "discussion_student_menu_button";
 const INSTRUCTOR_MENU_BUTTON_ID = "discussion_instructor_menu_button";
-/*
-export const mainMenu = new Menu({
-    {
+
+const discussionMainMenuData: MenuData = {
+    embedData: {
         title: "Discussion Menu",
         description: "Welcome to the discussion main menu!",
         fields: [
@@ -25,7 +28,7 @@ export const mainMenu = new Menu({
             },
         ]
     },
-    [
+    buttonData: [
         {
             customId: STUDENT_MENU_BUTTON_ID,
             style: ButtonStyle.Primary,
@@ -37,7 +40,18 @@ export const mainMenu = new Menu({
             label: INSTRUCTOR_MENU_BUTTON_LABEL,
         }
     ],
-    [
+    buttonBehaviors: [
+        // Student-menu-button behavior
+        {
+            checkFunction: (customId: string) => {
+                return customId === STUDENT_MENU_BUTTON_ID;
+            },
+            resultingAction: async (buttonInteraction: MessageComponentInteraction) => {
+                await buttonInteraction.update({content: "student button clicked!\nno functionality yet sadly", embeds: [], components: []});
+            }
+        },
+
+        // Instructor-menu-button behavior
         {
             checkFunction: (customId: string) => {
                 return customId === INSTRUCTOR_MENU_BUTTON_ID;
@@ -45,7 +59,8 @@ export const mainMenu = new Menu({
             resultingAction: async (buttonInteraction: MessageComponentInteraction) => {
                 await buttonInteraction.update(instructorMenu);
             }
-        }
+        },
     ]
-});
-*/
+}
+
+export const mainMenu = new Menu(discussionMainMenuData);
