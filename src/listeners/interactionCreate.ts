@@ -1,11 +1,8 @@
 import { CommandInteraction, Client, Interaction, ButtonInteraction } from "discord.js";
 import { CommandList } from "../constants/CommandList";
 
-import buttonFunctions from "../menus/_buttonFunctions";
-
 // constants
 const COMMAND_NOT_FOUND_MESSAGE = "Error: Command Not Found"
-const BUTTON_FUNCTION_NOT_FOUND_MESSAGE = "sorry button behavior not yet defined or there was an error with the defined behavior";
 
 
 export default (client: Client): void => {

@@ -1,18 +1,17 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 
-// constants
+// CONSTANTS
 const INSTRUCTOR_MENU_MESSAGE_CONTENT = "";
 
 //
 
-//embed (text)
+// Embed (text of menu)
 const instructorMenuEmbed = new EmbedBuilder({
     title: "Instructor Menu",
     description: "Use the buttons below to navigate your courses"
 }) 
 
-
-//buttons
+// Buttons (make up button row)
 const mainMenuButton = new ButtonBuilder({
     customId: "discussion_main_menu_button",
     style: ButtonStyle.Secondary,
@@ -31,8 +30,8 @@ const collectorTestButton = new ButtonBuilder({
     label: "collectorTest",
 });
 
-//row of buttons
+// Button Row (collection of all the interactive components of the menu)
 const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents([mainMenuButton, viewCoursesButton, collectorTestButton])
 
-// instructor menu
+// Instruction menu (The whole menu that is sent to the user)
 export default { content: INSTRUCTOR_MENU_MESSAGE_CONTENT, embeds: [instructorMenuEmbed], components: [buttonRow] }
