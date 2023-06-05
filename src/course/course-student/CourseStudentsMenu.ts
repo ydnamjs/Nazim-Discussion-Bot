@@ -1,6 +1,7 @@
 import { APIEmbedField } from "discord.js";
 import { Menu } from "../../classes/Menu";
 import { CourseStudent } from "./CourseStudentInterface";
+import { courseStudentsComponents } from "./CourseStudentComponents";
 
 const TOTAL_MAX_CHAR_LIMIT = 6000; // 6000 is the most characters discord will will allow in an embed
 
@@ -63,7 +64,7 @@ export class CourseStudentsMenu extends Menu {
                 description: embedDescription,
                 fields: studentFields
             },
-            components: []
+            components: courseStudentsComponents
         };
         
         super(menuData);
