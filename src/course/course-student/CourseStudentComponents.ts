@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonStyle, MessageComponentInteraction, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonStyle, MessageComponentInteraction, StringSelectMenuBuilder, TextInputBuilder } from "discord.js";
 import { makeButtonRow } from "../../constants/functions/ButtonRowMaker";
 
 // CONSTANTS
@@ -11,6 +11,16 @@ const MAIN_MENU_BUTTON_ID = "discussion_main_menu_button";
 const COURSE_MENU_BUTTON_ID = "discussion_course_expanded_menu_button";
 const PREVIOUS_PAGE_MENU_BUTTON_ID = "discussion_course_student_previous"
 const NEXT_PAGE_MENU_BUTTON_ID = "discussion_course_student_next"
+
+const REMOVE_MENU_BUTTON_LABEL = "remove student";
+const GET_POSTS_MENU_BUTTON_LABEL = "get student's posts";
+const GET_COMMENTS_MENU_BUTTON_LABEL = "get student's comments"
+const GET_SCORES_MENU_BUTTON_LABEL = "get student's scores"
+
+const REMOVE_MENU_BUTTON_ID = "discussion_remove_course_student_menu_button";
+const GET_POSTS_MENU_BUTTON_ID = "discussion_get_posts_course_student_menu_button";
+const GET_COMMENTS_MENU_BUTTON_ID = "discussion_get_comments_course_student_menu_button"
+const GET_SCORES_MENU_BUTTON_ID = "discussion_get_scores_course_student_menu_button"
 
 
 const rowOneButtonData = [
@@ -38,17 +48,29 @@ const rowOneButtonData = [
 
 const rowOne = makeButtonRow(rowOneButtonData);
 
-const studentSelectMenu = new StringSelectMenuBuilder({
-    custom_id: "discussion_course_student_selector",
-    placeholder: "",
-    options: [
-        {
-            label: "ydna_",
-            value: "ydna_"
-        }
-    ]
-})
+const rowTwoButtonData = [
+    {
+        customId: REMOVE_MENU_BUTTON_ID,
+        style: ButtonStyle.Danger,
+        label: REMOVE_MENU_BUTTON_LABEL,
+    },
+    {
+        customId: GET_POSTS_MENU_BUTTON_ID,
+        style: ButtonStyle.Primary,
+        label: GET_POSTS_MENU_BUTTON_LABEL,
+    },
+    {
+        customId: GET_COMMENTS_MENU_BUTTON_ID,
+        style: ButtonStyle.Primary,
+        label: GET_COMMENTS_MENU_BUTTON_LABEL,
+    },
+    {
+        customId: GET_SCORES_MENU_BUTTON_ID,
+        style: ButtonStyle.Primary,
+        label: GET_SCORES_MENU_BUTTON_LABEL,
+    },
+];
 
-const rowTwo = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(studentSelectMenu);
+const rowTwo = makeButtonRow(rowTwoButtonData);
 
-export const courseStudentsComponents = [rowOne, rowTwo];
+const courseStudentsComponents = [rowOne, rowTwo];

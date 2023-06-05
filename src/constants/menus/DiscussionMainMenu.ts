@@ -1,4 +1,4 @@
-import { ButtonStyle, MessageComponentInteraction } from "discord.js";
+import { BaseInteraction, ButtonStyle, Client, Message, MessageComponentInteraction } from "discord.js";
 import { Menu } from "../../classes/Menu";
 import { MenuData } from "../../interfaces/MenuData";
 import { makeButtonRow } from "../functions/ButtonRowMaker";
@@ -61,7 +61,7 @@ const discussionMainMenuData: MenuData = {
             checkFunction: (customId: string) => {
                 return customId === STUDENT_MENU_BUTTON_ID;
             },
-            resultingAction: async (buttonInteraction: MessageComponentInteraction) => {
+            resultingAction: async (client: Client, interaction: BaseInteraction, message: Message, buttonInteraction: MessageComponentInteraction) => {
                 await buttonInteraction.update({content: "student button clicked!\nno functionality yet sadly", embeds: [], components: []});
             }
         },
@@ -71,7 +71,7 @@ const discussionMainMenuData: MenuData = {
             checkFunction: (customId: string) => {
                 return customId === INSTRUCTOR_MENU_BUTTON_ID;
             },
-            resultingAction: async (buttonInteraction: MessageComponentInteraction) => {
+            resultingAction: async (client: Client, interaction: BaseInteraction, message: Message, buttonInteraction: MessageComponentInteraction) => {
                 await buttonInteraction.update(instructorMenu);
             }
         },

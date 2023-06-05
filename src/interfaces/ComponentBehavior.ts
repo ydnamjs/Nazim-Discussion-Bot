@@ -2,5 +2,5 @@ import { BaseInteraction, ButtonInteraction, CacheType, Client, Message, Message
 
 export interface ComponentBehavior {
     checkFunction: (customId: string) => boolean;
-    resultingAction: ( componentInteraction: MessageComponentInteraction ) => void;
+    resultingAction: ( client: Client, interaction: BaseInteraction, message: Message, componentInteraction: MessageComponentInteraction ) => void;
 }

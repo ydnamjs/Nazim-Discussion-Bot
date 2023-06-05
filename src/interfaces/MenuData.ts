@@ -3,7 +3,7 @@ import { ComponentBehavior } from "./ComponentBehavior";
 
 export interface MenuData {
     embedData: EmbedData,
-    components: ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>[],
+    components: ActionRowBuilder<ButtonBuilder>[],
     buttonBehaviors?: ComponentBehavior[],
     selectMenuBehaviors?: ComponentBehavior[],
 }

@@ -2,12 +2,11 @@ import { ActionRowBuilder, BaseInteraction, ButtonBuilder, Client, EmbedBuilder,
 import { ComponentBehavior } from "../interfaces/ComponentBehavior";
 import { MenuData } from "../interfaces/MenuData";
 
-// CONSTANTS
-const MENU_EXPIRTATION_MESSAGE = "Your previous menu was closed due to inactivity"; // Message sent when menu expires
-const MENU_EXPIRATION_TIME = 600_000 // Time for a menu to expire in ms (600_000 is 10 mins)
-
 // MENU CLASS
 export class Menu {
+
+    protected static MENU_EXPIRTATION_MESSAGE = "Your previous menu was closed due to inactivity"; // Message sent when menu expires
+    protected static MENU_EXPIRATION_TIME = 600_000 // Time for a menu to expire in ms (600_000 is 10 mins)
 
     // The message component is what you would send to show someone the menu
     // It is private and can be accessed from the getMessageComponent method because changing it is dangerous and should not be allowed
@@ -18,7 +17,6 @@ export class Menu {
     // Array of button behavior objects
     // Used in the collect function to specify what should happen when the id of a clicked button matches a certain format
     private buttonBehaviors: ComponentBehavior[];
-    private selectMenuBehaviors: ComponentBehavior[];
 
     constructor(menuData: MenuData) {
         
@@ -37,11 +35,6 @@ export class Menu {
         if(menuData.buttonBehaviors) {
             this.buttonBehaviors = menuData.buttonBehaviors;
         }
-
-        this.selectMenuBehaviors = [];
-        if(menuData.selectMenuBehaviors) {
-            this.selectMenuBehaviors = menuData.selectMenuBehaviors;
-        }
     }
 
     // Getter for message component
@@ -58,12 +51,12 @@ export class Menu {
             const collectorFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
     
             // Get the button that was pressed if one was pressed before menu expires
-            const buttonPressed = await message.awaitMessageComponent( {filter: collectorFilter, time: MENU_EXPIRATION_TIME } );
+            const buttonPressed = await message.awaitMessageComponent( {filter: collectorFilter, time: Menu.MENU_EXPIRATION_TIME } );
             
             // For every button behavior, if the check function returns true, execute the resulting action
             this.buttonBehaviors.forEach( (behavior: ComponentBehavior) => {
                 if(behavior.checkFunction(buttonPressed.customId)) {
-                    behavior.resultingAction(buttonPressed);
+                    behavior.resultingAction(client, interaction, message, buttonPressed);
                 }
             })
         }
@@ -74,7 +67,7 @@ export class Menu {
             
             // delete the menu and notify the user that it expired
             message.delete()
-            interaction.user.send(MENU_EXPIRTATION_MESSAGE)
+            interaction.user.send(Menu.MENU_EXPIRTATION_MESSAGE)
         }
     }
 
