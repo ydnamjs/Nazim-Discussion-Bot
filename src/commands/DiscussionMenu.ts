@@ -13,7 +13,8 @@ export const DiscussionMenu: Command = {
         
         // Direct Message the user the discussion main menu
         //const sentMenu = await interaction.user.send(mainMenu);
-        await interaction.user.send(mainMenu.getMenuMessageOptions());
+        await interaction.user.send(mainMenu.getMessageComponent());
+        
         // Let them know that they have been DM'd the discussion menu
         await interaction.followUp({
             ephemeral: true,
