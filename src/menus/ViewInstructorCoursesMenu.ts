@@ -1,5 +1,7 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Interaction } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Client, EmbedBuilder, Interaction } from "discord.js";
 import { course_model } from "../models/Course";
+
+import instructorMenu from "./InstructorMenu";
 
 //buttons
 const mainMenuBotton = new ButtonBuilder({
@@ -12,7 +14,7 @@ const mainMenuBotton = new ButtonBuilder({
 const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents([mainMenuBotton])
 
 
-export async function getCoursesMenu (client: Client, interaction: Interaction, pageNumber: number) {
+export async function getCoursesMenu (client: Client, interaction: ButtonInteraction, pageNumber: number) {
     
     let docs;
 
@@ -22,17 +24,15 @@ export async function getCoursesMenu (client: Client, interaction: Interaction, 
     }
     catch(error: any) {
         console.log(error);
-        /*
         await interaction.followUp({
             ephemeral: true,
             content: "database connection failed"
         });
-        */
-        return {content: "failed to retrieve courses", embeds: [], components: [buttonRow]};
+        return {instructorMenu};
     }
 
     if(!docs) {
-        return {content: "failed to retrieve courses", embeds: [], components: [buttonRow]};
+        return {instructorMenu};
     }
 
     const courseFields: {name: string, value: string}[] = [];

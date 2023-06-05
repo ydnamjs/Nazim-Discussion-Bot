@@ -12,6 +12,7 @@ const buttonFunctions: {[key: string]: (client: Client, interaction: ButtonInter
     // return to main menu button
     "discussion_main_menu_button": (client: Client, interaction: ButtonInteraction) => {
         interaction.update(mainMenu);
+        interaction.message.createMessageComponentCollector();
     },
 
     // student menu

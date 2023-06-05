@@ -13,7 +13,7 @@ const instructorMenuEmbed = new EmbedBuilder({
 
 
 //buttons
-const mainMenuBotton = new ButtonBuilder({
+const mainMenuButton = new ButtonBuilder({
     customId: "discussion_main_menu_button",
     style: ButtonStyle.Secondary,
     label: "main menu",
@@ -25,8 +25,14 @@ const viewCoursesButton = new ButtonBuilder({
     label: "view courses",
 });
 
+const collectorTestButton = new ButtonBuilder({
+    customId: "lol",
+    style: ButtonStyle.Danger,
+    label: "collectorTest",
+});
+
 //row of buttons
-const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents([mainMenuBotton, viewCoursesButton])
+const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents([mainMenuButton, viewCoursesButton, collectorTestButton])
 
 // instructor menu
 export default { content: INSTRUCTOR_MENU_MESSAGE_CONTENT, embeds: [instructorMenuEmbed], components: [buttonRow] }

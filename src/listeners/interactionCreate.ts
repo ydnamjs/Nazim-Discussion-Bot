@@ -15,11 +15,6 @@ export default (client: Client): void => {
         if (interaction.isCommand() || interaction.isContextMenuCommand()) {
             await handleSlashCommand(client, interaction);
         }
-        
-        // handle buttons
-        else if(interaction.isButton()) {
-            await handleButtonPress(client, interaction);
-        }
 
     });
 };
@@ -40,6 +35,7 @@ const handleSlashCommand = async (client: Client, interaction: CommandInteractio
     slashCommand.run(client, interaction);
 };
 
+/*
 const handleButtonPress = async (client: Client, interaction: ButtonInteraction) => {
     
     // find button functionality in list
@@ -59,5 +55,6 @@ const handleButtonPress = async (client: Client, interaction: ButtonInteraction)
     }
 
 };
+*/
 
 //some code taken from https://sabe.io/tutorials/how-to-build-discord-bot-typescript
