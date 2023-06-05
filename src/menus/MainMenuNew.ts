@@ -1,5 +1,6 @@
-import { ButtonStyle } from "discord.js";
+import { BaseInteraction, ButtonStyle, Client, Message, MessageComponentInteraction } from "discord.js";
 import { Menu } from "../classes/Menu";
+import { SetupInstructorViewButtonCollector, instructorMenu } from "./InstructorMenu";
 
 // CONSTANTS
 
@@ -34,6 +35,18 @@ export const mainMenu = new Menu(
             customId: INSTRUCTOR_MENU_BUTTON_ID,
             style: ButtonStyle.Primary,
             label: INSTRUCTOR_MENU_BUTTON_LABEL,
+        }
+    ],
+    [
+        {
+            checkFunction: (customId: string) => {
+                console.log("checking if ID matched");
+                return customId === INSTRUCTOR_MENU_BUTTON_ID;
+            },
+            resultingAction: async (buttonInteraction: MessageComponentInteraction) => {
+                console.log("changing menu")
+                await buttonInteraction.update(instructorMenu);
+            }
         }
     ]
 );
