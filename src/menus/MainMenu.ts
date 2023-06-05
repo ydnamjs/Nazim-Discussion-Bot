@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, CommandInteraction, EmbedBuilder, Interaction, Message } from "discord.js";
-import instructorMenu from "./InstructorMenu";
 import { MENU_EXPIRATION_TIME, MENU_EXPIRTATION_MESSAGE } from "../constants/MenuConstants";
+import instructorMenu from "./InstructorMenu";
 
 // CONSTANTS
 
@@ -60,7 +60,7 @@ export async function collectButtonInteraction(client: Client, interaction: Comm
         
         // Student-menu-button behavior
         if( buttonPressed.customId === STUDENT_MENU_BUTTON_ID ){
-            // FIXME temp function
+            // TODO: Add real function to this
             buttonPressed.update({content: "Button was pressed", embeds: [], components: []});
         }
 
