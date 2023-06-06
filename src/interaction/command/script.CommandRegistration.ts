@@ -1,6 +1,6 @@
 const { REST, Routes } = require('discord.js');
 import { DISCORD_TOKEN, CLIENT_ID, NAZIM_TEST_SERVER_ID, MY_SERVER_ID } from "../../secret";
-import { CommandList } from "./data.CommandList";
+import { commandList } from "./data.CommandList";
 
 
 // CONSTANT
@@ -14,11 +14,11 @@ function main(action: string, server: string) {
     if(action === "register") {
         switch(server) { 
             case "global": { 
-                console.warn("Command Registration command not yet implemented");
-               break; 
+                registerAllCommandsToGlobal();
+                break; 
             } 
             case "nazim": { 
-                registerAllCommandsToNazim() 
+                registerAllCommandsToNazim();
                break; 
             } 
             case "ydna": {
@@ -26,52 +26,72 @@ function main(action: string, server: string) {
                 break;
             }
             default: { 
-               console.warn("WARNING: Server parameter of command registration was invalid. Nothing was executed");
-               break; 
+                console.warn("WARNING: Server parameter of command registration was invalid. Nothing was executed");
+                break; 
             } 
          } 
     }
     else if (action === "unregister") {
         switch(server) { 
             case "global": { 
-                unregisterAllGlobalCommands(); 
+                unregisterAllCommandsGlobal(); 
                 break; 
             } 
             case "nazim": { 
-                console.warn("Command Registration command not yet implemented");
+                unregisterAllCommandsNazim();
                 break; 
             } 
             case "ydna": {
-                console.warn("Command Registration command not yet implemented");
+                unregisterAllCommandsYdna();
                 break;
             }
             default: { 
-               console.warn("WARNING: Server parameter of command registration was invalid. Nothing was executed");
-               break; 
+                console.warn("WARNING: Server parameter of command registration was invalid. Nothing was executed");
+                break; 
             } 
          } 
     }
 }
 
-
-// Unregister all global commands
-function unregisterAllGlobalCommands() {
-    rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] })
-	.then(() => console.log('Successfully deleted all application commands.'))
-	.catch(console.error);
-}
-
 // Register commands to ydna's server
-function registerAllCommandsToYdna() {
-    rest.put(Routes.applicationCommands(CLIENT_ID, MY_SERVER_ID), { body: CommandList })
-    .then(() => console.log('Successfully registered all application commands.'))
+function registerAllCommandsToGlobal() {
+    rest.put(Routes.applicationCommands(CLIENT_ID), { body: commandList })
+    .then(() => console.log('Successfully registered all application commands to global'))
     .catch(console.error);
 }
 
 // Register commands to Nazim's server
 function registerAllCommandsToNazim() {
-    rest.put(Routes.applicationCommands(CLIENT_ID, NAZIM_TEST_SERVER_ID), { body: CommandList })
-	.then(() => console.log('Successfully registered all application commands.'))
+    rest.put(Routes.applicationCommands(CLIENT_ID, NAZIM_TEST_SERVER_ID), { body: commandList })
+	.then(() => console.log('Successfully registered all application commands to Nazim\'s Server'))
+	.catch(console.error);
+}
+
+// Register commands to ydna's server
+function registerAllCommandsToYdna() {
+    rest.put(Routes.applicationCommands(CLIENT_ID, MY_SERVER_ID), { body: commandList })
+    .then(() => console.log('Successfully registered all application commands to ydna\'s Server'))
+    .catch(console.error);
+}
+
+// Unregister all global commands
+function unregisterAllCommandsGlobal() {
+    rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] })
+	.then(() => console.log('Successfully deleted all application commands from global'))
+	.catch(console.error);
+}
+
+// Unregister all Nazim's server commands
+function unregisterAllCommandsNazim() {
+    rest.put(Routes.applicationCommands(CLIENT_ID, NAZIM_TEST_SERVER_ID), { body: [] })
+	.then(() => console.log('Successfully deleted all application commands from Nazim\'s server'))
+	.catch(console.error);
+}
+
+// Unregister all ydna's server commands
+function unregisterAllCommandsYdna() {
+    rest.put(Routes.applicationCommands(CLIENT_ID, MY_SERVER_ID), { body: [] })
+	.then(() => console.log('Successfully deleted all application commands from ydna\'s server'))
 	.catch(console.error);
 }
 
