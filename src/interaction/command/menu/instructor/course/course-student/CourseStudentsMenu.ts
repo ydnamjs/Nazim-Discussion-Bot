@@ -1,9 +1,9 @@
 import { APIEmbedField, BaseInteraction, ButtonStyle, Client, InteractionUpdateOptions, Message, MessageComponentInteraction, } from "discord.js";
-import { Menu } from "../../Menu";
-import { makeButtonRow } from "../../ButtonRowMaker";
+import { Menu } from "../../../Class_Menu";
+import { makeButtonRow } from "../../../ButtonRowMaker";
 import { CourseStudent } from "./CourseStudentInterface";
-import { ComponentBehavior } from "../../ComponentBehavior";
-import { makeButtonBehaviorOnID } from "../../buttonBehaviorOnIdMaker";
+import { ComponentBehavior } from "../../../ComponentBehavior";
+//import { makeButtonBehaviorOnID } from "../../../buttonBehaviorOnIdMaker";
 
 // CONSTANTS
 const TOTAL_MAX_CHAR_LIMIT = 6000; // 6000 is the most characters discord will will allow in an embed

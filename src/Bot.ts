@@ -1,12 +1,13 @@
+import { Client, GatewayIntentBits, Partials } from "discord.js";
+
 //secrets like database connection and discord token that are top secret and not put on github
 import { DISCORD_TOKEN, MONGODB_SRV } from "./secret";
 
-import { Client, GatewayIntentBits, Partials } from "discord.js";
-
 //import event listeners
-import interactionCreate from "./listeners/interactionCreate";
-import ready from "./listeners/ready";
+import commandListener from "./interaction/command/Utility_CommandListener";
+import onlineLogger from "./Listener_OnlineLogger";
 
+// TODO: converting this to an import disalows the useNewUrlParser option for some reason. When done with refactoring figure out if converting breaks it or not
 //import database connection thing
 const mongoose = require("mongoose");
 
@@ -46,8 +47,8 @@ client.login(DISCORD_TOKEN);
 //function that adds all of the event listeners from the listeners folder
 function addListeners() {
     console.log("adding listeners...");
-    ready(client);
-    interactionCreate(client);
+    onlineLogger(client);
+    commandListener(client);
     console.log("listeners added!");
 }
 

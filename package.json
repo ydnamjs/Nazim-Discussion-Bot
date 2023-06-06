@@ -5,10 +5,15 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/Bot.ts",
-    "wipe-commands": "ts-node src/scripts/DeleteCommands.ts"
+    "reg-global": "ts-node ./interaction/command/Script_CommandRegistration register global",
+    "reg-ydna": "ts-node src/interaction/command/Script_CommandRegistration register ydna",
+    "reg-nazim": "ts-node src/interaction/command/Script_CommandRegistration register nazim",
+    "unreg-global": "ts-node src/interaction/command/Script_CommandRegistration unregister global",
+    "unreg-ydna": "ts-node src/interaction/command/Script_CommandRegistration unregister ydna",
+    "unreg-nazim": "ts-node src/interaction/command/Script_CommandRegistration unregister nazim"
   },
   "author": "Michael Snead",
-  "license": "ISC",
+  "license": "GPLV3",
   "dependencies": {
     "discord.js": "^14.11.0",
     "mongoose": "^7.2.2"
