@@ -1,7 +1,7 @@
 import { CommandInteraction, Client} from "discord.js";
 import { Command } from "../interface.Command";
 
-import { BaseMenu } from "./class.Menu";
+import { BaseMenu } from "./class.BaseMenu";
 import { MenuData } from "./interface.MenuData";
 
 // constants
