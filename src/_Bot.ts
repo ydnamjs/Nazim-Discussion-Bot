@@ -4,8 +4,8 @@ import { Client, GatewayIntentBits, Partials } from "discord.js";
 import { DISCORD_TOKEN, MONGODB_SRV } from "./secret";
 
 //import event listeners
-import commandListener from "./interaction/command/Utility_CommandListener";
-import onlineLogger from "./Listener_OnlineLogger";
+import commandListener from "./interaction/command/util.CommandListener";
+import onlineLogger from "./util.OnlineLogger";
 
 // TODO: converting this to an import disalows the useNewUrlParser option for some reason. When done with refactoring figure out if converting breaks it or not
 //import database connection thing

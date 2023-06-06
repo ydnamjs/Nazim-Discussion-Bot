@@ -1,6 +1,6 @@
 const { REST, Routes } = require('discord.js');
 import { DISCORD_TOKEN, CLIENT_ID, NAZIM_TEST_SERVER_ID, MY_SERVER_ID } from "../../secret";
-import { CommandList } from "./Data_CommandList";
+import { CommandList } from "./data.CommandList";
 
 
 // CONSTANT

@@ -1,9 +1,8 @@
 import { CommandInteraction, Client, Interaction } from "discord.js";
-import { CommandList } from "./Data_CommandList";
+import { CommandList } from "./data.CommandList";
 
 // constants
 const COMMAND_NOT_FOUND_MESSAGE = "Error: Command Not Found"
-
 
 export default (client: Client): void => {
     client.on("interactionCreate", async (interaction: Interaction) => {
