@@ -1,7 +1,7 @@
 import { CommandInteraction, Client, EmbedBuilder } from "discord.js";
 import { Command } from "./Command";
 
-import { course, course_model } from "../models/Course";
+import { course, course_model } from "../models-MARKED-FOR-DELETION/Course";
 
 export const RegisterDiscussionCourse: Command = {
     name: "register-discussion-course",
