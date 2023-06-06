@@ -9,6 +9,8 @@ export const DiscussionMenu: Command = {
     description: "opens an embed menu for managing the discussion features",
     run: async (client: Client, interaction: CommandInteraction) => {
         
+        // CURRENTLY DOES NOTHING BECAUSE REFACTOR REMOVED THE IMPLEMENTATION
+
         // Direct Message the user the discussion main menu
         //const sentMenu = await interaction.user.send(mainMenu);
         //const sentMenu = await interaction.user.send(mainMenu.getMessageComponent());
