@@ -1,10 +1,10 @@
 //command interface
-import { Command } from "./Command";
+import { Command } from "./Interface_Command";
 
 //import command from its respective file
-import { DiscussionMenu } from "./DiscussionMenu";
-import { RegisterDiscussionCourse } from "./RegisterDiscussionCourse";
-import { testMenu } from "./TestMenu";
+import { DiscussionMenu } from "./Command_DiscussionMenu";
+import { RegisterDiscussionCourse } from "./Command_RegisterDiscussionCourse";
+import { testMenu } from "./Command_TestMenu";
 
 //list of all the available commands
 export const CommandList: Command[] = [DiscussionMenu, RegisterDiscussionCourse, testMenu];

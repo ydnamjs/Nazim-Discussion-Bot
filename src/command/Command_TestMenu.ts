@@ -1,5 +1,5 @@
 import { CommandInteraction, Client, Interaction} from "discord.js";
-import { Command } from "./Command";
+import { Command } from "./Interface_Command";
 import { CourseStudentsMenu } from "../menu/course/course-student/CourseStudentsMenu";
 import { CourseStudent } from "../menu/course/course-student/CourseStudentInterface";
 
