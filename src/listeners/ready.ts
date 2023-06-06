@@ -1,5 +1,5 @@
 import { Client } from "discord.js";
-import { CommandList } from "../commands/CommandList";
+import { CommandList } from "../command/CommandList";
 
 export default (client: Client): void => {
     client.on("ready", async () => {
@@ -8,7 +8,7 @@ export default (client: Client): void => {
         }
 
         //registers the commands should be off unless commands need updated/added since discord limits how many can be registered in a day
-        //await client.application.commands.set(CommandList, "1115297883017723934");
+        await client.application.commands.set(CommandList, "931758776372068402");
         console.log(`${client.user.username} is online!`);
     });
 };

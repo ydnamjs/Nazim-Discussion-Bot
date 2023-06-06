@@ -6,9 +6,9 @@ import { CourseStudent } from "../menu/course/course-student/CourseStudentInterf
 // constants
 const MENU_SENT_MESSAGE = "CourseStudent menu was sent to your direct messages. Click Here: ";
 
-export const testCourseStudentMenu: Command = {
-    name: "test-course-student-menu",
-    description: "opens a menu of student information for a course",
+export const testMenu: Command = {
+    name: "test-menu",
+    description: "opens the current menu being tested",
     run: async (client: Client, interaction: CommandInteraction) => {
         
         // Direct Message the user the discussion main menu
