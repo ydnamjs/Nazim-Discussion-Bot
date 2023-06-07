@@ -46,5 +46,5 @@ export interface MenuData {
     description: string, // Description that appears in the embed portion of the menu
     fields: {name: string, value: string}[], // Fields that make up the embed
     additionalComponents?: menuComponentArray, // InteractionComponent rows that follow the embed in the menu 
-    buttonBehaviors?: ComponentBehavior[], // 
+    additionalButtonBehaviors?: ComponentBehavior[], // 
 }

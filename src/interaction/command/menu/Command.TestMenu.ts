@@ -90,7 +90,7 @@ export const testMenu: Command = {
         const sampleMenu = new BaseMenu(sampleMenuData);
 
         // sample menu
-        const messageLink = (await sampleMenu.send(interaction.user)).url;
+        const messageLink = (await sampleMenu.send(client, interaction)).url;
 
         // Let them know that they have been DM'd the discussion menu
         await interaction.followUp({
