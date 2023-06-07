@@ -140,7 +140,7 @@ export class BaseMenu {
 // BUTTON BEHAVIOR MANAGEMENT
 
     private static MENU_EXPIRTATION_MESSAGE = "Your discussion menu expired due to inactivity";
-    private static MENU_EXPIRATION_TIME = 600_000;
+    private static MENU_EXPIRATION_TIME = 5_000;
 
     buttonBehaviors: ComponentBehavior[];
 
@@ -162,13 +162,12 @@ export class BaseMenu {
         }
         catch (error: any) {
 
-            // FIXME: THERE REALLY SHOULD BE A CHECK FOR IF THE MENU DID EXPIRE OR IF A DIFFERENT ERROR HAPPENED
-            // CURRENTLY IT TREATS ALL ERRORS AS IF THE MENU EXPIRED
-
-            // delete the menu and notify the user that it expired
-            message.delete()
-            interaction.user.send(BaseMenu.MENU_EXPIRTATION_MESSAGE);
-            
+            // if the collector expired, delete the menu and notify the user that it expired
+            // TODO: I feel like theres a better way to do this but it will work for now
+            if(error.toString().includes("Collector received no interactions before ending with reason: time")) {
+                message.delete()
+                interaction.user.send(BaseMenu.MENU_EXPIRTATION_MESSAGE);
+            }
         }
     }
 
