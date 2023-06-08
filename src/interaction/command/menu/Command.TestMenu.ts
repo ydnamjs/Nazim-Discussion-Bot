@@ -1,7 +1,7 @@
 import { CommandInteraction, Client, ButtonBuilder, ActionRowBuilder, ButtonComponentData, ButtonStyle} from "discord.js";
 import { Command } from "../interface.Command";
 
-import { MenuNavigated } from "./class.MenuNavigated";
+import { NavigatedMenu } from "./class.NavigatedMenu";
 import { BaseMenu } from "./class.BaseMenu";
 import { MenuData } from "./interface.MenuData";
 
@@ -99,10 +99,10 @@ export const testMenu: Command = {
         }
 
         // sample menu
-        const sampleMenuNavigated = new MenuNavigated("NAVIGATION", "NO READING", fields, [], []);
+        const sampleNavigatedMenu = new NavigatedMenu("NAVIGATION", "NO READING", fields, [], []);
 
         // sample menu
-        const messageLink = (await sampleMenuNavigated.send(client, interaction)).url;
+        const messageLink = (await sampleNavigatedMenu.send(client, interaction)).url;
 
         // Let them know that they have been DM'd the discussion menu
         await interaction.followUp({

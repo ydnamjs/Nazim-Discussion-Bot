@@ -3,6 +3,8 @@ import { ComponentBehavior, MenuData} from "./interface.MenuData";
 import { BaseMenu } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 
+
+
 // NAVIGATION BUTTONS
 
 const PREV_PAGE_CUSTOMID = "discussion_previous_page_button";
@@ -102,7 +104,7 @@ const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
 }
 
 // MENU CLASS
-export class MenuNavigated extends BaseMenu{
+export class NavigatedMenu extends BaseMenu{
 
     constructor(title: string, description: string, fields: {name: string, value: string}[], additionalComponents: ActionRowBuilder<ButtonBuilder>[], additionalButtonBehaviors: ComponentBehavior[]) {
 
