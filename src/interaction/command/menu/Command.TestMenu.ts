@@ -2,8 +2,6 @@ import { CommandInteraction, Client, ButtonBuilder, ActionRowBuilder, ButtonComp
 import { Command } from "../interface.Command";
 
 import { CustomNavOptions, NavigatedMenu } from "./class.NavigatedMenu";
-import { BaseMenu } from "./class.BaseMenu";
-import { MenuData } from "./interface.MenuData";
 
 
 // constants
@@ -107,10 +105,6 @@ export const testMenu: Command = {
             additionalButtonBehaviors:[], 
             additionalComponents: sampleAdditionalComponents
         }, sampleNavOptions);
-
-
-
-
 
         // sample menu
         const messageLink = (await sampleNavigatedMenu.send(client, interaction)).url;
