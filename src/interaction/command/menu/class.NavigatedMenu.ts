@@ -1,6 +1,6 @@
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, ButtonStyle, Client, ComponentType, EmbedBuilder, InteractionButtonComponentData, Message, MessageCreateOptions, User } from "discord.js";
 import { ComponentBehavior, MenuData} from "./interface.MenuData";
-import { BaseMenu } from "./class.BaseMenu";
+import { BaseMenu, buttonData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 
 export interface NavigatedMenuData {
@@ -33,27 +33,39 @@ const CLOSE_MENU_LABEL = "close menu";
 const CLOSE_MENU_DISABLED = false;
 const CLOSE_MENU_STYLE = ButtonStyle.Danger;
 
-function makeNavigationRow( specialMenuButton?: {
-    customId: string,
-    label: string
-    disabled: boolean
-    style: ButtonStyle,
-}) {
+function makeNavigationRow( 
+    prevButtonOptions: {
+        customId?: string,
+        label?: string,
+        disabled?: boolean,
+    }, 
+    nextButtonOptions: {
+        customId?: string,
+        label?: string,
+        disabled?: boolean,
+    }, 
+    specialMenuButton?: {
+        customId: string,
+        label: string,
+        disabled: boolean,
+        style: ButtonStyle,
+    }
+) {
     
     // add the previous and next page buttons
-    const navButtonData = [
+    const navButtonData: buttonData[] = [
         // previous page
         {
-            customId: PREV_PAGE_CUSTOMID,
-            label: PREV_PAGE_LABEL,
-            disabled: PREV_PAGE_DISABLED,
+            customId: prevButtonOptions.customId !== undefined ? prevButtonOptions.customId : PREV_PAGE_CUSTOMID,
+            label: prevButtonOptions.label !== undefined ? prevButtonOptions.label : PREV_PAGE_LABEL,
+            disabled: prevButtonOptions.disabled !== undefined ? prevButtonOptions.disabled : PREV_PAGE_DISABLED,
             style: PREV_PAGE_STYLE,
         },
         // next page
         {
-            customId: NEXT_PAGE_CUSTOMID,
-            label: NEXT_PAGE_LABEL,
-            disabled: NEXT_PAGE_DISABLED,
+            customId: nextButtonOptions.customId !== undefined ? nextButtonOptions.customId : NEXT_PAGE_CUSTOMID,
+            label: nextButtonOptions.label !== undefined ? nextButtonOptions.label : NEXT_PAGE_LABEL,
+            disabled: nextButtonOptions.disabled !== undefined ? nextButtonOptions.disabled : NEXT_PAGE_DISABLED,
             style: NEXT_PAGE_STYLE,
         },
     ];
@@ -114,7 +126,7 @@ export class NavigatedMenu extends BaseMenu{
 
     constructor(menuData: NavigatedMenuData) {
 
-        const navigationRow = makeNavigationRow();
+        const navigationRow = makeNavigationRow({}, {}, {customId: "I'm special", label: "Im special", disabled: false, style: ButtonStyle.Secondary});
 
         const superMenuData: MenuData = {
             title: menuData.title,

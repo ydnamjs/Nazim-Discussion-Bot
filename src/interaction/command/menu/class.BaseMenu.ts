@@ -1,5 +1,12 @@
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, Client, EmbedBuilder, Message, MessageCreateOptions } from "discord.js";
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, ButtonStyle, Client, EmbedBuilder, Message, MessageCreateOptions } from "discord.js";
 import { ComponentBehavior, MenuData } from "./interface.MenuData";
+
+export interface buttonData {
+    customId: string, 
+    label:string, disabled: 
+    boolean, 
+    style: ButtonStyle
+};
 
 // The maximum number of components discord allows in a message
 // Having more than this number in a menu causes problems because a menu is just a special message
