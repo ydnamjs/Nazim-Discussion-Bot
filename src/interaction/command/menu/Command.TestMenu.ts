@@ -1,7 +1,7 @@
 import { CommandInteraction, Client, ButtonBuilder, ActionRowBuilder, ButtonComponentData, ButtonStyle} from "discord.js";
 import { Command } from "../interface.Command";
 
-import { NavigatedMenu } from "./class.NavigatedMenu";
+import { CustomNavOptions, NavigatedMenu } from "./class.NavigatedMenu";
 import { BaseMenu } from "./class.BaseMenu";
 import { MenuData } from "./interface.MenuData";
 
@@ -87,6 +87,18 @@ export const testMenu: Command = {
             makeActionRowButton(sampleButtonData4),
         ];
 
+        // sample navOptions
+        const sampleNavOptions: CustomNavOptions = {
+            prevButtonOptions: {label: "prev"},
+            nextButtonOptions: {label: "next", disabled: false},
+            specialMenuButton: {
+                customId: "im spec",
+                label: "im spec",
+                disabled: false,
+                style: ButtonStyle.Primary
+            }
+        }
+
         // sample menu
         const sampleNavigatedMenu = new NavigatedMenu({
             title: "NAVIGATION", 
@@ -94,7 +106,11 @@ export const testMenu: Command = {
             fields: fields, 
             additionalButtonBehaviors:[], 
             additionalComponents: sampleAdditionalComponents
-        });
+        }, sampleNavOptions);
+
+
+
+
 
         // sample menu
         const messageLink = (await sampleNavigatedMenu.send(client, interaction)).url;

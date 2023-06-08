@@ -3,6 +3,8 @@ import { ComponentBehavior, MenuData} from "./interface.MenuData";
 import { BaseMenu, buttonData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 
+
+
 export interface NavigatedMenuData {
     title: string, 
     description: string, 
@@ -33,50 +35,44 @@ const CLOSE_MENU_LABEL = "close menu";
 const CLOSE_MENU_DISABLED = false;
 const CLOSE_MENU_STYLE = ButtonStyle.Danger;
 
-function makeNavigationRow( 
-    prevButtonOptions: {
-        customId?: string,
-        label?: string,
-        disabled?: boolean,
-    }, 
-    nextButtonOptions: {
-        customId?: string,
-        label?: string,
-        disabled?: boolean,
-    }, 
-    specialMenuButton?: {
-        customId: string,
-        label: string,
-        disabled: boolean,
-        style: ButtonStyle,
-    }
-) {
+interface customPageButtonData {
+    customId?: string, 
+    label?:string, 
+    disabled?: boolean, 
+};
+export interface CustomNavOptions {    
+    prevButtonOptions: customPageButtonData, 
+    nextButtonOptions: customPageButtonData, 
+    specialMenuButton?: buttonData
+}
+
+function makeNavigationRow(customNavOptions: CustomNavOptions) {
     
     // add the previous and next page buttons
     const navButtonData: buttonData[] = [
         // previous page
         {
-            customId: prevButtonOptions.customId !== undefined ? prevButtonOptions.customId : PREV_PAGE_CUSTOMID,
-            label: prevButtonOptions.label !== undefined ? prevButtonOptions.label : PREV_PAGE_LABEL,
-            disabled: prevButtonOptions.disabled !== undefined ? prevButtonOptions.disabled : PREV_PAGE_DISABLED,
+            customId: customNavOptions.prevButtonOptions.customId !== undefined ? customNavOptions.prevButtonOptions.customId : PREV_PAGE_CUSTOMID,
+            label: customNavOptions.prevButtonOptions.label !== undefined ? customNavOptions.prevButtonOptions.label : PREV_PAGE_LABEL,
+            disabled: customNavOptions.prevButtonOptions.disabled !== undefined ? customNavOptions.prevButtonOptions.disabled : PREV_PAGE_DISABLED,
             style: PREV_PAGE_STYLE,
         },
         // next page
         {
-            customId: nextButtonOptions.customId !== undefined ? nextButtonOptions.customId : NEXT_PAGE_CUSTOMID,
-            label: nextButtonOptions.label !== undefined ? nextButtonOptions.label : NEXT_PAGE_LABEL,
-            disabled: nextButtonOptions.disabled !== undefined ? nextButtonOptions.disabled : NEXT_PAGE_DISABLED,
+            customId: customNavOptions.nextButtonOptions.customId !== undefined ? customNavOptions.nextButtonOptions.customId : NEXT_PAGE_CUSTOMID,
+            label: customNavOptions.nextButtonOptions.label !== undefined ? customNavOptions.nextButtonOptions.label : NEXT_PAGE_LABEL,
+            disabled: customNavOptions.nextButtonOptions.disabled !== undefined ? customNavOptions.nextButtonOptions.disabled : NEXT_PAGE_DISABLED,
             style: NEXT_PAGE_STYLE,
         },
     ];
 
     // if the parent menu isnt the main menu than add it (we wouldnt want to have two main menu buttons)
-    if(specialMenuButton) {
+    if(customNavOptions.specialMenuButton) {
         navButtonData.push({
-            customId: specialMenuButton.customId,
-            label: specialMenuButton.label,
-            disabled: specialMenuButton.disabled,
-            style: specialMenuButton.style,
+            customId: customNavOptions.specialMenuButton.customId,
+            label: customNavOptions.specialMenuButton.label,
+            disabled: customNavOptions.specialMenuButton.disabled,
+            style: customNavOptions.specialMenuButton.style,
         });
     }
     
@@ -124,9 +120,17 @@ const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
 // MENU CLASS
 export class NavigatedMenu extends BaseMenu{
 
-    constructor(menuData: NavigatedMenuData) {
-
-        const navigationRow = makeNavigationRow({}, {}, {customId: "I'm special", label: "Im special", disabled: false, style: ButtonStyle.Secondary});
+    constructor(menuData: NavigatedMenuData, customNavOptions?: CustomNavOptions) {
+        let navigationRow;
+        if(customNavOptions){
+            navigationRow = makeNavigationRow(customNavOptions);
+        }
+        else {
+            navigationRow = makeNavigationRow({
+                prevButtonOptions: {},
+                nextButtonOptions: {}
+            });
+        }
 
         const superMenuData: MenuData = {
             title: menuData.title,
