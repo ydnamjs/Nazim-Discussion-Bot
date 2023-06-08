@@ -1,6 +1,4 @@
 import { Client, GatewayIntentBits, Partials } from "discord.js";
-
-//secrets like database connection and discord token that are top secret and not put on github
 import { DISCORD_TOKEN, MONGODB_SRV } from "./secret";
 
 //import event listeners
@@ -11,41 +9,59 @@ import onlineLogger from "./util.OnlineLogger";
 //import database connection thing
 const mongoose = require("mongoose");
 
-console.log("Bot is starting...");
 
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.DirectMessages,
-    ],
-    partials: [
-        //not really sure what this is but it's needed for the bot to recognize when it recieves a DM for some reason
-        Partials.Channel
-    ]
-});
+// MAIN CALL
+main();
 
-//connect to database
-console.log("Attempting to connect to the database...");
-mongoose.connect(
-    MONGODB_SRV, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }
-).then(()=>{
-    console.log("Successfully connected to the database!")
-}).catch((err: Error) => {
-    console.log(err);
-});
+/**
+ * @function The main function of the entire project.
+ * This is the actual running bot.
+ */
+async function main() {
 
-addListeners();
+    console.log("Bot is starting...");
 
-//log in to discord
-client.login(DISCORD_TOKEN);
+    const client = new Client({
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.MessageContent,
+            GatewayIntentBits.DirectMessages,
+        ],
+        partials: [
+            Partials.Channel //not really sure what this is but it's needed for the bot to recognize when it recieves a DM for some reason
+        ]
+    });
 
+    //connect to database
+    console.log("Attempting to connect to the database...");
+    await mongoose.connect(
+        MONGODB_SRV, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        }
+    ).then(()=>{
+        console.log("Successfully connected to the database!")
+    }).catch((err: Error) => {
+        console.log(err);
+    });
+
+    // add the listeners to the client so that it can interact with the world
+    addListeners(client);
+
+    //log in to discord
+    client.login(DISCORD_TOKEN);
+}
+    
 //function that adds all of the event listeners from the listeners folder
-function addListeners() {
+/**
+ * @function Adds event listeners to the given client
+ * 
+ * @param {Client} client - The client to add event listeners to
+ * 
+ * @note listeners are defined and imported from subfolder: "interaction"
+ */
+function addListeners(client: Client) {
     console.log("adding listeners...");
     onlineLogger(client);
     commandListener(client);
