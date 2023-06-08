@@ -1,23 +1,27 @@
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions } from "discord.js";
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions } from "discord.js";
 
-// interface that defines interaction component behavior in menus
-// every interaction component has a custom id but no way to define functionality
-// so we create collectors that fire when an interaction is recieved and then look at the custom id to determine the behavior
-// this interface is really an object consisting of two functions: filter and resultingAction
-// filter is meant to determine if the resulting action should fire and resultingAction is the behavior that is to be executed
-// "why not just have filter be a string and define it later as check for if interaction.customID === filterString?" I hear you ask
-// because then you cant specify patterns beyond an identical id.
-// for example what if you wanted a function to fire for when the id was "page-1" "page-3" and "page-5" ...
-// you could list every id from "page-1" to "page-99999" or...
-// use the following function: (customId: string): boolean => { return ( (customId.substring(0, 5) === "page-") && (parseInt(customId.substring(5)) / 2 === 1)) }
+/**  
+ * @interface interface of filter and action function
+ * @property {function} filter - function that defines if the resulting action should execute
+ * @property {function} resultingAction - function to be ran when the filter evaluates to true
+ * @description the purpose of this structure is to be able to create a list of behaviors for buttons in a menu based on more than matching an id exactly.
+ * For example being able to execute on a function if the first 5 characters are "page-" and you wanted the same behavior for buttons "page-1" "page-2" and "page-3" ...
+*/
 export interface ComponentBehavior {
     filter: (customId: string) => boolean;
-    resultingAction: ( client: Client, interaction: BaseInteraction, message: Message, componentInteraction: MessageComponentInteraction ) => void;
+    resultingAction: ( message: Message, componentInteraction: MessageComponentInteraction ) => void;
 }
 
-// interface that defines the input data for the menu class
-// all of the complex behavior is defined and described in comments above
-// after that it's just a regular old interface
+/** 
+ * @interface that defines the input data for the menu class
+ * @property {String} title - the title of the menu
+ * @property {String} description - the description of the menu
+ * @property {object[]} fields - list of title descriptions pairs for the menu content
+ * @property {String} fields.name - name of the list element to be displayed in the menu
+ * @property {String} fields.value - description of the list element to be displayed in the menu
+ * @property {ActionRowBuilder} components - discord.js interaction rows of components to be put under the menu
+ * @property {ComponentBehavior[]} buttonBehaviors - the behaviors of the buttons see ComponentBehavior interface in class.BaseMenu.ts
+*/ 
 export interface MenuData {
     title: string, // Title that appears in the embed portion of the menu
     description: string, // Description that appears in the embed portion of the menu
@@ -26,41 +30,65 @@ export interface MenuData {
     buttonBehaviors?: ComponentBehavior[], // Component Behavior list for buttons in the menu (see above for what this means)
 }
 
+/**
+ * @interface data to make a button DOES NOT INCLUDE BEHAVIOR
+ * @property {string} customId - id that must be unique and is used for determing behavior
+ * @property {string} label - the text to be displayed on the button
+ * @property {boolean} disabled - whether the button is disabled or not. disabled buttons are faded out and can not be clicked
+ * @property {enum: ButtonStyle} style - the style of the button see https://discordjs.guide/message-components/buttons.html#button-styles
+ */
 export interface buttonData {
     customId: string, 
-    label:string, disabled: 
-    boolean, 
+    label:string, 
+    disabled: boolean, 
     style: ButtonStyle
 };
 
-// The maximum number of components discord allows in a message
-// Having more than this number in a menu causes problems because a menu is just a special message
+/**
+ *  @constant The maximum number of components discord allows in a message
+*/
 const MAX_NUMBER_OF_COMPONENTS = 5; 
 
+/**
+ * @class Base Menu is an interactive menu that is meant to be sent as a message to a user to display information about the discussion tracking feature
+ * @param {MenuData} menuData - the data used to construct the menu
+ */
 export class BaseMenu {
 
 // MENU MESSAGING
 
-    // message data member
-    // object that is used to construct a message that shows the visual aspect of the menu to be sent to a user as a direct message
+    /** @member {MessageCreateOptions} object that is used to construct a message containing the embed and components */
     menuMessageData: MessageCreateOptions;
 
-    // sends the menu to the user specified's DM's and returns the message sent
+    /** 
+     * @function sends the menu as a message to the interaction user as a direct message
+     * @param {Client} client - the client that the bot is logged in as
+     * @param {BaseInteraction} interaction - the interaction that spawned this menu
+     * @returns {Promise<Message<false>>} - the message that was sent
+     */
     async send(client: Client, interaction: BaseInteraction): Promise<Message<false>> {
         const sentMenuMessage = await interaction.user.send(this.menuMessageData);
-        this.collectButtonInteraction(client, interaction, sentMenuMessage)
+        this.collectButtonInteraction(interaction, sentMenuMessage)
         return sentMenuMessage;
     }
 
 // BUTTON BEHAVIOR
 
+    /** @constant The message sent to the user when the menu expires due to inactivity */
     private static MENU_EXPIRTATION_MESSAGE = "Your discussion menu expired due to inactivity";
+    /** @constant the amount of time in miliseconds before the menu expires (gets deleted) */
     private static MENU_EXPIRATION_TIME = 600_000;
 
-    // menu member that holds all of the button behavior information
-    buttonBehaviors: ComponentBehavior[];
+    /** @member list of all the behaviors for the buttons */
+    private buttonBehaviors: ComponentBehavior[];
 
-    async collectButtonInteraction(client: Client, interaction: BaseInteraction, message: Message ): Promise<void> {
+    /** 
+     * @function handles the collection of interactions on the menu when it is sent
+     * @param {Client} client - the client that the bot is logged in as
+     * @param {BaseInteraction} interaction - the interaction that the menu belongs to
+     * @param {Message} message - the message from which the button interactions are being collected
+     */
+    async collectButtonInteraction(interaction: BaseInteraction, message: Message ): Promise<void> {
         try {
 
             // Filter that checks if id of the button clicker matches the id of the menu reciever (should always be that way since DM but just in case)
@@ -72,7 +100,7 @@ export class BaseMenu {
             // For every button behavior, if the check function returns true, execute the resulting action
             this.buttonBehaviors.forEach( (behavior: ComponentBehavior) => {
                 if(behavior.filter(buttonPressed.customId)) {
-                    behavior.resultingAction(client, interaction, message, buttonPressed);
+                    behavior.resultingAction(message, buttonPressed);
                 }
             })
         }

@@ -59,7 +59,7 @@ async function main() {
  * 
  * @param {Client} client - The client to add event listeners to
  * 
- * @note listeners are defined and imported from subfolder: "interaction"
+ * @note listeners are defined and imported from subfolder:  "interaction"
  */
 function addListeners(client: Client) {
     console.log("adding listeners...");

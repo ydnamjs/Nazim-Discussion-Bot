@@ -4,7 +4,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonComponentData } from "discord.js
 
 const MAX_BUTTONS_PER_ROW = 5; // 5 is chosen because that is discord's current limit (as of 6/5/2023:MM/DD/YYYY) https://discord.com/developers/docs/interactions/message-components#buttons
 const EMPTY_ARRAY_ERROR_MESSAGE = "ERROR: makeButtonRow called with empty buttonRowData! Make Sure To Always Have At Least One Element";
-const MAX_BUTTONS_EXCEEDED_WARNING_MESSAGE = "WARNING: number of buttons in makeButtonRow has exceeded max amount of displayable buttons. Any buttons beyond the limit quantity will not exist";
+const MAX_BUTTONS_EXCEEDED_ERROR_MESSAGE = "ERROR: number of buttons in makeButtonRow has exceeded max amount of displayable buttons";
 
 // helper function to construct action row builders for rows of buttons
 // useful because it saves me from having to write out all the make builders
@@ -17,7 +17,7 @@ export function makeActionRowButton( buttonRowData: Partial<ButtonComponentData>
 
     // Give warning if array length is longer than max length
     if(buttonRowData.length > MAX_BUTTONS_PER_ROW) {
-        console.warn(MAX_BUTTONS_EXCEEDED_WARNING_MESSAGE);
+        throw new Error(MAX_BUTTONS_EXCEEDED_ERROR_MESSAGE);
     }
 
     // Make a button builder for each piece of data provided up to the limit or until out of data
