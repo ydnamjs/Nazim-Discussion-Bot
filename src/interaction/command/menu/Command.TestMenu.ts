@@ -1,7 +1,7 @@
 import { CommandInteraction, Client, ButtonBuilder, ActionRowBuilder, ButtonComponentData, ButtonStyle} from "discord.js";
 import { Command } from "../interface.Command";
 
-import { BaseMenu } from "./class.BaseMenu";
+import { BaseMenu } from "./class.MenuNavigated";
 import { MenuData, assertValidComponentMenuArray } from "./interface.MenuData";
 
 // constants
