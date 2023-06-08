@@ -8,7 +8,6 @@ import { CommandInteraction, ChatInputApplicationCommandData, Client } from "dis
  * 
  * @property {Function} run - the function to be run when the command is called
  * 
- *
  */
 export interface Command extends ChatInputApplicationCommandData {
     run: (client: Client, interaction: CommandInteraction) => void;
