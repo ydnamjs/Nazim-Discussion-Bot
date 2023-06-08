@@ -1,153 +1,69 @@
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, ButtonStyle, Client, ComponentType, EmbedBuilder, InteractionButtonComponentData, Message, MessageCreateOptions, User } from "discord.js";
-import { ComponentBehavior, MenuData, assertValidComponentMenuArray } from "./interface.MenuData";
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions } from "discord.js";
 
-// MENU CLASS
+// interface that defines interaction component behavior in menus
+// every interaction component has a custom id but no way to define functionality
+// so we create collectors that fire when an interaction is recieved and then look at the custom id to determine the behavior
+// this interface is really an object consisting of two functions: filter and resultingAction
+// filter is meant to determine if the resulting action should fire and resultingAction is the behavior that is to be executed
+// "why not just have filter be a string and define it later as check for if interaction.customID === filterString?" I hear you ask
+// because then you cant specify patterns beyond an identical id.
+// for example what if you wanted a function to fire for when the id was "page-1" "page-3" and "page-5" ...
+// you could list every id from "page-1" to "page-99999" or...
+// use the following function: (customId: string): boolean => { return ( (customId.substring(0, 5) === "page-") && (parseInt(customId.substring(5)) / 2 === 1)) }
+export interface ComponentBehavior {
+    filter: (customId: string) => boolean;
+    resultingAction: ( client: Client, interaction: BaseInteraction, message: Message, componentInteraction: MessageComponentInteraction ) => void;
+}
+
+// interface that defines the input data for the menu class
+// all of the complex behavior is defined and described in comments above
+// after that it's just a regular old interface
+export interface MenuData {
+    title: string, // Title that appears in the embed portion of the menu
+    description: string, // Description that appears in the embed portion of the menu
+    fields: {name: string, value: string}[], // Fields that make up the embed
+    components?: ActionRowBuilder<ButtonBuilder>[], // InteractionComponent rows that follow the embed in the menu 
+    buttonBehaviors?: ComponentBehavior[], // Component Behavior list for buttons in the menu (see above for what this means)
+}
+
+export interface buttonData {
+    customId: string, 
+    label:string, disabled: 
+    boolean, 
+    style: ButtonStyle
+};
+
+// The maximum number of components discord allows in a message
+// Having more than this number in a menu causes problems because a menu is just a special message
+const MAX_NUMBER_OF_COMPONENTS = 5; 
+
 export class BaseMenu {
 
-// MAKE BUTTON ROW HELPER FUNCTION
+// MENU MESSAGING
 
-    private static MAX_BUTTONS_PER_ROW = 5; // 5 is chosen because that is discord's current limit (as of 6/5/2023:MM/DD/YYYY) https://discord.com/developers/docs/interactions/message-components#buttons
-    private static EMPTY_ARRAY_ERROR_MESSAGE = "ERROR: makeButtonRow called with empty buttonRowData! Make Sure To Always Have At Least One Element";
-    private static MAX_BUTTONS_EXCEEDED_WARNING_MESSAGE = "WARNING: number of buttons in makeButtonRow has exceeded max amount of displayable buttons. Any buttons beyond the limit quantity will not exist";
+    // message data member
+    // object that is used to construct a message that shows the visual aspect of the menu to be sent to a user as a direct message
+    menuMessageData: MessageCreateOptions;
 
-    // helper function to construct action row builders for rows of buttons
-    // useful because it saves me from having to write out all the make builders
-    protected makeActionRowButton( buttonRowData: Partial<ButtonComponentData>[]): ActionRowBuilder<ButtonBuilder> {
-    
-        // Throw error if array is empty
-        if(buttonRowData.length < 1) {
-            throw new Error(BaseMenu.EMPTY_ARRAY_ERROR_MESSAGE)
-        }
-    
-        // Give warning if array length is longer than max length
-        if(buttonRowData.length > BaseMenu.MAX_BUTTONS_PER_ROW) {
-            console.warn(BaseMenu.MAX_BUTTONS_EXCEEDED_WARNING_MESSAGE);
-        }
-    
-        // Make a button builder for each piece of data provided up to the limit or until out of data
-        const buttons: ButtonBuilder[] = [];
-        for(let count = 0; count < BaseMenu.MAX_BUTTONS_PER_ROW && count < buttonRowData.length; count++) {
-            buttons.push(new ButtonBuilder(buttonRowData[count]));
-        }
-        
-        //create an action row builder using buttons and return that
-        return new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
+    // sends the menu to the user specified's DM's and returns the message sent
+    async send(client: Client, interaction: BaseInteraction): Promise<Message<false>> {
+        const sentMenuMessage = await interaction.user.send(this.menuMessageData);
+        this.collectButtonInteraction(client, interaction, sentMenuMessage)
+        return sentMenuMessage;
     }
 
-// NAVIGATION BUTTONS
-
-    protected PARENT_MENU_IS_MAIN_MENU = false;
-
-    protected PREV_PAGE_CUSTOMID = "discussion_previous_page_button";
-    protected PREV_PAGE_LABEL = "previous page";
-    protected PREV_PAGE_DISABLED = true;
-    private static PREV_PAGE_STYLE = ButtonStyle.Primary as number;
-
-    protected NEXT_PAGE_CUSTOMID = "discussion_next_page_button";
-    protected NEXT_PAGE_LABEL = "next page";
-    protected NEXT_PAGE_DISABLED = true;
-    private static NEXT_PAGE_STYLE = ButtonStyle.Primary as number;
-
-    protected PARENT_MENU_CUSTOMID = "discussion_parent_menu_button";
-    protected PARENT_MENU_LABEL = "parent menu";
-    protected PARENT_MENU_DISABLED = true;
-    private static PARENT_MENU_STYLE = ButtonStyle.Secondary as number;
-
-    private static MAIN_MENU_CUSTOMID = "discussion_main_menu_button";
-    private static MAIN_MENU_LABEL = "main menu";
-    protected MAIN_MENU_DISABLED = false;
-    private static MAIN_MENU_STYLE = ButtonStyle.Secondary as number;
-
-    private static CLOSE_MENU_CUSTOMID = "discussion_close_menu_button";
-    private static CLOSE_MENU_LABEL = "close menu";
-    private static CLOSE_MENU_DISABLED = false;
-    private static CLOSE_MENU_STYLE = ButtonStyle.Danger;
-
-    private static MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
-        filter: (customId: string) => {
-            return customId === BaseMenu.MAIN_MENU_CUSTOMID;
-        },
-        resultingAction: async (client, interaction, message, componentInteraction) => {
-            // TODO: update the menu to the main menu once the main menu class has been added
-            componentInteraction.reply("feature not yet implemented");
-        }
-    }
-
-    private static CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
-        filter: (customId: string) => {
-            return customId === BaseMenu.CLOSE_MENU_CUSTOMID;
-        },
-        resultingAction: async (client, interaction, message, componentInteraction) => {
-            await message.reply("Discussion menu closed");
-            message.delete();
-        }
-    }
-
-    private makeNavigationRow() {
-        
-        // add the previous and next page buttons
-        const navData = [
-            // previous page
-            {
-                customId: this.PREV_PAGE_CUSTOMID,
-                label: this.PREV_PAGE_LABEL,
-                disabled: this.PREV_PAGE_DISABLED,
-                style: BaseMenu.PREV_PAGE_STYLE,
-            },
-            // next page
-            {
-                customId: this.NEXT_PAGE_CUSTOMID,
-                label: this.NEXT_PAGE_LABEL,
-                disabled: this.NEXT_PAGE_DISABLED,
-                style: BaseMenu.NEXT_PAGE_STYLE,
-            },
-        ];
-
-        // if the parent menu isnt the main menu than add it (we wouldnt want to have two main menu buttons)
-        if(!this.PARENT_MENU_IS_MAIN_MENU) {
-            navData.push({
-                customId: this.PARENT_MENU_CUSTOMID,
-                label: this.PARENT_MENU_LABEL,
-                disabled: this.PARENT_MENU_DISABLED,
-                style: BaseMenu.PARENT_MENU_STYLE,
-            });
-        }
-        
-        // add the main menu and the close menu buttons
-        navData.push(            
-        // home/main menu
-        {
-            customId: BaseMenu.MAIN_MENU_CUSTOMID,
-            label: BaseMenu.MAIN_MENU_LABEL,
-            disabled: this.MAIN_MENU_DISABLED,
-            style: BaseMenu.MAIN_MENU_STYLE,
-        },
-        // close menu
-        {
-            customId: BaseMenu.CLOSE_MENU_CUSTOMID,
-            label: BaseMenu.CLOSE_MENU_LABEL,
-            disabled: BaseMenu.CLOSE_MENU_DISABLED,
-            style: BaseMenu.CLOSE_MENU_STYLE,
-        })
-
-        return this.makeActionRowButton(navData);
-    }
-
-    // navigation button row data member
-    // this member holds the data used to generate the navigation menu buttons in the constructor
-    // it is protected and not static because subclasses should be able to change the look of the buttons to some degree
-
-// BUTTON BEHAVIOR MANAGEMENT
+// BUTTON BEHAVIOR
 
     private static MENU_EXPIRTATION_MESSAGE = "Your discussion menu expired due to inactivity";
-    private static MENU_EXPIRATION_TIME = 5_000;
+    private static MENU_EXPIRATION_TIME = 600_000;
 
+    // menu member that holds all of the button behavior information
     buttonBehaviors: ComponentBehavior[];
 
     async collectButtonInteraction(client: Client, interaction: BaseInteraction, message: Message ): Promise<void> {
         try {
 
-            // Filter function that checks if id of the button clicker matches the id of the menu reciever (should always be that way since DM but just in case)
+            // Filter that checks if id of the button clicker matches the id of the menu reciever (should always be that way since DM but just in case)
             const collectorFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
 
             // Get the button that was pressed if one was pressed before menu expires
@@ -171,53 +87,30 @@ export class BaseMenu {
         }
     }
 
-// MENU MESSAGING
-
-    // message data member
-    // object that is used to construct a message that shows the visual aspect of the menu to be sent to a user as a direct message
-    menuMessageData: MessageCreateOptions;
-
-    // sends the menu to the user specified's DM's and returns the message sent
-    async send(client: Client, interaction: BaseInteraction): Promise<Message<false>> {
-        const sentMenuMessage = await interaction.user.send(this.menuMessageData);
-        this.collectButtonInteraction(client, interaction, sentMenuMessage)
-        return sentMenuMessage;
-    }
-
-// SET UP
-
     constructor(menuData: MenuData) {
-        
-        // create an embed for the menu using the data provided in menu data
+
+        // build an embed as the menu's display
         const menuEmbed = new EmbedBuilder({
             title: menuData.title,
             description: menuData.description,
             fields: menuData.fields
         });
 
-        // create the navitagion bar using data in the class member
-        // see class member "NAVIGATION_ROW_BUTTON_DATA" for more information
-        //const navigationActionRow = this.makeActionRowButton( this.navigationRowButtonData );
-        const navigationActionRow = this.makeNavigationRow();
+        // components can be a max of 5 rows
+        if(menuData.components && menuData.components.length > MAX_NUMBER_OF_COMPONENTS) {
 
-        // create an array to store all the components that the menu will have and start by putting the navigation row in it
-        let menuComponents = [navigationActionRow];
-
-        // if additional components were supplied, add those to
-        if(menuData.additionalComponents) {
-            menuComponents = [...menuComponents, ...menuData.additionalComponents]
         }
 
         // construct the menuMessageData to be sent to the user
         this.menuMessageData = { 
             embeds: [menuEmbed],
-            components: menuComponents
+            components: menuData.components
         }
 
+        // define the behaviors for the menu's buttons
         this.buttonBehaviors = [];
-        if(menuData.additionalButtonBehaviors) {
-            this.buttonBehaviors = [...menuData.additionalButtonBehaviors];
+        if(menuData.buttonBehaviors) {
+            this.buttonBehaviors = menuData.buttonBehaviors;
         }
-        this.buttonBehaviors.push(BaseMenu.MAIN_MENU_BUTTON_BEHAVIOR, BaseMenu.CLOSE_MENU_BUTTON_BEHAVIOR);
     }
 }

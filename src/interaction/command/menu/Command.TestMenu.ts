@@ -1,8 +1,8 @@
 import { CommandInteraction, Client, ButtonBuilder, ActionRowBuilder, ButtonComponentData, ButtonStyle} from "discord.js";
 import { Command } from "../interface.Command";
 
-import { BaseMenu } from "./class.BaseMenu";
-import { MenuData, assertValidComponentMenuArray } from "./interface.MenuData";
+import { CustomNavOptions, NavigatedMenu } from "./class.NavigatedMenu";
+
 
 // constants
 const MENU_SENT_MESSAGE = "CourseStudent menu was sent to your direct messages. Click Here: ";
@@ -15,8 +15,6 @@ export const testMenu: Command = {
         // direct Message the user the menu being tested
         
         // sample constants
-        const title = "Sample Title";
-        const description = "sample desc";
         const fields = [
             {
                 name: "field 1",
@@ -69,6 +67,16 @@ export const testMenu: Command = {
             });
         }
 
+        const sampleButtonData5: Partial<ButtonComponentData>[] = [];
+        for (let i = 21; i < 26; i++) {
+            sampleButtonData5.push({
+                customId: "test" + i,
+                label: "button" + i,
+                disabled: false,
+                style: ButtonStyle.Primary
+            });
+        }
+
         // sample additional components
         const sampleAdditionalComponents = [
             makeActionRowButton(sampleButtonData1),
@@ -76,21 +84,30 @@ export const testMenu: Command = {
             makeActionRowButton(sampleButtonData3),
             makeActionRowButton(sampleButtonData4),
         ];
-        assertValidComponentMenuArray(sampleAdditionalComponents);
 
-        // sample menu data
-        const sampleMenuData: MenuData = {
-            title: title,
-            description: description,
-            fields: fields,
-            additionalComponents: sampleAdditionalComponents
+        // sample navOptions
+        const sampleNavOptions: CustomNavOptions = {
+            prevButtonOptions: {label: "prev"},
+            nextButtonOptions: {label: "next", disabled: false},
+            specialMenuButton: {
+                customId: "im spec",
+                label: "im spec",
+                disabled: false,
+                style: ButtonStyle.Primary
+            }
         }
 
         // sample menu
-        const sampleMenu = new BaseMenu(sampleMenuData);
+        const sampleNavigatedMenu = new NavigatedMenu({
+            title: "NAVIGATION", 
+            description: "NO READING", 
+            fields: fields, 
+            additionalButtonBehaviors:[], 
+            additionalComponents: sampleAdditionalComponents
+        }, sampleNavOptions);
 
         // sample menu
-        const messageLink = (await sampleMenu.send(client, interaction)).url;
+        const messageLink = (await sampleNavigatedMenu.send(client, interaction)).url;
 
         // Let them know that they have been DM'd the discussion menu
         await interaction.followUp({
