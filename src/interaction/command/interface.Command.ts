@@ -1,7 +1,7 @@
 import { CommandInteraction, ChatInputApplicationCommandData, Client } from "discord.js";
 
 /**
- * @interface {Command} command
+ * @interface Command
  * 
  * @description Interface that extends discords default ChatInputApplicationCommandData
  * useful because we can specify a run property so that we can declare command behavior with the definition of the command
