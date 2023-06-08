@@ -1,5 +1,9 @@
-import { BaseInteraction, Client, EmbedBuilder, Message, MessageCreateOptions } from "discord.js";
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, Client, EmbedBuilder, Message, MessageCreateOptions } from "discord.js";
 import { ComponentBehavior, MenuData } from "./interface.MenuData";
+
+// The maximum number of components discord allows in a message
+// Having more than this number in a menu causes problems because a menu is just a special message
+const MAX_NUMBER_OF_COMPONENTS = 5; 
 
 export class BaseMenu {
 
@@ -12,21 +16,22 @@ export class BaseMenu {
     // sends the menu to the user specified's DM's and returns the message sent
     async send(client: Client, interaction: BaseInteraction): Promise<Message<false>> {
         const sentMenuMessage = await interaction.user.send(this.menuMessageData);
-        //this.collectButtonInteraction(client, interaction, sentMenuMessage)
+        this.collectButtonInteraction(client, interaction, sentMenuMessage)
         return sentMenuMessage;
     }
 
 // BUTTON BEHAVIOR
 
     private static MENU_EXPIRTATION_MESSAGE = "Your discussion menu expired due to inactivity";
-    private static MENU_EXPIRATION_TIME = 5_000;
+    private static MENU_EXPIRATION_TIME = 600_000;
 
+    // menu member that holds all of the button behavior information
     buttonBehaviors: ComponentBehavior[];
 
     async collectButtonInteraction(client: Client, interaction: BaseInteraction, message: Message ): Promise<void> {
         try {
 
-            // Filter function that checks if id of the button clicker matches the id of the menu reciever (should always be that way since DM but just in case)
+            // Filter that checks if id of the button clicker matches the id of the menu reciever (should always be that way since DM but just in case)
             const collectorFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
 
             // Get the button that was pressed if one was pressed before menu expires
@@ -51,24 +56,29 @@ export class BaseMenu {
     }
 
     constructor(menuData: MenuData) {
+
+        // build an embed as the menu's display
         const menuEmbed = new EmbedBuilder({
             title: menuData.title,
             description: menuData.description,
             fields: menuData.fields
         });
 
-         // if additional components were supplied, add those to
-        let menuComponents = menuData.additionalComponents;
+        // components can be a max of 5 rows
+        if(menuData.components && menuData.components.length > MAX_NUMBER_OF_COMPONENTS) {
+
+        }
 
         // construct the menuMessageData to be sent to the user
         this.menuMessageData = { 
             embeds: [menuEmbed],
-            components: menuComponents
+            components: menuData.components
         }
 
+        // define the behaviors for the menu's buttons
         this.buttonBehaviors = [];
-        if(menuData.additionalButtonBehaviors) {
-            this.buttonBehaviors = menuData.additionalButtonBehaviors;
+        if(menuData.buttonBehaviors) {
+            this.buttonBehaviors = menuData.buttonBehaviors;
         }
     }
 }

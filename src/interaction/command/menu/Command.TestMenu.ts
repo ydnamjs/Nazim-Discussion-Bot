@@ -1,8 +1,10 @@
 import { CommandInteraction, Client, ButtonBuilder, ActionRowBuilder, ButtonComponentData, ButtonStyle} from "discord.js";
 import { Command } from "../interface.Command";
 
-import { BaseMenu } from "./class.MenuNavigated";
-import { MenuData, assertValidComponentMenuArray } from "./interface.MenuData";
+import { MenuNavigated } from "./class.MenuNavigated";
+import { BaseMenu } from "./class.BaseMenu";
+import { MenuData } from "./interface.MenuData";
+
 
 // constants
 const MENU_SENT_MESSAGE = "CourseStudent menu was sent to your direct messages. Click Here: ";
@@ -69,28 +71,38 @@ export const testMenu: Command = {
             });
         }
 
+        const sampleButtonData5: Partial<ButtonComponentData>[] = [];
+        for (let i = 21; i < 26; i++) {
+            sampleButtonData5.push({
+                customId: "test" + i,
+                label: "button" + i,
+                disabled: false,
+                style: ButtonStyle.Primary
+            });
+        }
+
         // sample additional components
         const sampleAdditionalComponents = [
             makeActionRowButton(sampleButtonData1),
             makeActionRowButton(sampleButtonData2),
             makeActionRowButton(sampleButtonData3),
             makeActionRowButton(sampleButtonData4),
+            makeActionRowButton(sampleButtonData5),
         ];
-        assertValidComponentMenuArray(sampleAdditionalComponents);
 
         // sample menu data
         const sampleMenuData: MenuData = {
             title: title,
             description: description,
             fields: fields,
-            additionalComponents: sampleAdditionalComponents
+            components: sampleAdditionalComponents
         }
 
         // sample menu
-        const sampleMenu = new BaseMenu(sampleMenuData);
+        const sampleMenuNavigated = new MenuNavigated("NAVIGATION", "NO READING", fields, [], []);
 
         // sample menu
-        const messageLink = (await sampleMenu.send(client, interaction)).url;
+        const messageLink = (await sampleMenuNavigated.send(client, interaction)).url;
 
         // Let them know that they have been DM'd the discussion menu
         await interaction.followUp({
