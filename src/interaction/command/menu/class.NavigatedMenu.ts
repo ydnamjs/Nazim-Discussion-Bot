@@ -2,8 +2,16 @@ import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, 
 import { BaseMenu, buttonData, ComponentBehavior, MenuData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 
-
-
+/**
+ * @interface NavigatedMenuData
+ * @property {String} title - the title of the menu
+ * @property {String} description - the description of the menu
+ * @property {object[]} fields - list of title descriptions pairs for the menu content
+ * @property {String} fields.name - name of the list element to be displayed in the menu
+ * @property {String} fields.value - description of the list element to be displayed in the menu
+ * @property {ActionRowBuilder} additionalComponents - discord.js interaction rows of components to be put under the navigation row. Max of 4
+ * @property {ComponentBehavior[]} buttonBehaviors - the behaviors of the buttons see ComponentBehavior interface in class.BaseMenu.ts
+ */
 export interface NavigatedMenuData {
     title: string, 
     description: string, 
@@ -33,18 +41,35 @@ const CLOSE_MENU_CUSTOMID = "discussion_close_menu_button";
 const CLOSE_MENU_LABEL = "close menu";
 const CLOSE_MENU_DISABLED = false;
 const CLOSE_MENU_STYLE = ButtonStyle.Danger;
-
+/**
+ * @interface interface for custom page buttons input
+ * @property {String} customId - **optional** the string for the button's id to be used in place of default
+ * @property {String} label - **optional** the text to be displayed on the button to be used in place of default
+ * @property {boolean} disabled - **optional** the state of if the button is disabled to be used in place of default
+ */
 interface customPageButtonData {
     customId?: string, 
     label?:string, 
     disabled?: boolean, 
 };
+
+/**
+ * @interface custom options for the navigation of the menu that overwrite the defaults
+ * @property {customPageButtonData} prevButtonOptions - options to overwrite the default previous page button
+ * @property {customPageButtonData} nextButtonOptions - options to overwrite the default next page button
+ * @property {buttonData} specialMenuButton - **optional** button data that specifies a special button that appears between next page and main menu if it exists
+ */
 export interface CustomNavOptions {    
     prevButtonOptions: customPageButtonData, 
     nextButtonOptions: customPageButtonData, 
     specialMenuButton?: buttonData
 }
 
+/**
+ * @function makes an ActionRowBuilder of the navigation buttons (typically used for a navigated menu)
+ * @param {CustomNavOptions} customNavOptions - object containing definitions for overwriting the defailt menu buttons (main menu and close menu are not changable nor is the the style of the page buttons)
+ * @returns {ActionRowBuilder} the row containing the navigation buttons specified by the customNavOptions and defaults
+ */
 function makeNavigationRow(customNavOptions: CustomNavOptions) {
     
     // add the previous and next page buttons
@@ -95,28 +120,34 @@ function makeNavigationRow(customNavOptions: CustomNavOptions) {
     return makeActionRowButton(navButtonData);
 }
 
+/** @constant behavior of the main menu button */
 const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     
     filter: (customId: string) => {
         return customId === MAIN_MENU_CUSTOMID;
     },
-    resultingAction: async (client, interaction, message, componentInteraction) => {
+    resultingAction: async ( _message, componentInteraction) => {
         // TODO: update the menu to the main menu once the main menu class has been added
         componentInteraction.reply("feature not yet implemented");
     }
 }
 
+/** @constant behavior of the close menu button */
 const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     filter: (customId: string) => {
         return customId === CLOSE_MENU_CUSTOMID;
     },
-    resultingAction: async (client, interaction, message, componentInteraction) => {
+    resultingAction: async ( message, componentInteraction) => {
         await message.reply("Discussion menu closed");
         message.delete();
     }
 }
 
-// MENU CLASS
+/**
+ * @class menu that contains a row of buttons for navigating through all the menus as the first row of components
+ * @param {NavigatedMenu} menuData - data used to generate the parts of the menu that are not defined by default
+ * @param {CustomNavOptions} customNavOptions - options used to modify some of the existing navigation buttons (prev and next page as well as a special middle button)
+ */
 export class NavigatedMenu extends BaseMenu{
 
     constructor(menuData: NavigatedMenuData, customNavOptions?: CustomNavOptions) {

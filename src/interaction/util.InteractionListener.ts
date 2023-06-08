@@ -1,9 +1,17 @@
 import { CommandInteraction, Client, Interaction } from "discord.js";
-import { commandList } from "./data.CommandList";
+import { commandList } from "./command/data.CommandList";
 
 // constants
-const COMMAND_NOT_FOUND_MESSAGE = "Error: Command Not Found"
+/**
+ * @constant - The message to reply to the user with when they send a command that does not exist
+ */
+const COMMAND_NOT_FOUND_MESSAGE = "Error: Command Not Found. Please contact an admin"
 
+/** 
+ * @function creates a listener for interactions on the given client
+ * 
+ * @param {Client} client - the client whose interactions should be listened for
+*/
 export default (client: Client): void => {
     client.on("interactionCreate", async (interaction: Interaction) => {
         
@@ -15,7 +23,15 @@ export default (client: Client): void => {
     });
 };
 
-const handleSlashCommand = async (client: Client, interaction: CommandInteraction): Promise<void> => {
+/**
+ * 
+ * @function handles finding and running a command for the client
+ * 
+ * @param {Client} client - the client to run the command for
+ * 
+ * @param {CommandInteraction} interaction - the interaction with the command to run
+ */
+async function handleSlashCommand(client: Client, interaction: CommandInteraction): Promise<void> {
     
     // find the command in the list
     const slashCommand = commandList.find(c => c.name === interaction.commandName);

@@ -5,6 +5,18 @@ import { commandList } from "./data.CommandList";
 // MAIN CALL
 main(process.argv[2], process.argv[3]);
 
+/**
+ * @function
+ * 
+ * @param {string} action - The action to do 
+ * - "reg" for registering 
+ * - "unreg" for unregistering commands (deleting)
+ * 
+ * @param {string} server - The server to do the action for 
+ * - "global" for all servers
+ * - "nazim" for the nazim test server
+ * - "ydna" for ydna's serer
+ */
 async function main(action: string, server: string) {
 
     // TODO: some of the stuff here can probably be removed. Not super urgent but if you have free time its something to do
