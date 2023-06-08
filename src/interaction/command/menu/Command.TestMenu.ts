@@ -17,8 +17,6 @@ export const testMenu: Command = {
         // direct Message the user the menu being tested
         
         // sample constants
-        const title = "Sample Title";
-        const description = "sample desc";
         const fields = [
             {
                 name: "field 1",
@@ -87,19 +85,16 @@ export const testMenu: Command = {
             makeActionRowButton(sampleButtonData2),
             makeActionRowButton(sampleButtonData3),
             makeActionRowButton(sampleButtonData4),
-            makeActionRowButton(sampleButtonData5),
         ];
 
-        // sample menu data
-        const sampleMenuData: MenuData = {
-            title: title,
-            description: description,
-            fields: fields,
-            components: sampleAdditionalComponents
-        }
-
         // sample menu
-        const sampleNavigatedMenu = new NavigatedMenu("NAVIGATION", "NO READING", fields, [], []);
+        const sampleNavigatedMenu = new NavigatedMenu({
+            title: "NAVIGATION", 
+            description: "NO READING", 
+            fields: fields, 
+            additionalButtonBehaviors:[], 
+            additionalComponents: sampleAdditionalComponents
+        });
 
         // sample menu
         const messageLink = (await sampleNavigatedMenu.send(client, interaction)).url;

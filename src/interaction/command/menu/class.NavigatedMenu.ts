@@ -3,7 +3,13 @@ import { ComponentBehavior, MenuData} from "./interface.MenuData";
 import { BaseMenu } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 
-
+export interface NavigatedMenuData {
+    title: string, 
+    description: string, 
+    fields: {name: string, value: string}[], 
+    additionalComponents: ActionRowBuilder<ButtonBuilder>[], 
+    additionalButtonBehaviors: ComponentBehavior[]
+}
 
 // NAVIGATION BUTTONS
 
@@ -106,16 +112,16 @@ const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
 // MENU CLASS
 export class NavigatedMenu extends BaseMenu{
 
-    constructor(title: string, description: string, fields: {name: string, value: string}[], additionalComponents: ActionRowBuilder<ButtonBuilder>[], additionalButtonBehaviors: ComponentBehavior[]) {
+    constructor(menuData: NavigatedMenuData) {
 
         const navigationRow = makeNavigationRow();
 
         const superMenuData: MenuData = {
-            title: title,
-            description: description,
-            fields: fields,
-            components: [navigationRow, ...additionalComponents],
-            buttonBehaviors: [MAIN_MENU_BUTTON_BEHAVIOR, CLOSE_MENU_BUTTON_BEHAVIOR , ...additionalButtonBehaviors]
+            title: menuData.title,
+            description: menuData.description,
+            fields: menuData.fields,
+            components: [navigationRow, ...menuData.additionalComponents],
+            buttonBehaviors: [MAIN_MENU_BUTTON_BEHAVIOR, CLOSE_MENU_BUTTON_BEHAVIOR , ...menuData.additionalButtonBehaviors]
         }
 
         super(superMenuData);
