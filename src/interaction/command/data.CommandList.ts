@@ -2,7 +2,7 @@
 import { Command } from "./interface.Command";
 
 // Imported commands
-import { testMenu } from "./menu/Command.TestMenu";
+import { testMenu } from "./menu/command.TestMenu";
 
 /**
  * @constant List of all the available commands
