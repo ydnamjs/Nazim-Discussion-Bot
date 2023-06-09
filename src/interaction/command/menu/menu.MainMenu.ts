@@ -13,7 +13,7 @@ const MAIN_MENU_FIELDS: {name: string,  value:string}[] = [];
 const MAIN_MENU_STUDENT_BUTTON_ID = "discussion_student_menu_button";
 const MAIN_MENU_STUDENT_BUTTON_LABEL = "student view";
 const MAIN_MENU_STUDENT_BUTTON_STYLE = ButtonStyle.Primary;
-const MAIN_MENU_STUDENT_BUTTON_DISABLED = false;
+const MAIN_MENU_STUDENT_BUTTON_DISABLED = true;
 
 const MAIN_MENU_STAFF_BUTTON_ID = "discussion_staff_menu_button";
 const MAIN_MENU_STAFF_BUTTON_LABEL = "staff view";
@@ -83,7 +83,7 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
 
             const staffMenu = new StaffMenu(courseInfo);
 
-            componentInteraction.update(staffMenu.menuMessageData as unknown as InteractionUpdateOptions);
+            componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
             staffMenu.collectButtonInteraction(componentInteraction, message);
         }
     },
