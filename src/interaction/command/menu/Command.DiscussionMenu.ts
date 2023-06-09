@@ -1,4 +1,4 @@
-import { CommandInteraction, Client, Interaction} from "discord.js";
+import { CommandInteraction, Client } from "discord.js";
 import { Command } from "../interface.Command";
 import { mainMenu } from "./menu.MainMenu";
 

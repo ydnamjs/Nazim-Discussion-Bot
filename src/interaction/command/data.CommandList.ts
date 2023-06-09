@@ -1,9 +1,9 @@
 // command interface
 import { Command } from "./interface.Command";
-import { DiscussionMenu } from "./menu/command.DiscussionMenu";
+import { DiscussionMenu } from "./menu/Command.DiscussionMenu";
 
 // Imported commands
-import { testMenu } from "./menu/command.TestMenu";
+import { testMenu } from "./menu/Command.TestMenu";
 
 /**
  * @constant List of all the available commands

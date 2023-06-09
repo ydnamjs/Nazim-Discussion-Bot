@@ -1,4 +1,4 @@
-import { CommandInteraction, Client, ButtonBuilder, ActionRowBuilder, ButtonComponentData, ButtonStyle, GuildMember, Guild, User, BaseInteraction} from "discord.js";
+import { CommandInteraction, Client } from "discord.js";
 import { Command } from "../interface.Command";
 
 //import mongoose from "mongoose";
