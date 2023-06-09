@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { BaseMenu, buttonData, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
+import { updateToMainMenu } from "./menu.MainMenu";
 
 /**
  * @interface NavigatedMenuData
@@ -126,10 +127,7 @@ const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     filter: (customId: string) => {
         return customId === MAIN_MENU_CUSTOMID;
     },
-    resultingAction: async ( _message, componentInteraction) => {
-        // TODO: update the menu to the main menu once the main menu class has been added
-        componentInteraction.reply("feature not yet implemented");
-    }
+    resultingAction: updateToMainMenu
 }
 
 /** @constant behavior of the close menu button */

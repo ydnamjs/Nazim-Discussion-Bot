@@ -2,6 +2,8 @@ import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonS
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../class.NavigatedMenu";
 import { Course, courseModel } from "../../../../models/Course";
 import { getRolesOfUserInGuild } from "../../../../util.getRolesOfUserInGuild";
+import { ComponentBehavior } from "../class.BaseMenu";
+import { updateToMainMenu } from "../menu.MainMenu";
 
 /**
  * @function updates a menu so that it is now a staff menu
@@ -49,6 +51,10 @@ export interface DiscussionCourseBasicData {
 
 const STAFF_MENU_TITLE = "My Courses";
 const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To access a specific course click the view course button and input the name of the course";
+
+const STAFF_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
+
+]
 
 /**
  * @class menu that displays basic info about a user's courses

@@ -1,4 +1,4 @@
-import { ButtonComponentData, ButtonStyle, Message, MessageComponentInteraction } from "discord.js";
+import { ButtonComponentData, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { BaseMenu, ComponentBehavior } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 import { updateToStaffMenu } from "./staff/class.StaffMenu";
@@ -67,3 +67,8 @@ export const mainMenu = new BaseMenu({
     components: MAIN_MENU_COMPONENTS,
     buttonBehaviors: MAIN_MENU_BUTTON_BEHAVIORS
 });
+
+export async function updateToMainMenu(message: Message, componentInteraction: MessageComponentInteraction) {
+    componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
+    mainMenu.collectButtonInteraction(componentInteraction, message);
+}
