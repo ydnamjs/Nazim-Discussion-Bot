@@ -1,6 +1,10 @@
-import { ButtonComponentData, ButtonStyle, Message, MessageComponentInteraction } from "discord.js";
+import { ButtonComponentData, ButtonStyle, Client, InteractionUpdateOptions, Message, MessageComponentInteraction, MessageCreateOptions } from "discord.js";
 import { BaseMenu, ComponentBehavior, buttonData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
+import { getRolesOfUserInGuild } from "./command.TestMenu";
+import { Course, courseModel } from "../../../models/Course";
+import { Types } from "mongoose";
+import { DiscussionCourseBasicData, StaffMenu } from "./staff/class.StaffMenu";
 
 const MAIN_MENU_TITLE = "Discussion Menu";
 const MAIN_MENU_DESCRIPTION = "Welcom to the discussion menu! Click the button below that corresponds to your role to open a menu for that role";
@@ -54,13 +58,33 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
         filter: (customId: string) => {
             return customId === MAIN_MENU_STAFF_BUTTON_ID;
         },
-        resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
-            // TODO: Implement opening of staff view once staff menu is implemented
-            componentInteraction.update({
-                content: "Staff view not yet implemented",
-                embeds: [],
-                components: []
-            });
+        resultingAction: async (message: Message, componentInteraction: MessageComponentInteraction) => {
+            
+            const roles = await getRolesOfUserInGuild(componentInteraction);
+
+            let allCourses: Course[] = [];
+
+            try {
+                allCourses = await courseModel.find({'roles.staff': {$in: roles}});
+            }
+            catch(error: any) {
+                console.error(error);
+            }
+            
+            let courseInfo: DiscussionCourseBasicData[] = [];
+            for(let i = 0; i < allCourses.length; i++) {
+                courseInfo.push({
+                    name: allCourses[i].name,
+                    numStudents: 0,
+                    numPosts: 0,
+                    numComments: 0
+                });
+            }
+
+            const staffMenu = new StaffMenu(courseInfo);
+
+            componentInteraction.update(staffMenu.menuMessageData as unknown as InteractionUpdateOptions);
+            staffMenu.collectButtonInteraction(componentInteraction, message);
         }
     },
 ]

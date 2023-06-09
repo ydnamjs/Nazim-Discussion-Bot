@@ -3,13 +3,14 @@ import { Command } from "../interface.Command";
 
 //import mongoose from "mongoose";
 import { StaffMenu } from "./staff/class.StaffMenu";
-import { courseModel } from "../../../models/Course";
+import { Course, courseModel } from "../../../models/Course";
+import { Document, Types } from "mongoose";
 //import { DB } from "../../../secret";
 
 // constants
 const MENU_SENT_MESSAGE = "CourseStudent menu was sent to your direct messages. Click Here: ";
 
-async function getRolesOfUserInGuild(interaction: BaseInteraction) {
+export async function getRolesOfUserInGuild(interaction: BaseInteraction) {
     if(interaction.guild && await interaction.guild.members.fetch(interaction.user)) {
         const roles = ((await interaction.guild.members.fetch(interaction.user)).roles.cache).keys();
         if (roles) {
@@ -26,12 +27,26 @@ export const testMenu: Command = {
     
         const roles = await getRolesOfUserInGuild(interaction);
 
-        console.log(roles);
+        let allCourses: (Document<unknown, {}, Course> & Omit<Course & { _id: Types.ObjectId; }, never>)[] = [];
 
-        //await courseModel.find({INSTRUCTOR_ID: interaction.user.id});
+        try {
+            allCourses = await courseModel.find({'roles.staff': {$in: roles}}).select('name roles.student -_id');
+        }
+        catch(error: any) {
+            console.error(error);
+        }
+
+        console.log(allCourses);
 
         // sample menu
-        const sampleNavigatedMenu: StaffMenu = new StaffMenu();
+        const sampleNavigatedMenu: StaffMenu = new StaffMenu([
+            {
+                name: "cisc355",
+                numStudents: 43,
+                numPosts: 13,
+                numComments: 2
+            }
+        ]);
 
         // sample menu
         const messageLink = (await sampleNavigatedMenu.send(client, interaction)).url;
