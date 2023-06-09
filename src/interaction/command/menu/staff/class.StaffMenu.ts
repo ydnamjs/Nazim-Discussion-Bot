@@ -1,7 +1,8 @@
-import { Client, BaseInteraction, CacheType, Message, User, MessageComponentInteraction, InteractionUpdateOptions } from "discord.js";
-import { NavigatedMenu, NavigatedMenuData } from "../class.NavigatedMenu";
+import { Client, BaseInteraction, CacheType, Message, User, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle } from "discord.js";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../class.NavigatedMenu";
 import { Course, courseModel } from "../../../../models/Course";
 import { getRolesOfUserInGuild } from "../../../../util.getRolesOfUserInGuild";
+import { buttonData } from "../class.BaseMenu";
 
 /**
  * @function updates a menu so that it is now a staff menu
@@ -74,7 +75,17 @@ export class StaffMenu extends NavigatedMenu {
             additionalComponents: [],
             additionalButtonBehaviors: []
         }
+        const customNavOptions: CustomNavOptions = {
+            prevButtonOptions: {},
+            nextButtonOptions: {},
+            specialMenuButton: { 
+                customId: "discussion_staff_expand_button",
+                label: "expand course view",
+                disabled: true,
+                style: ButtonStyle.Primary
+            }
+        };
         
-        super(menuData);
+        super(menuData, customNavOptions);
     }
 }
