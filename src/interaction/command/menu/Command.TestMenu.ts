@@ -5,24 +5,10 @@ import { Command } from "../interface.Command";
 import { StaffMenu } from "./staff/class.StaffMenu";
 import { Course, courseModel } from "../../../models/Course";
 import { Document, Types } from "mongoose";
-import { ROLES_GUILD } from "../../../secret";
-//import { DB } from "../../../secret";
+import { getRolesOfUserInGuild } from "../../../util.getRolesOfUserInGuild";
 
 // constants
 const MENU_SENT_MESSAGE = "CourseStudent menu was sent to your direct messages. Click Here: ";
-
-export async function getRolesOfUserInGuild(interaction: BaseInteraction) {
-    
-    const guild = interaction.client.guilds.cache.get(ROLES_GUILD) as Guild;
-    
-    if( await guild.members.fetch(interaction.user)) {
-        const roles = ((await guild.members.fetch(interaction.user)).roles.cache).keys();
-        if (roles) {
-            return [...roles];
-        }
-    }
-    return [];
-}
 
 export const testMenu: Command = {
     name: "test-menu",

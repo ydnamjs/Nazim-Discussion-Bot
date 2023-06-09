@@ -1,9 +1,7 @@
 import { ButtonComponentData, ButtonStyle, Client, InteractionUpdateOptions, Message, MessageComponentInteraction, MessageCreateOptions } from "discord.js";
 import { BaseMenu, ComponentBehavior, buttonData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
-import { getRolesOfUserInGuild } from "./command.TestMenu";
-import { Course, courseModel } from "../../../models/Course";
-import { DiscussionCourseBasicData, StaffMenu } from "./staff/class.StaffMenu";
+import { updateToStaffMenu } from "./staff/class.StaffMenu";
 
 const MAIN_MENU_TITLE = "Discussion Menu";
 const MAIN_MENU_DESCRIPTION = "Welcom to the discussion menu! Click the button below that corresponds to your role to open a menu for that role";
@@ -57,36 +55,7 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
         filter: (customId: string) => {
             return customId === MAIN_MENU_STAFF_BUTTON_ID;
         },
-        resultingAction: async (message: Message, componentInteraction: MessageComponentInteraction) => {
-            
-            // get the roles of the user in the guild
-            const roles = await getRolesOfUserInGuild(componentInteraction);
-
-            // get the courses from which they are staff
-            let allCourses: Course[] = [];
-            try {
-                allCourses = await courseModel.find({'roles.staff': {$in: roles}});
-            }
-            catch(error: any) {
-                console.error(error);
-            }
-            
-            // convert the courses and data into data for the staff menu
-            let courseInfo: DiscussionCourseBasicData[] = [];
-            for(let i = 0; i < allCourses.length; i++) {
-                courseInfo.push({
-                    name: allCourses[i].name,
-                    numStudents: 0,
-                    numPosts: 0,
-                    numComments: 0
-                });
-            }
-
-            // replace the old menu with the staff menu
-            const staffMenu = new StaffMenu(courseInfo);
-            componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
-            staffMenu.collectButtonInteraction(componentInteraction, message);
-        }
+        resultingAction: updateToStaffMenu
     },
 ]
 
