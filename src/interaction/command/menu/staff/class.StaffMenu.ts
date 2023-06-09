@@ -1,26 +1,29 @@
 import { Client, BaseInteraction, CacheType, Message, User } from "discord.js";
 import { NavigatedMenu, NavigatedMenuData } from "../class.NavigatedMenu";
 
+export interface DiscussionCourseBasicData {
+    name: string,
+    numStudents: number,
+    numPosts: number,
+    numComments: number,
+}
+
+
 const STAFF_MENU_TITLE = "My Courses";
 const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To access a specific course click the view course button and input the name of the course";
 
 export class StaffMenu extends NavigatedMenu {
-    constructor() {
+    constructor(courseInfo: DiscussionCourseBasicData[]) {
         
-        const fields = [
-            {
-                name: "cisc355-010",
-                value: "# of students: " + 23 + "\n# of posts: " + 4 + "\n# of comments: " + 13
-            },
-            {
-                name: "cisc355-011",
-                value: "# of students: " + 27 + "\n# of posts: " + 8 + "\n# of comments: " + 35
-            },
-            {
-                name: "cisc999-000",
-                value: "# of students: " + -85 + "\n# of posts: " + 9 + "\n# of comments: " + 24
-            }
-        ]
+        let fields: { name: string; value: string; }[] = []
+        courseInfo.forEach((course: DiscussionCourseBasicData)=>{
+            fields.push(
+                {
+                    name: course.name,
+                    value: "# of students: " + course.numStudents + "\n# of posts: " + course.numPosts + "\n# of comments: " + course.numComments
+                }
+            )
+        })
         
         const menuData: NavigatedMenuData = {
             title: STAFF_MENU_TITLE,
