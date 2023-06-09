@@ -48,7 +48,7 @@ export interface buttonData {
  *  @constant The maximum number of components discord allows in a message
 */
 export const MAX_NUMBER_OF_COMPONENT_ROWS = 5; 
-const MAX_COMPONENT_ROWS_EXCEEDED_ERROR = "ERROR: TRIED TO CREATE A MENU WITH MORE COMPONENT ROWS THAN ALLOWED"
+const MAX_COMPONENT_ROWS_EXCEEDED_ERROR = "ERROR: TRIED TO CREATE A MENU WITH MORE COMPONENT ROWS THAN ALLOWED";
 
 /**
  * @class Base Menu is an interactive menu that is meant to be sent as a message to a user to display information about the discussion tracking feature
@@ -118,17 +118,17 @@ export class BaseMenu {
 
     constructor(menuData: MenuData) {
 
+        // components have a maximum number of rows
+        if(menuData.components && menuData.components.length > MAX_NUMBER_OF_COMPONENT_ROWS) {
+            throw new Error(MAX_COMPONENT_ROWS_EXCEEDED_ERROR);
+        }
+
         // build an embed as the menu's display
         const menuEmbed = new EmbedBuilder({
             title: menuData.title,
             description: menuData.description,
             fields: menuData.fields
         });
-
-        // components can be a max of 5 rows
-        if(menuData.components && menuData.components.length > MAX_NUMBER_OF_COMPONENT_ROWS) {
-            throw new Error(MAX_COMPONENT_ROWS_EXCEEDED_ERROR);
-        }
 
         // construct the menuMessageData to be sent to the user
         this.menuMessageData = { 
