@@ -2,6 +2,7 @@ import { CommandInteraction, Client, ButtonBuilder, ActionRowBuilder, ButtonComp
 import { Command } from "../interface.Command";
 
 import { CustomNavOptions, NavigatedMenu } from "./class.NavigatedMenu";
+import { StaffMenu } from "./staff/class.StaffMenu";
 
 
 // constants
@@ -12,99 +13,8 @@ export const testMenu: Command = {
     description: "opens the current menu being tested",
     run: async (client: Client, interaction: CommandInteraction) => {
         
-        // direct Message the user the menu being tested
-        
-        // sample constants
-        const fields = [
-            {
-                name: "field 1",
-                value: "text1\ntext2n\ntext3",
-            },
-            {
-                name: "field 2",
-                value: "text4\ntext5n\ntext6",
-            }
-        ]
-
-        // sample button data
-        const sampleButtonData1 = [];
-        for (let i = 1; i < 6; i++) {
-            sampleButtonData1.push({
-                customId: "test" + i,
-                label: "button" + i,
-                disabled: false,
-                style: ButtonStyle.Primary
-            });
-        }
-
-        const sampleButtonData2 = [];
-        for (let i = 6; i < 11; i++) {
-            sampleButtonData2.push({
-                customId: "test" + i,
-                label: "button" + i,
-                disabled: false,
-                style: ButtonStyle.Primary
-            });
-        }
-
-        const sampleButtonData3 = [];
-        for (let i = 11; i < 16; i++) {
-            sampleButtonData3.push({
-                customId: "test" + i,
-                label: "button" + i,
-                disabled: false,
-                style: ButtonStyle.Primary
-            });
-        }
-
-        const sampleButtonData4 = [];
-        for (let i = 16; i < 21; i++) {
-            sampleButtonData4.push({
-                customId: "test" + i,
-                label: "button" + i,
-                disabled: false,
-                style: ButtonStyle.Primary
-            });
-        }
-
-        const sampleButtonData5: Partial<ButtonComponentData>[] = [];
-        for (let i = 21; i < 26; i++) {
-            sampleButtonData5.push({
-                customId: "test" + i,
-                label: "button" + i,
-                disabled: false,
-                style: ButtonStyle.Primary
-            });
-        }
-
-        // sample additional components
-        const sampleAdditionalComponents = [
-            makeActionRowButton(sampleButtonData1),
-            makeActionRowButton(sampleButtonData2),
-            makeActionRowButton(sampleButtonData3),
-            makeActionRowButton(sampleButtonData4),
-        ];
-
-        // sample navOptions
-        const sampleNavOptions: CustomNavOptions = {
-            prevButtonOptions: {label: "prev"},
-            nextButtonOptions: {label: "next", disabled: false},
-            specialMenuButton: {
-                customId: "im spec",
-                label: "im spec",
-                disabled: false,
-                style: ButtonStyle.Primary
-            }
-        }
-
         // sample menu
-        const sampleNavigatedMenu = new NavigatedMenu({
-            title: "NAVIGATION", 
-            description: "NO READING", 
-            fields: fields, 
-            additionalButtonBehaviors:[], 
-            additionalComponents: sampleAdditionalComponents
-        }, sampleNavOptions);
+        const sampleNavigatedMenu = new StaffMenu();
 
         // sample menu
         const messageLink = (await sampleNavigatedMenu.send(client, interaction)).url;
