@@ -1,5 +1,5 @@
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonComponentData, ButtonStyle, Client, ComponentType, EmbedBuilder, InteractionButtonComponentData, Message, MessageCreateOptions, User } from "discord.js";
-import { BaseMenu, buttonData, ComponentBehavior, MenuData } from "./class.BaseMenu";
+import { BaseMenu, buttonData, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 
 /**
@@ -143,6 +143,8 @@ const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     }
 }
 
+const MAX_ADDITIONAL_COMPONENT_ROWS_EXCEEDED_ERROR = "ERROR: TRIED TO CREATE A NAVIAGTIONMENU WITH MORE ADDITIONAL COMPONENT ROWS THAN ALLOWED";
+
 /**
  * @class menu that contains a row of buttons for navigating through all the menus as the first row of components
  * @param {NavigatedMenu} menuData - data used to generate the parts of the menu that are not defined by default
@@ -151,6 +153,13 @@ const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
 export class NavigatedMenu extends BaseMenu{
 
     constructor(menuData: NavigatedMenuData, customNavOptions?: CustomNavOptions) {
+        
+        // components have a maximum number of rows
+        if(menuData.additionalComponents && menuData.additionalComponents.length > MAX_NUMBER_OF_COMPONENT_ROWS - 1) {
+            throw new Error(MAX_ADDITIONAL_COMPONENT_ROWS_EXCEEDED_ERROR);
+        }
+        
+
         let navigationRow;
         if(customNavOptions){
             navigationRow = makeNavigationRow(customNavOptions);
