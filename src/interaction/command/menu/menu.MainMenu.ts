@@ -3,7 +3,6 @@ import { BaseMenu, ComponentBehavior, buttonData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 import { getRolesOfUserInGuild } from "./command.TestMenu";
 import { Course, courseModel } from "../../../models/Course";
-import { Types } from "mongoose";
 import { DiscussionCourseBasicData, StaffMenu } from "./staff/class.StaffMenu";
 
 const MAIN_MENU_TITLE = "Discussion Menu";
@@ -60,10 +59,11 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
         },
         resultingAction: async (message: Message, componentInteraction: MessageComponentInteraction) => {
             
+            // get the roles of the user in the guild
             const roles = await getRolesOfUserInGuild(componentInteraction);
 
+            // get the courses from which they are staff
             let allCourses: Course[] = [];
-
             try {
                 allCourses = await courseModel.find({'roles.staff': {$in: roles}});
             }
@@ -71,6 +71,7 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
                 console.error(error);
             }
             
+            // convert the courses and data into data for the staff menu
             let courseInfo: DiscussionCourseBasicData[] = [];
             for(let i = 0; i < allCourses.length; i++) {
                 courseInfo.push({
@@ -81,8 +82,8 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
                 });
             }
 
+            // replace the old menu with the staff menu
             const staffMenu = new StaffMenu(courseInfo);
-
             componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
             staffMenu.collectButtonInteraction(componentInteraction, message);
         }
