@@ -1,4 +1,4 @@
-import { ButtonComponentData, ButtonStyle } from "discord.js";
+import { ButtonComponentData, ButtonStyle, Message, MessageComponentInteraction } from "discord.js";
 import { BaseMenu, ComponentBehavior, buttonData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
 
@@ -36,18 +36,28 @@ const MAIN_MENU_COMPONENTS = [makeActionRowButton(MAIN_MENU_BUTTON_DATA)];
 const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
     {
         filter: (customId: string) => {
-            return true;
+            return customId === MAIN_MENU_STUDENT_BUTTON_ID;
         },
-        resultingAction: () => {
-            // TODO: Implement opening of student view
+        resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
+            // TODO: Implement opening of student view once student menu is implemented
+            componentInteraction.update({
+                content: "Student view not yet implemented",
+                embeds: [],
+                components: []
+            });
         }
     },
     {
         filter: (customId: string) => {
-            return true;
+            return customId === MAIN_MENU_STAFF_BUTTON_ID;
         },
-        resultingAction: () => {
-            // TODO: Implement opening of staff view
+        resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
+            // TODO: Implement opening of staff view once staff menu is implemented
+            componentInteraction.update({
+                content: "Staff view not yet implemented",
+                embeds: [],
+                components: []
+            });
         }
     },
 ]
@@ -56,5 +66,6 @@ export const mainMenu = new BaseMenu({
     title: MAIN_MENU_TITLE,
     description: MAIN_MENU_DESCRIPTION,
     fields: MAIN_MENU_FIELDS,
-    components: MAIN_MENU_COMPONENTS
+    components: MAIN_MENU_COMPONENTS,
+    buttonBehaviors: MAIN_MENU_BUTTON_BEHAVIORS
 });
