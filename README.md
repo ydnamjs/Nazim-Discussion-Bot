@@ -5,14 +5,14 @@ This is a typescript discord bot meant to track and award points for discussions
 
 The goal is to have it work in tandem with discords forum channels and assign points based on posts and comments within them.
 
-Instructors should be able to:
+# Instructors should be able to:
 - define requirements for posts and comments to earn points (character length, paragraph count, and having links)
 - award additional points to posts that generate comments
 - give awards and penalties to posts and comments that students make through discord reactions
 - define custom periods of time with their own score limits and goals
 - get the scores of every student (overall and by score period) in a csv document
 
-Students should be able to: 
+# Students should be able to: 
 - see their own points per score period
 - be notified when posts or comments dont meet requirements
 - be notified when posts or comments recieve an award or penalty
