@@ -29,6 +29,7 @@ export const addCourse: Command = {
 		//	make sure course does not exist already
         if((await courseModel.find({name: course})).length) {
             interaction.editReply({ content: `${course} has already been registered as a course.`});
+            return;
         }
 
 		const reason = `Creating new course \`${course}\` as requested 
