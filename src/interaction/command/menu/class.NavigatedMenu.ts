@@ -1,7 +1,7 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions } from "discord.js";
 import { BaseMenu, buttonData, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData } from "./class.BaseMenu";
 import { makeActionRowButton } from "./util.makeActionRow";
-import { updateToMainMenu } from "./menu.MainMenu";
+import { mainMenu } from "./menu.MainMenu";
 
 /**
  * @interface NavigatedMenuData
@@ -127,7 +127,10 @@ const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     filter: (customId: string) => {
         return customId === MAIN_MENU_CUSTOMID;
     },
-    resultingAction: updateToMainMenu
+    resultingAction: async ( message, componentInteraction) => {
+        componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
+        mainMenu.collectButtonInteraction(componentInteraction, message);
+    }
 }
 
 /** @constant behavior of the close menu button */

@@ -67,8 +67,3 @@ export const mainMenu = new BaseMenu({
     components: MAIN_MENU_COMPONENTS,
     buttonBehaviors: MAIN_MENU_BUTTON_BEHAVIORS
 });
-
-export async function updateToMainMenu(message: Message, componentInteraction: MessageComponentInteraction) {
-    componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
-    mainMenu.collectButtonInteraction(componentInteraction, message);
-}

@@ -3,7 +3,6 @@ import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../class.Nav
 import { Course, courseModel } from "../../../../models/Course";
 import { getRolesOfUserInGuild } from "../../../../util.getRolesOfUserInGuild";
 import { ComponentBehavior } from "../class.BaseMenu";
-import { updateToMainMenu } from "../menu.MainMenu";
 
 /**
  * @function updates a menu so that it is now a staff menu
