@@ -99,6 +99,13 @@ export const addCourse: Command = {
             parent: categoryChannel.id, 
             reason: reason
         });
+        const discussionChannel = await interaction.guild.channels.create({
+            name: `${course}_discussion`,
+            type: ChannelType.GuildForum,
+            permissionOverwrites: standardPerms, 
+            parent: categoryChannel.id, 
+            reason: reason, 
+        });
 		const staffChannel = await interaction.guild.channels.create({
             name: `${course}_staff`,
             type: ChannelType.GuildText,
@@ -121,6 +128,7 @@ export const addCourse: Command = {
 			channels: {
 				category: categoryChannel.id,
 				general: generalChannel.id,
+                discussion: discussionChannel.id,
 				staff: staffChannel.id,
 				private: privateQuestionChannel.id
 			},
