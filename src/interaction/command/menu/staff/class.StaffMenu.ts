@@ -28,10 +28,9 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     let courseInfo: DiscussionCourseBasicData[] = [];
     for(let i = 0; i < allCourses.length; i++) {
         
+        // TODO: Change this to user sage user class and database
         const studentRole = await((await componentInteraction.client.guilds.fetch(GUILDS.MAIN)).roles.fetch(allCourses[i].roles.student));
-
         if(studentRole)
-        console.log(studentRole.members.size);
 
         courseInfo.push({
             name: allCourses[i].name,
