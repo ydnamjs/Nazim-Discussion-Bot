@@ -3,7 +3,7 @@ import { DISCORD_TOKEN, MONGODB_SRV } from "./secret";
 
 //import event listeners
 import commandListener from "./interaction/util.InteractionListener";
-import onlineLogger from "./interaction/util.ReadyListener";
+import onlineLogger from "./util.ReadyListener";
 
 // TODO: converting this to an import disalows the useNewUrlParser option for some reason. When done with refactoring figure out if converting breaks it or not
 //import database connection thing

@@ -1,7 +1,7 @@
 import { OverwriteResolvable, CommandInteraction, Client, PermissionsBitField, ChannelType, ApplicationCommandOptionType } from 'discord.js';
-import { Course, courseModel } from '../../models/Course';
-import { Command } from './interface.Command';
-import { GUILDS, ROLES } from '../../secret';
+import { Course, courseModel } from '../../../models/Course';
+import { Command } from '../interface.Command';
+import { GUILDS, ROLES } from '../../../secret';
 
 export const addCourse: Command = {
     
