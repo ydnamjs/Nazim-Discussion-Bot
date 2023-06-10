@@ -18,7 +18,7 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     // get the courses from which they are staff
     let allCourses: Course[] = [];
     try {
-        allCourses = await courseModel.find({'roles.staff': {$in: roles}});
+        allCourses = await courseModel.find({'roles.staff': {$in: roles}, 'channels.discussion': {$ne: 'n/a'}});
     }
     catch(error: any) {
         console.error(error);
