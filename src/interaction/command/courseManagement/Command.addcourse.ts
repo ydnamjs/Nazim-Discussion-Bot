@@ -35,8 +35,6 @@ export const addCourse: Command = {
 		const reason = `Creating new course \`${course}\` as requested 
 		by \`${interaction.user.username}\` \`(${interaction.user.id})\`.`;
 
-        console.log(reason);
-
 		//	create staff role for course
 		const staffRole = await interaction.guild.roles.create({
 			name: `${course} Staff`,
@@ -45,16 +43,12 @@ export const addCourse: Command = {
 			reason: reason
 		});
 
-        console.log("made staff role");
-
 		//	create student role for course
 		const studentRole = await interaction.guild.roles.create({
 			name: `CISC ${course}`,
 			permissions: BigInt(0),
 			reason: reason
 		});
-
-        console.log("made student role");
 
 		//	set permissions for the course
 		const standardPerms: Array<OverwriteResolvable> = [{
@@ -74,8 +68,6 @@ export const addCourse: Command = {
 			deny: PermissionsBitField.Flags.ViewChannel
 		}];
 		const staffPerms = [standardPerms[0], standardPerms[1], standardPerms[2]];
-
-        console.log("made perms");
 
 		//	create course category
 		const categoryChannel = await interaction.guild.channels.create({
@@ -122,8 +114,6 @@ export const addCourse: Command = {
             reason: reason, 
             topic: '[no message count]'
         });
-
-        console.log("made channels and category");
 
 		//	adding the course to the database
 		const newCourse: Course = {
