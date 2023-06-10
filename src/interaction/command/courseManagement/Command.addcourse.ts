@@ -8,12 +8,20 @@ export const addCourse: Command = {
     name: "add-course",
 	description: 'Creates a courses category and adds all necessary channels/roles.',
 
-	options: [{
-		name: 'course',
-		description: 'The three-digit course ID of the course to be added (ex: 108).',
-		type: ApplicationCommandOptionType.String,
-		required: true
-	}],
+	options: [
+        {
+		    name: 'course',
+		    description: 'The three-digit course ID of the course to be added (ex: 108).',
+		    type: ApplicationCommandOptionType.String,
+		    required: true
+    	},
+        {
+            name: 'is-discussion',
+            description: 'Whether or not the course should have a discussion channel and discussion tracking',
+            type: ApplicationCommandOptionType.Boolean,
+            required: true
+        }
+    ],
 
 	run: async (client: Client, interaction: CommandInteraction) => {
 		//interaction.reply('<a:loading:755121200929439745> working...');
@@ -85,27 +93,32 @@ export const addCourse: Command = {
             parent: categoryChannel.id, 
             reason: reason
         });
-        const homeworkChannel = await interaction.guild.channels.create({
+        await interaction.guild.channels.create({
             name: `${course}_homework`, 
             type: ChannelType.GuildText,
             permissionOverwrites: standardPerms, 
             parent: categoryChannel.id, 
             reason: reason
         });
-		const LabChannel = await interaction.guild.channels.create({
+		await interaction.guild.channels.create({
             name: `${course}_labs`,
             type: ChannelType.GuildText,
             permissionOverwrites: standardPerms, 
             parent: categoryChannel.id, 
             reason: reason
         });
-        const discussionChannel = await interaction.guild.channels.create({
-            name: `${course}_discussion`,
-            type: ChannelType.GuildForum,
-            permissionOverwrites: standardPerms, 
-            parent: categoryChannel.id, 
-            reason: reason, 
-        });
+
+        let discussionChannel = undefined
+
+        if(interaction.options.get('is-discussion') !== undefined && interaction.options.get('is-discussion')?.value) {
+            discussionChannel = await interaction.guild.channels.create({
+                name: `${course}_discussion`,
+                type: ChannelType.GuildForum,
+                permissionOverwrites: standardPerms, 
+                parent: categoryChannel.id, 
+                reason: reason, 
+            });
+        }
 		const staffChannel = await interaction.guild.channels.create({
             name: `${course}_staff`,
             type: ChannelType.GuildText,
@@ -128,7 +141,7 @@ export const addCourse: Command = {
 			channels: {
 				category: categoryChannel.id,
 				general: generalChannel.id,
-                discussion: discussionChannel.id,
+                discussion: discussionChannel? discussionChannel.id : 'n/a',
 				staff: staffChannel.id,
 				private: privateQuestionChannel.id
 			},
