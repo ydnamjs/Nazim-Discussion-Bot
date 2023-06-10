@@ -3,6 +3,7 @@ import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../class.Nav
 import { Course, courseModel } from "../../../../models/Course";
 import { getRolesOfUserInGuild } from "../../../../util.getRolesOfUserInGuild";
 import { ComponentBehavior } from "../class.BaseMenu";
+import { GUILDS } from "../../../../secret";
 
 /**
  * @function updates a menu so that it is now a staff menu
@@ -26,9 +27,15 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     // convert the courses and data into data for the staff menu
     let courseInfo: DiscussionCourseBasicData[] = [];
     for(let i = 0; i < allCourses.length; i++) {
+        
+        const studentRole = await((await componentInteraction.client.guilds.fetch(GUILDS.MAIN)).roles.fetch(allCourses[i].roles.student));
+
+        if(studentRole)
+        console.log(studentRole.members.size);
+
         courseInfo.push({
             name: allCourses[i].name,
-            numStudents: 0,
+            numStudents: studentRole ? studentRole.members.size : 0,
             numPosts: 0,
             numComments: 0
         });
