@@ -1,4 +1,4 @@
-import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle, ForumChannel } from "discord.js";
+import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle, ForumChannel, ThreadChannel } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../class.NavigatedMenu";
 import { Course, courseModel } from "../../../../models/Course";
 import { getRolesOfUserInGuild } from "../../../../util.getRolesOfUserInGuild";
@@ -34,13 +34,15 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
         // TODO: Change this to user sage user class and database
         const studentRole = await guild.roles.fetch(allCourses[i].roles.student);
 
-        const postCount = threads.filter(thread => thread.parentId === allCourses[i].channels.discussion).size
+        const posts = [...threads.filter(thread => thread.parentId === allCourses[i].channels.discussion).values()] as ThreadChannel[];
+        let numComments = 0;
+        posts.forEach(post => numComments += post.messageCount as number)
 
         courseInfo.push({
             name: allCourses[i].name,
             numStudents: studentRole ? studentRole.members.size : 0,
-            numPosts: postCount,
-            numComments: 0
+            numPosts: posts.length,
+            numComments: numComments
         });
     }
 
