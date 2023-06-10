@@ -51,7 +51,7 @@ export const removeCourse: Command = {
         staff?.delete();
 
         // delete the course from the database
-        courseModel.deleteOne(course);
+        await courseModel.deleteOne({name: course.name});
 
         interaction.editReply(`Successfully removed course with ID ${course}`);
     }
