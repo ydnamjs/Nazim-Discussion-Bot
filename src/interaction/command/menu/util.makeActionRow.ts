@@ -1,6 +1,6 @@
 // MAKE BUTTON ROW HELPER FUNCTION
 
-import { ActionRowBuilder, ButtonBuilder, ButtonComponent, ButtonComponentData } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonComponentData } from "discord.js";
 
 /** @constant the maximum number of buttons allowed in a row */
 const MAX_BUTTONS_PER_ROW = 5; // 5 is chosen because that is discord's current limit (as of 6/5/2023:MM/DD/YYYY) https://discord.com/developers/docs/interactions/message-components#buttons

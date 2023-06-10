@@ -1,4 +1,5 @@
-import { Client } from "discord.js";
+import { Client, Guild } from "discord.js";
+import { GUILDS } from "./secret";
 
 
 /**
@@ -11,7 +12,11 @@ export default (client: Client): void => {
         if (!client.user || !client.application) {
             return;
         }
-
+        // TODO: idk how bad this is but it seems essential if discussions are to be able to get info about people who havent interacted with the bot since its last restart
+        console.log("fetching members");
+        const guild = client.guilds.cache.get(GUILDS.MAIN) as Guild;
+        await guild.members.fetch();
+        console.log("all members fetched");
         console.log(`${client.user.username} is online!`);
     });
 };
