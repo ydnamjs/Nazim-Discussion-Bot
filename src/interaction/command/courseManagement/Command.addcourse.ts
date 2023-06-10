@@ -141,7 +141,7 @@ export const addCourse: Command = {
 			channels: {
 				category: categoryChannel.id,
 				general: generalChannel.id,
-                discussion: discussionChannel? discussionChannel.id : 'n/a',
+                discussion: discussionChannel? discussionChannel.id : null,
 				staff: staffChannel.id,
 				private: privateQuestionChannel.id
 			},

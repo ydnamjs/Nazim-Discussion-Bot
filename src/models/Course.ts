@@ -8,7 +8,7 @@ export interface Course {
 		general: string;
 		staff: string;
 		private: string;
-        discussion?: string;
+        discussion: string | null;
 	}
 	roles: {
 		student: string;

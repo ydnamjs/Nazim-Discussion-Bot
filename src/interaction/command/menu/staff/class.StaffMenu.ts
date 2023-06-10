@@ -1,4 +1,4 @@
-import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle } from "discord.js";
+import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle, ForumChannel } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../class.NavigatedMenu";
 import { Course, courseModel } from "../../../../models/Course";
 import { getRolesOfUserInGuild } from "../../../../util.getRolesOfUserInGuild";
@@ -18,24 +18,28 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     // get the courses from which they are staff
     let allCourses: Course[] = [];
     try {
-        allCourses = await courseModel.find({'roles.staff': {$in: roles}, 'channels.discussion': {$ne: 'n/a'}});
+        allCourses = await courseModel.find({'roles.staff': {$in: roles}, 'channels.discussion': {$ne: null}});
     }
     catch(error: any) {
         console.error(error);
     }
-    
+
+    const guild = await componentInteraction.client.guilds.fetch(GUILDS.MAIN)
+    const threads = guild.channels.cache.filter(x => x.isThread());
+
     // convert the courses and data into data for the staff menu
     let courseInfo: DiscussionCourseBasicData[] = [];
     for(let i = 0; i < allCourses.length; i++) {
-        
+                
         // TODO: Change this to user sage user class and database
-        const studentRole = await((await componentInteraction.client.guilds.fetch(GUILDS.MAIN)).roles.fetch(allCourses[i].roles.student));
-        if(studentRole)
+        const studentRole = await guild.roles.fetch(allCourses[i].roles.student);
+
+        const postCount = threads.filter(thread => thread.parentId === allCourses[i].channels.discussion).size
 
         courseInfo.push({
             name: allCourses[i].name,
             numStudents: studentRole ? studentRole.members.size : 0,
-            numPosts: 0,
+            numPosts: postCount,
             numComments: 0
         });
     }
@@ -57,9 +61,11 @@ export interface DiscussionCourseBasicData {
 const STAFF_MENU_TITLE = "My Courses";
 const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To access a specific course click the view course button and input the name of the course";
 
+/*
 const STAFF_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
 
 ]
+*/
 
 /**
  * @class menu that displays basic info about a user's courses
