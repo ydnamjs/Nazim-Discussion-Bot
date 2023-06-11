@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits, Partials } from "discord.js";
-import { DISCORD_TOKEN, NAZIM_TEST_SERVER_ID, MY_SERVER_ID } from "../../secret";
+import { DISCORD_TOKEN, NAZIM_TEST_SERVER_ID, MY_SERVER_ID } from "../secret";
 import { commandList } from "./data.CommandList";
 
 // MAIN CALL

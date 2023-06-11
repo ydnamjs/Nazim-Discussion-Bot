@@ -2,9 +2,9 @@
 import { Command } from "./interface.Command";
 
 // Imported commands
-import { addCourse } from "./courseManagement/Command.addcourse";
-import { DiscussionMenu } from "./menu/Command.DiscussionMenu";
-import { removeCourse } from "./courseManagement/Command.RemoveCourse";
+import { addCourse } from "../pieces/courseManagement/Command.addcourse";
+import { DiscussionMenu } from "../pieces/discussion/menu/Command.DiscussionMenu";
+import { removeCourse } from "../pieces/courseManagement/Command.RemoveCourse";
 
 /**
  * @constant List of all the available commands

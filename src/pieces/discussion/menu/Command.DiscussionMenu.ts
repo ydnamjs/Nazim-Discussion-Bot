@@ -1,5 +1,5 @@
 import { CommandInteraction, Client } from "discord.js";
-import { Command } from "../interface.Command";
+import { Command } from "../../../command/interface.Command";
 import { mainMenu } from "./menu.DiscussionMainMenu";
 
 //** @constant the message sent to the user indicating that a menu was sent to them */
