@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions } from "discord.js";
 import { BaseMenu, buttonData, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData } from "./class.BaseMenu";
-import { makeActionRowButton } from "./util.makeActionRow";
+import { makeActionRowButton } from "../../../generalUtilities/MakeActionRow";
 import { mainMenu } from "./menu.MainMenu";
 
 /**

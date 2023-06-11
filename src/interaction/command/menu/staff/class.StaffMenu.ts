@@ -1,7 +1,7 @@
 import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle, ForumChannel, ThreadChannel } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../class.NavigatedMenu";
 import { Course, courseModel } from "../../../../models/Course";
-import { getRolesOfUserInGuild } from "../../../../util.getRolesOfUserInGuild";
+import { getRolesOfUserInGuild } from "../../../../generalUtilities/GetRolesOfUserInGuild";
 import { ComponentBehavior } from "../class.BaseMenu";
 import { GUILDS } from "../../../../secret";
 
@@ -15,7 +15,7 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     // get the roles of the user in the guild
     const roles = await getRolesOfUserInGuild(componentInteraction);
 
-    // get the courses from which they are staff
+    // get the courses from which the user is a staff member of
     let allCourses: Course[] = [];
     try {
         allCourses = await courseModel.find({'roles.staff': {$in: roles}, 'channels.discussion': {$ne: null}});
@@ -27,7 +27,7 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     const guild = await componentInteraction.client.guilds.fetch(GUILDS.MAIN)
     const threads = guild.channels.cache.filter(x => x.isThread());
 
-    // convert the courses and data into data for the staff menu
+    // convert the courses into data for the staff menu
     let courseInfo: DiscussionCourseBasicData[] = [];
     for(let i = 0; i < allCourses.length; i++) {
                 

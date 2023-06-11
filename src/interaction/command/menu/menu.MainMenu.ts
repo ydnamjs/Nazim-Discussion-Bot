@@ -1,6 +1,6 @@
 import { ButtonComponentData, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { BaseMenu, ComponentBehavior } from "./class.BaseMenu";
-import { makeActionRowButton } from "./util.makeActionRow";
+import { makeActionRowButton } from "../../../generalUtilities/MakeActionRow";
 import { updateToStaffMenu } from "./staff/class.StaffMenu";
 
 const MAIN_MENU_TITLE = "Discussion Menu";
