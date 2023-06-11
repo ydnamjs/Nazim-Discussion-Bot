@@ -1,6 +1,6 @@
 import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle, ForumChannel, ThreadChannel } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../class.NavigatedMenu";
-import { Course, courseModel } from "../../../../models/Course";
+import { Course, courseModel } from "../../../../generalModels/Course";
 import { getRolesOfUserInGuild } from "../../../../generalUtilities/GetRolesOfUserInGuild";
 import { ComponentBehavior } from "../class.BaseMenu";
 import { GUILDS } from "../../../../secret";

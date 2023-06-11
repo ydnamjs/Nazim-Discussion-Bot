@@ -1,5 +1,5 @@
 import { CommandInteraction, Client, ApplicationCommandOptionType, CategoryChannel } from 'discord.js';
-import { Course, courseModel } from '../../../models/Course';
+import { Course, courseModel } from '../../../generalModels/Course';
 import { Command } from '../interface.Command';
 
 
