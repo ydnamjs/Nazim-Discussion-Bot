@@ -1,5 +1,5 @@
 import { CommandInteraction, Client, Interaction } from "discord.js";
-import { commandList } from "../command/data.CommandList";
+import { commandList } from "../command/CommandList";
 
 // constants
 /**

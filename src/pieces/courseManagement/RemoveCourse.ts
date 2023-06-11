@@ -1,6 +1,6 @@
 import { CommandInteraction, Client, ApplicationCommandOptionType, CategoryChannel } from 'discord.js';
 import { Course, courseModel } from '../../generalModels/Course';
-import { Command } from '../../command/interface.Command';
+import { Command } from '../../command/Command';
 
 
 export const removeCourse: Command = {

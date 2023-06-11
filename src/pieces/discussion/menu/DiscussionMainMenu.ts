@@ -1,7 +1,7 @@
 import { ButtonComponentData, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
-import { BaseMenu, ComponentBehavior } from "./class.BaseMenu";
+import { BaseMenu, ComponentBehavior } from "./BaseMenu";
 import { makeActionRowButton } from "../../../generalUtilities/MakeActionRow";
-import { updateToStaffMenu } from "./staff/class.StaffMenu";
+import { updateToStaffMenu } from "./staff/DiscussionStaffMenu";
 
 const MAIN_MENU_TITLE = "Discussion Menu";
 const MAIN_MENU_DESCRIPTION = "Welcom to the discussion menu! Click the button below that corresponds to your role to open a menu for that role";

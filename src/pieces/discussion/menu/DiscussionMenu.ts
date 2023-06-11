@@ -1,6 +1,6 @@
 import { CommandInteraction, Client } from "discord.js";
-import { Command } from "../../../command/interface.Command";
-import { mainMenu } from "./menu.DiscussionMainMenu";
+import { Command } from "../../../command/Command";
+import { mainMenu } from "./DiscussionMainMenu";
 
 //** @constant the message sent to the user indicating that a menu was sent to them */
 const MENU_SENT_MESSAGE = "Discussion menu was sent to your direct messages: ";
