@@ -1,5 +1,5 @@
 import { Client, Guild } from "discord.js";
-import { GUILDS } from "./secret";
+import { GUILDS } from "../secret";
 
 
 /**

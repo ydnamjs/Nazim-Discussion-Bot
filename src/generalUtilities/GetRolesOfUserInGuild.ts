@@ -1,5 +1,5 @@
 import { BaseInteraction, Guild } from "discord.js";
-import { ROLES_GUILD } from "./secret";
+import { ROLES_GUILD } from "../secret";
 
 export async function getRolesOfUserInGuild(interaction: BaseInteraction) {
     
