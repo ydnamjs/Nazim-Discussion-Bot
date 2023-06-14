@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions, StringSelectMenuBuilder } from "discord.js";
 import { BaseMenu, buttonData, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData } from "./BaseMenu";
 import { makeActionRowButton } from "../../../generalUtilities/MakeActionRow";
 import { mainMenu } from "./DiscussionMainMenu";
@@ -17,8 +17,8 @@ export interface NavigatedMenuData {
     title: string, 
     description: string, 
     fields: {name: string, value: string}[], 
-    additionalComponents: ActionRowBuilder<ButtonBuilder>[], 
-    additionalButtonBehaviors: ComponentBehavior[]
+    additionalComponents: ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>[], 
+    additionalComponentBehaviors: ComponentBehavior[]
 }
 
 // NAVIGATION BUTTONS
@@ -129,7 +129,7 @@ const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     },
     resultingAction: async ( message, componentInteraction) => {
         componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
-        mainMenu.collectButtonInteraction(componentInteraction, message);
+        mainMenu.collectMenuInteraction(componentInteraction, message);
     }
 }
 
@@ -177,7 +177,7 @@ export class NavigatedMenu extends BaseMenu{
             description: menuData.description,
             fields: menuData.fields,
             components: [navigationRow, ...menuData.additionalComponents],
-            buttonBehaviors: [MAIN_MENU_BUTTON_BEHAVIOR, CLOSE_MENU_BUTTON_BEHAVIOR , ...menuData.additionalButtonBehaviors]
+            componentBehaviors: [MAIN_MENU_BUTTON_BEHAVIOR, CLOSE_MENU_BUTTON_BEHAVIOR , ...menuData.additionalComponentBehaviors]
         }
 
         super(superMenuData);

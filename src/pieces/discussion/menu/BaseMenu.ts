@@ -1,10 +1,10 @@
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions } from "discord.js";
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions, StringSelectMenuBuilder } from "discord.js";
 
 /**  
  * @interface interface of filter and action function
  * @property {function} filter - function that defines if the resulting action should execute
  * @property {function} resultingAction - function to be ran when the filter evaluates to true
- * @description the purpose of this structure is to be able to create a list of behaviors for buttons in a menu based on more than matching an id exactly.
+ * @description the purpose of this structure is to be able to create a list of behaviors forcomponents in a menu based on more than matching an id exactly.
  * For example being able to execute on a function if the first 5 characters are "page-" and you wanted the same behavior for buttons "page-1" "page-2" and "page-3" ...
 */
 export interface ComponentBehavior {
@@ -20,14 +20,14 @@ export interface ComponentBehavior {
  * @property {String} fields.name - name of the list element to be displayed in the menu
  * @property {String} fields.value - description of the list element to be displayed in the menu
  * @property {ActionRowBuilder} components - discord.js interaction rows of components to be put under the menu
- * @property {ComponentBehavior[]} buttonBehaviors - the behaviors of the buttons see ComponentBehavior interface in class.BaseMenu.ts
+ * @property {ComponentBehavior[]} componentBehaviors - the behaviors of the components see ComponentBehavior interface in class.BaseMenu.ts
 */ 
 export interface MenuData {
-    title: string, // Title that appears in the embed portion of the menu
-    description: string, // Description that appears in the embed portion of the menu
-    fields: {name: string, value: string}[], // Fields that make up the embed
-    components?: ActionRowBuilder<ButtonBuilder>[], // InteractionComponent rows that follow the embed in the menu 
-    buttonBehaviors?: ComponentBehavior[], // Component Behavior list for buttons in the menu (see above for what this means)
+    title: string,
+    description: string,
+    fields: {name: string, value: string}[],
+    components?: ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>[],
+    componentBehaviors?: ComponentBehavior[],
 }
 
 /**
@@ -39,7 +39,7 @@ export interface MenuData {
  */
 export interface buttonData {
     customId: string, 
-    label:string, 
+    label: string, 
     disabled: boolean, 
     style: ButtonStyle
 };
@@ -69,39 +69,39 @@ export class BaseMenu {
      */
     async send(client: Client, interaction: BaseInteraction): Promise<Message<false>> {
         const sentMenuMessage = await interaction.user.send(this.menuMessageData);
-        this.collectButtonInteraction(interaction, sentMenuMessage)
+        this.collectMenuInteraction(interaction, sentMenuMessage)
         return sentMenuMessage;
     }
 
-// BUTTON BEHAVIOR
+// COMPONENT BEHAVIOR
 
     /** @constant The message sent to the user when the menu expires due to inactivity */
     private static MENU_EXPIRTATION_MESSAGE = "Your discussion menu expired due to inactivity";
     /** @constant the amount of time in miliseconds before the menu expires (gets deleted) */
     private static MENU_EXPIRATION_TIME = 600_000;
 
-    /** @member list of all the behaviors for the buttons */
-    private buttonBehaviors: ComponentBehavior[];
+    /** @member list of all the behaviors for the menu components */
+    private componentBehaviors: ComponentBehavior[];
 
     /** 
      * @function handles the collection of interactions on the menu when it is sent
      * @param {Client} client - the client that the bot is logged in as
      * @param {BaseInteraction} interaction - the interaction that the menu belongs to
-     * @param {Message} message - the message from which the button interactions are being collected
+     * @param {Message} message - the message from which the component interactions are being collected
      */
-    async collectButtonInteraction(interaction: BaseInteraction, message: Message ): Promise<void> {
+    async collectMenuInteraction(interaction: BaseInteraction, message: Message ): Promise<void> {
         try {
 
-            // Filter that checks if id of the button clicker matches the id of the menu reciever (should always be that way since DM but just in case)
+            // Filter that checks if id of the component user matches the id of the menu reciever (should always be that way since DM but just in case)
             const collectorFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
 
-            // Get the button that was pressed if one was pressed before menu expires
-            const buttonPressed = await message.awaitMessageComponent( {filter: collectorFilter, time: BaseMenu.MENU_EXPIRATION_TIME } );
+            // Get the component that was pressed if one was pressed before menu expires
+            const componentUsed = await message.awaitMessageComponent( {filter: collectorFilter, time: BaseMenu.MENU_EXPIRATION_TIME } );
 
-            // For every button behavior, if the check function returns true, execute the resulting action
-            this.buttonBehaviors.forEach( (behavior: ComponentBehavior) => {
-                if(behavior.filter(buttonPressed.customId)) {
-                    behavior.resultingAction(message, buttonPressed);
+            // For every component behavior, if the check function returns true, execute the resulting action
+            this.componentBehaviors.forEach( (behavior: ComponentBehavior) => {
+                if(behavior.filter(componentUsed.customId)) {
+                    behavior.resultingAction(message, componentUsed);
                 }
             })
         }
@@ -130,16 +130,16 @@ export class BaseMenu {
             fields: menuData.fields
         });
 
-        // construct the menuMessageData to be sent to the user
+        // construct the menu Message Data for the message to be sent to the user
         this.menuMessageData = { 
             embeds: [menuEmbed],
             components: menuData.components
         }
 
-        // define the behaviors for the menu's buttons
-        this.buttonBehaviors = [];
-        if(menuData.buttonBehaviors) {
-            this.buttonBehaviors = menuData.buttonBehaviors;
+        // define the behaviors for the menu's components
+        this.componentBehaviors = [];
+        if(menuData.componentBehaviors) {
+            this.componentBehaviors = menuData.componentBehaviors;
         }
     }
 }

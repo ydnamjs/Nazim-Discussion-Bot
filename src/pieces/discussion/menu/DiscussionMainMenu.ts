@@ -65,5 +65,5 @@ export const mainMenu = new BaseMenu({
     description: MAIN_MENU_DESCRIPTION,
     fields: MAIN_MENU_FIELDS,
     components: MAIN_MENU_COMPONENTS,
-    buttonBehaviors: MAIN_MENU_BUTTON_BEHAVIORS
+    componentBehaviors: MAIN_MENU_BUTTON_BEHAVIORS
 });
