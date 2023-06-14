@@ -1,4 +1,4 @@
-import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle, ForumChannel, ThreadChannel } from "discord.js";
+import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle, ForumChannel, ThreadChannel, SelectMenuBuilder, StringSelectMenuBuilder, ActionRowBuilder } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { Course, courseModel } from "../../../../generalModels/Course";
 import { getRolesOfUserInGuild } from "../../../../generalUtilities/GetRolesOfUserInGuild";
@@ -49,7 +49,7 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     // replace the old menu with the staff menu
     const staffMenu = new StaffMenu(courseInfo);
     componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
-    staffMenu.collectButtonInteraction(componentInteraction, message);
+    staffMenu.collectMenuInteraction(componentInteraction, message);
 }
 
 /** @interface basic information about a discussion course. intended to be made into a list and fed to staff menu so that it can be used to generate the list of courses */
@@ -61,7 +61,7 @@ export interface DiscussionCourseBasicData {
 }
 
 const STAFF_MENU_TITLE = "My Courses";
-const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To access a specific course click the view course button and input the name of the course";
+const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To access a specific course select it from the drop down or click the view course button and input the name of the course";
 
 /*
 const STAFF_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
@@ -76,23 +76,38 @@ const STAFF_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
 export class StaffMenu extends NavigatedMenu {
     constructor(courseInfo: DiscussionCourseBasicData[]) {
         
-        let fields: { name: string; value: string; }[] = []
+        // generate the fields of basic info for each course and the select menu options
+        let fields: { name: string; value: string; }[] = [];
+        let selectMenuOptions: {value: string, label: string}[] = []; 
         courseInfo.forEach((course: DiscussionCourseBasicData)=>{
-            fields.push(
-                {
-                    name: course.name,
-                    value: "# of students: " + course.numStudents + "\n# of posts: " + course.numPosts + "\n# of comments: " + course.numComments
-                }
-            )
+            fields.push({
+                name: course.name,
+                value: "# of students: " + course.numStudents + "\n# of posts: " + course.numPosts + "\n# of comments: " + course.numComments
+            });
+            selectMenuOptions.push({
+                value: course.name,
+                label: course.name,
+            })
         })
         
+        const courseSelect = new StringSelectMenuBuilder({
+            custom_id: "discussion-course-select",
+            options: selectMenuOptions,
+        });
+
+        const courseSelectRow = new ActionRowBuilder<StringSelectMenuBuilder>({
+            components: [courseSelect]
+        })
+
+        // data to be fed into super class navigated menu
         const menuData: NavigatedMenuData = {
             title: STAFF_MENU_TITLE,
             description: STAFF_MENU_DESCRIPTION,
             fields: fields,
-            additionalComponents: [],
-            additionalButtonBehaviors: []
+            additionalComponents: [courseSelectRow],
+            additionalComponentBehaviors: []
         }
+
         const customNavOptions: CustomNavOptions = {
             prevButtonOptions: {},
             nextButtonOptions: {},
