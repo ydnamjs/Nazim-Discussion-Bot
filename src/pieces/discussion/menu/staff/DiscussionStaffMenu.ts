@@ -2,8 +2,9 @@ import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonS
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { Course, courseModel } from "../../../../generalModels/Course";
 import { getRolesOfUserInGuild } from "../../../../generalUtilities/GetRolesOfUserInGuild";
-import { ComponentBehavior } from "../BaseMenu";
 import { GUILDS } from "../../../../secret";
+import { ComponentBehavior } from "../BaseMenu";
+import { updateToManageCourseMenu } from "./ManageCourseMenu";
 
 /**
  * @function updates a menu so that it is now a staff menu
@@ -52,7 +53,12 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     staffMenu.collectMenuInteraction(componentInteraction, message);
 }
 
-/** @interface basic information about a discussion course. intended to be made into a list and fed to staff menu so that it can be used to generate the list of courses */
+/** 
+ * @interface basic information about a discussion course. intended to be made into a list and fed to staff menu so that it can be used to generate the list of courses 
+ * @property {string} name - name of the course
+ * @property {number} numPosts - the number of posts the course has
+ * @property {number} numComments - the number of comments the course has
+*/
 export interface DiscussionCourseBasicData {
     name: string,
     numStudents: number,
@@ -63,11 +69,36 @@ export interface DiscussionCourseBasicData {
 const STAFF_MENU_TITLE = "My Courses";
 const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To access a specific course select it from the drop down or click the view course button and input the name of the course";
 
-/*
-const STAFF_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
+const EXPAND_COURSE_BUTTON_ID = "discussion_staff_expand_button";
+const EXPAN_COURSE_BUTTON_LABEL = "expand course view";
 
+const DROP_DOWN_ID = "discussion-course-select";
+
+const EXTRA_BEHAVIORS: ComponentBehavior[] = [
+    {
+        // expand course button
+        filter: (custom_id: string) => {
+            return custom_id === EXPAND_COURSE_BUTTON_ID;
+        },
+        resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
+            // TODO: Implement functionality once modal has been created
+        }
+    },
+    {
+        // expand course button
+        filter: (custom_id: string) => {
+            return custom_id === DROP_DOWN_ID;
+        },
+        resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
+            if(componentInteraction.isStringSelectMenu()){
+                updateToManageCourseMenu(componentInteraction.values[0], message, componentInteraction);
+            }
+            else {
+                componentInteraction.reply("An error occurred. Expected a select menu event but recieved something different");
+            }
+        }
+    }
 ]
-*/
 
 /**
  * @class menu that displays basic info about a user's courses
@@ -91,7 +122,7 @@ export class StaffMenu extends NavigatedMenu {
         })
         
         const courseSelect = new StringSelectMenuBuilder({
-            custom_id: "discussion-course-select",
+            custom_id: DROP_DOWN_ID,
             options: selectMenuOptions,
         });
 
@@ -105,15 +136,15 @@ export class StaffMenu extends NavigatedMenu {
             description: STAFF_MENU_DESCRIPTION,
             fields: fields,
             additionalComponents: [courseSelectRow],
-            additionalComponentBehaviors: []
+            additionalComponentBehaviors: EXTRA_BEHAVIORS
         }
 
         const customNavOptions: CustomNavOptions = {
             prevButtonOptions: {},
             nextButtonOptions: {},
             specialMenuButton: { 
-                customId: "discussion_staff_expand_button",
-                label: "expand course view",
+                customId: EXPAND_COURSE_BUTTON_ID,
+                label: EXPAN_COURSE_BUTTON_LABEL,
                 disabled: true,
                 style: ButtonStyle.Primary
             }
