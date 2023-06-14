@@ -85,7 +85,7 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
         }
     },
     {
-        // expand course button
+        // drop down menu
         filter: (custom_id: string) => {
             return custom_id === DROP_DOWN_ID;
         },
@@ -125,6 +125,9 @@ export class StaffMenu extends NavigatedMenu {
             custom_id: DROP_DOWN_ID,
             options: selectMenuOptions,
         });
+
+        courseSelect.setMaxValues(1);
+        courseSelect.setMinValues(1);
 
         const courseSelectRow = new ActionRowBuilder<StringSelectMenuBuilder>({
             components: [courseSelect]
