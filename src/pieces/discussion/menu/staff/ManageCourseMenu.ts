@@ -1,5 +1,7 @@
-import { InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { ComponentBehavior } from "../BaseMenu";
+import { updateToStaffMenu } from "./DiscussionStaffMenu";
 
 export async function updateToManageCourseMenu(name: string, message: Message, componentInteraction: MessageComponentInteraction) {
 
@@ -7,6 +9,18 @@ export async function updateToManageCourseMenu(name: string, message: Message, c
     const manageCourseMenu = new ManageCourseMenu(name);
     componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
     manageCourseMenu.collectMenuInteraction(componentInteraction, message);
+}
+
+const BACK_BUTTON_ID = "discussion_staff_menu_button";
+
+const BACK_BUTTON_BEHAVIOR: ComponentBehavior = {
+    filter: (customId) => {
+        return customId === BACK_BUTTON_ID;
+    },
+    resultingAction: (message, componentInteraction) => {
+        updateToStaffMenu(message, componentInteraction);
+    }
+
 }
 
 export class ManageCourseMenu extends NavigatedMenu {
@@ -21,12 +35,18 @@ export class ManageCourseMenu extends NavigatedMenu {
             description: "MANAGE COURSE TEMP DESC",
             fields: fields,
             additionalComponents: [],
-            additionalComponentBehaviors: []
+            additionalComponentBehaviors: [BACK_BUTTON_BEHAVIOR]
         }
 
         const customNavOptions: CustomNavOptions = {
             prevButtonOptions: {},
             nextButtonOptions: {},
+            specialMenuButton: {
+                customId: BACK_BUTTON_ID, 
+                label: "back to my courses",
+                disabled: false,
+                style: ButtonStyle.Secondary
+            }
         };
         
         super(menuData, customNavOptions);
