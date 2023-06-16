@@ -43,8 +43,8 @@ const VIEW_STAFF_BUTTON_STYLE = ButtonStyle.Secondary
 // NAVIGATION ROW
 
 export const customNavOptions: CustomNavOptions = {
-    prevButtonOptions: {},
-    nextButtonOptions: {},
+    prevButtonOptions: {exists: false},
+    nextButtonOptions: {exists: false},
     specialMenuButton: {
         customId: BACK_BUTTON_ID, 
         label: BACK_BUTTON_LABEL,

@@ -49,9 +49,10 @@ const CLOSE_MENU_STYLE = ButtonStyle.Danger;
  * @property {boolean} disabled - **optional** the state of if the button is disabled to be used in place of default
  */
 interface customPageButtonData {
+    exists: boolean
     customId?: string, 
     label?:string, 
-    disabled?: boolean, 
+    disabled?: boolean,
 };
 
 /**
@@ -69,27 +70,31 @@ export interface CustomNavOptions {
 /**
  * @function makes an ActionRowBuilder of the navigation buttons (typically used for a navigated menu)
  * @param {CustomNavOptions} customNavOptions - object containing definitions for overwriting the defailt menu buttons (main menu and close menu are not changable nor is the the style of the page buttons)
- * @returns {ActionRowBuilder} the row containing the navigation buttons specified by the customNavOptions and defaults
+ * @returns {ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>} the row containing the navigation buttons specified by the customNavOptions and defaults
  */
-function makeNavigationRow(customNavOptions: CustomNavOptions) {
+function makeNavigationRow(customNavOptions: CustomNavOptions): ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder> {
     
     // add the previous and next page buttons
-    const navButtonData: buttonData[] = [
-        // previous page
-        {
+    const navButtonData: buttonData[] = []
+        
+    // if the previous page should exist, add it
+    if(customNavOptions.prevButtonOptions.exists)
+        navButtonData.push({
             customId: customNavOptions.prevButtonOptions.customId !== undefined ? customNavOptions.prevButtonOptions.customId : PREV_PAGE_CUSTOMID,
             label: customNavOptions.prevButtonOptions.label !== undefined ? customNavOptions.prevButtonOptions.label : PREV_PAGE_LABEL,
             disabled: customNavOptions.prevButtonOptions.disabled !== undefined ? customNavOptions.prevButtonOptions.disabled : PREV_PAGE_DISABLED,
             style: PREV_PAGE_STYLE,
-        },
-        // next page
-        {
+        });
+
+    // if the next page should exist, add it
+    if(customNavOptions.nextButtonOptions.exists) {
+        navButtonData.push({
             customId: customNavOptions.nextButtonOptions.customId !== undefined ? customNavOptions.nextButtonOptions.customId : NEXT_PAGE_CUSTOMID,
             label: customNavOptions.nextButtonOptions.label !== undefined ? customNavOptions.nextButtonOptions.label : NEXT_PAGE_LABEL,
             disabled: customNavOptions.nextButtonOptions.disabled !== undefined ? customNavOptions.nextButtonOptions.disabled : NEXT_PAGE_DISABLED,
             style: NEXT_PAGE_STYLE,
-        },
-    ];
+        })
+    }
 
     // if the parent menu isnt the main menu than add it (we wouldnt want to have two main menu buttons)
     if(customNavOptions.specialMenuButton) {
@@ -153,7 +158,7 @@ const MAX_ADDITIONAL_COMPONENT_ROWS_EXCEEDED_ERROR = "ERROR: TRIED TO CREATE A N
  */
 export class NavigatedMenu extends BaseMenu{
 
-    constructor(menuData: NavigatedMenuData, customNavOptions?: CustomNavOptions) {
+    constructor(menuData: NavigatedMenuData, pageNumber: number, customNavOptions?: CustomNavOptions) {
         
         // components have a maximum number of rows
         if(menuData.additionalComponents && menuData.additionalComponents.length > MAX_NUMBER_OF_COMPONENT_ROWS - 1) {
@@ -167,8 +172,8 @@ export class NavigatedMenu extends BaseMenu{
         }
         else {
             navigationRow = makeNavigationRow({
-                prevButtonOptions: {},
-                nextButtonOptions: {}
+                prevButtonOptions: { exists : true },
+                nextButtonOptions: { exists : true }
             });
         }
 

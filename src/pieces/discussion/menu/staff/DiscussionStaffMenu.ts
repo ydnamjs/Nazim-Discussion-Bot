@@ -143,8 +143,8 @@ export class StaffMenu extends NavigatedMenu {
         }
 
         const customNavOptions: CustomNavOptions = {
-            prevButtonOptions: {},
-            nextButtonOptions: {},
+            prevButtonOptions: { exists: true },
+            nextButtonOptions: { exists: true },
             specialMenuButton: { 
                 customId: EXPAND_COURSE_BUTTON_ID,
                 label: EXPAN_COURSE_BUTTON_LABEL,
@@ -153,6 +153,6 @@ export class StaffMenu extends NavigatedMenu {
             }
         };
         
-        super(menuData, customNavOptions);
+        super(menuData, 0, customNavOptions);
     }
 }

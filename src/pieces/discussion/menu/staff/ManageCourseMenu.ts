@@ -25,6 +25,6 @@ export class ManageCourseMenu extends NavigatedMenu {
             additionalComponentBehaviors: COURSE_MENU_ADDITIONAL_BEHAVIORS
         }
 
-        super(menuData, customNavOptions);
+        super(menuData, 0, customNavOptions);
     }
 }
