@@ -10,6 +10,11 @@ const BACK_BUTTON_LABEL = "back to my courses";
 const BACK_BUTTON_DISABLED = false;
 const BACK_BUTTON_STYLE = ButtonStyle.Secondary
 
+const GET_SCORES_BUTTON_ID = "discussion-get-scores-button";
+const GET_SCORES_BUTTON_LABEL = "Get Scores CSV";
+const GET_SCORES_BUTTON_DISABLED = true;
+const GET_SCORES_BUTTON_STYLE = ButtonStyle.Primary
+
 // NAVIGATION ROW
 
 export const customNavOptions: CustomNavOptions = {
@@ -26,10 +31,10 @@ export const customNavOptions: CustomNavOptions = {
 // SCORING ROW
 
 const GET_SCORES_BUTTON_DATA = {
-    label: "Get Scores CSV",
-    custom_id: "discussion-get-scores-button",
-    disabled: true,
-    style: ButtonStyle.Primary
+    custom_id: GET_SCORES_BUTTON_ID,
+    label: GET_SCORES_BUTTON_LABEL,
+    disabled: GET_SCORES_BUTTON_DISABLED,
+    style: GET_SCORES_BUTTON_STYLE
 };
 
 const MANAGE_POST_SCORING_BUTTON_DATA = {
