@@ -15,6 +15,11 @@ const GET_SCORES_BUTTON_LABEL = "Get Scores CSV";
 const GET_SCORES_BUTTON_DISABLED = true;
 const GET_SCORES_BUTTON_STYLE = ButtonStyle.Primary
 
+const MANAGE_POST_SCORING_BUTTON_ID = "discussion-manage-post-scoring";
+const MANAGE_POST_SCORING_BUTTON_LABEL = "Manage Post Scoring";
+const MANAGE_POST_SCORING_BUTTON_DISABLED = true;
+const MANAGE_POST_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
+
 // NAVIGATION ROW
 
 export const customNavOptions: CustomNavOptions = {
@@ -38,10 +43,10 @@ const GET_SCORES_BUTTON_DATA = {
 };
 
 const MANAGE_POST_SCORING_BUTTON_DATA = {
-    label: "Manage Post Scoring",
-    custom_id: "discussion-manage-post-scoring",
-    disabled: true,
-    style: ButtonStyle.Secondary
+    custom_id: MANAGE_POST_SCORING_BUTTON_ID,
+    label: MANAGE_POST_SCORING_BUTTON_LABEL,
+    disabled: MANAGE_POST_SCORING_BUTTON_DISABLED,
+    style: MANAGE_POST_SCORING_BUTTON_STYLE
 }
 
 const MANAGE_COMMENT_SCORING_BUTTON_DATA = {
