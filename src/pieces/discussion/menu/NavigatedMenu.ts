@@ -42,6 +42,7 @@ const CLOSE_MENU_CUSTOMID = "discussion_close_menu_button";
 const CLOSE_MENU_LABEL = "close menu";
 const CLOSE_MENU_DISABLED = false;
 const CLOSE_MENU_STYLE = ButtonStyle.Danger;
+
 /**
  * @interface interface for custom page buttons input
  * @property {String} customId - **optional** the string for the button's id to be used in place of default
@@ -96,7 +97,7 @@ function makeNavigationRow(customNavOptions: CustomNavOptions): ActionRowBuilder
         })
     }
 
-    // if the parent menu isnt the main menu than add it (we wouldnt want to have two main menu buttons)
+    // if the special button is defined, add it
     if(customNavOptions.specialMenuButton) {
         navButtonData.push({
             customId: customNavOptions.specialMenuButton.customId,
