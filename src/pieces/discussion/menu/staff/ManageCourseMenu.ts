@@ -1,7 +1,8 @@
-import { ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { ComponentBehavior } from "../BaseMenu";
 import { updateToStaffMenu } from "./DiscussionStaffMenu";
+import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
 
 export async function updateToManageCourseMenu(name: string, message: Message, componentInteraction: MessageComponentInteraction) {
 
@@ -23,6 +24,15 @@ const BACK_BUTTON_BEHAVIOR: ComponentBehavior = {
 
 }
 
+const GET_SCORES_BUTTON_DATA = {
+    label: "Get Scores CSV",
+    custom_id: "test",
+    disabled: true,
+    style: ButtonStyle.Primary
+};
+
+const SCORE_BUTTON_ROW = makeActionRowButton([GET_SCORES_BUTTON_DATA])
+
 export class ManageCourseMenu extends NavigatedMenu {
     constructor(tempTitle: string) {
         
@@ -34,10 +44,11 @@ export class ManageCourseMenu extends NavigatedMenu {
             title: tempTitle,
             description: "MANAGE COURSE TEMP DESC",
             fields: fields,
-            additionalComponents: [],
+            additionalComponents: [SCORE_BUTTON_ROW],
             additionalComponentBehaviors: [BACK_BUTTON_BEHAVIOR]
         }
 
+        // navigation row data
         const customNavOptions: CustomNavOptions = {
             prevButtonOptions: {},
             nextButtonOptions: {},
@@ -48,7 +59,7 @@ export class ManageCourseMenu extends NavigatedMenu {
                 style: ButtonStyle.Secondary
             }
         };
-        
+
         super(menuData, customNavOptions);
     }
 }
