@@ -45,7 +45,14 @@ const MANAGE_COMMENT_SCORING_BUTTON_DATA = {
     style: ButtonStyle.Secondary
 }
 
-const SCORE_BUTTON_ROW = makeActionRowButton([GET_SCORES_BUTTON_DATA, MANAGE_POST_SCORING_BUTTON_DATA, MANAGE_COMMENT_SCORING_BUTTON_DATA])
+const MANAGE_SCORE_PERIODS_BUTTON_DATA = {
+    label: "Manage Score Periods",
+    custom_id: "discussion-manage-score-periods",
+    disabled: true,
+    style: ButtonStyle.Secondary
+}
+
+const SCORE_BUTTON_ROW = makeActionRowButton([GET_SCORES_BUTTON_DATA, MANAGE_POST_SCORING_BUTTON_DATA, MANAGE_COMMENT_SCORING_BUTTON_DATA, MANAGE_SCORE_PERIODS_BUTTON_DATA])
 
 export class ManageCourseMenu extends NavigatedMenu {
     constructor(tempTitle: string) {
