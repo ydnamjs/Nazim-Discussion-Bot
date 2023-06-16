@@ -1,8 +1,6 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
-import { ComponentBehavior } from "../BaseMenu";
-import { updateToStaffMenu } from "./DiscussionStaffMenu";
-import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
+import { InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { COURSE_MENU_ADDITIONAL_BEHAVIORS, COURSE_MENU_ADDITIONAL_COMPONENTS, customNavOptions } from "./CourseMenuComponents";
 
 export async function updateToManageCourseMenu(name: string, message: Message, componentInteraction: MessageComponentInteraction) {
 
@@ -11,48 +9,6 @@ export async function updateToManageCourseMenu(name: string, message: Message, c
     componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
     manageCourseMenu.collectMenuInteraction(componentInteraction, message);
 }
-
-const BACK_BUTTON_ID = "discussion_staff_menu_button";
-
-const BACK_BUTTON_BEHAVIOR: ComponentBehavior = {
-    filter: (customId) => {
-        return customId === BACK_BUTTON_ID;
-    },
-    resultingAction: (message, componentInteraction) => {
-        updateToStaffMenu(message, componentInteraction);
-    }
-
-}
-
-const GET_SCORES_BUTTON_DATA = {
-    label: "Get Scores CSV",
-    custom_id: "discussion-get-scores-button",
-    disabled: true,
-    style: ButtonStyle.Primary
-};
-
-const MANAGE_POST_SCORING_BUTTON_DATA = {
-    label: "Manage Post Scoring",
-    custom_id: "discussion-manage-post-scoring",
-    disabled: true,
-    style: ButtonStyle.Secondary
-}
-
-const MANAGE_COMMENT_SCORING_BUTTON_DATA = {
-    label: "Manage Comment Scoring",
-    custom_id: "discussion-manage-comment-scoring",
-    disabled: true,
-    style: ButtonStyle.Secondary
-}
-
-const MANAGE_SCORE_PERIODS_BUTTON_DATA = {
-    label: "Manage Score Periods",
-    custom_id: "discussion-manage-score-periods",
-    disabled: true,
-    style: ButtonStyle.Secondary
-}
-
-const SCORE_BUTTON_ROW = makeActionRowButton([GET_SCORES_BUTTON_DATA, MANAGE_POST_SCORING_BUTTON_DATA, MANAGE_COMMENT_SCORING_BUTTON_DATA, MANAGE_SCORE_PERIODS_BUTTON_DATA])
 
 export class ManageCourseMenu extends NavigatedMenu {
     constructor(tempTitle: string) {
@@ -65,21 +21,9 @@ export class ManageCourseMenu extends NavigatedMenu {
             title: tempTitle,
             description: "MANAGE COURSE TEMP DESC",
             fields: fields,
-            additionalComponents: [SCORE_BUTTON_ROW],
-            additionalComponentBehaviors: [BACK_BUTTON_BEHAVIOR]
+            additionalComponents: COURSE_MENU_ADDITIONAL_COMPONENTS,
+            additionalComponentBehaviors: COURSE_MENU_ADDITIONAL_BEHAVIORS
         }
-
-        // navigation row data
-        const customNavOptions: CustomNavOptions = {
-            prevButtonOptions: {},
-            nextButtonOptions: {},
-            specialMenuButton: {
-                customId: BACK_BUTTON_ID, 
-                label: "back to my courses",
-                disabled: false,
-                style: ButtonStyle.Secondary
-            }
-        };
 
         super(menuData, customNavOptions);
     }
