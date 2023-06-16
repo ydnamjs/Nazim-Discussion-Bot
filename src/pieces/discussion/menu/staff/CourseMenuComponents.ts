@@ -30,6 +30,11 @@ const MANAGE_SCORE_PERIODS_BUTTON_LABEL = "Manage Score Periods";
 const MANAGE_SCORE_PERIODS_BUTTON_DISABLED = true;
 const MANAGE_SCORE_PERIODS_BUTTON_STYLE = ButtonStyle.Secondary
 
+const VIEW_STUDENTS_BUTTON_ID = "discussion-view-students";
+const VIEW_STUDENTS_BUTTON_LABEL = "View Students";
+const VIEW_STUDENTS_BUTTON_DISABLED = true;
+const VIEW_STUDENTS_BUTTON_STYLE = ButtonStyle.Secondary
+
 // NAVIGATION ROW
 
 export const customNavOptions: CustomNavOptions = {
@@ -78,10 +83,10 @@ const SCORE_BUTTON_ROW = makeActionRowButton([GET_SCORES_BUTTON_DATA, MANAGE_POS
 // PEOPLE ROW
 
 const VIEW_STUDENTS_BUTTON_DATA = {
-    label: "View Students",
-    custom_id: "discussion-view-students",
-    disabled: true,
-    style: ButtonStyle.Secondary
+    custom_id: VIEW_STUDENTS_BUTTON_ID,
+    label: VIEW_STUDENTS_BUTTON_LABEL,
+    disabled: VIEW_STUDENTS_BUTTON_DISABLED,
+    style: VIEW_STUDENTS_BUTTON_STYLE
 }
 
 const VIEW_STAFF_BUTTON_DATA = {
