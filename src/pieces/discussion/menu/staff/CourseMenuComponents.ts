@@ -20,6 +20,11 @@ const MANAGE_POST_SCORING_BUTTON_LABEL = "Manage Post Scoring";
 const MANAGE_POST_SCORING_BUTTON_DISABLED = true;
 const MANAGE_POST_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
 
+const MANAGE_COMMENT_SCORING_BUTTON_ID = "discussion-manage-comment-scoring";
+const MANAGE_COMMENT_SCORING_BUTTON_LABEL = "Manage Comment Scoring";
+const MANAGE_COMMENT_SCORING_BUTTON_DISABLED = true;
+const MANAGE_COMMENT_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
+
 // NAVIGATION ROW
 
 export const customNavOptions: CustomNavOptions = {
@@ -50,10 +55,10 @@ const MANAGE_POST_SCORING_BUTTON_DATA = {
 }
 
 const MANAGE_COMMENT_SCORING_BUTTON_DATA = {
-    label: "Manage Comment Scoring",
-    custom_id: "discussion-manage-comment-scoring",
-    disabled: true,
-    style: ButtonStyle.Secondary
+    custom_id: MANAGE_COMMENT_SCORING_BUTTON_ID,
+    label: MANAGE_COMMENT_SCORING_BUTTON_LABEL,
+    disabled: MANAGE_COMMENT_SCORING_BUTTON_DISABLED,
+    style: MANAGE_COMMENT_SCORING_BUTTON_STYLE
 }
 
 const MANAGE_SCORE_PERIODS_BUTTON_DATA = {
