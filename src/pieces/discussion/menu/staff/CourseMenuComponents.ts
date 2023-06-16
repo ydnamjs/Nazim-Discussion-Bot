@@ -61,11 +61,18 @@ const VIEW_STUDENTS_BUTTON_DATA = {
     style: ButtonStyle.Secondary
 }
 
-const PEOPLE_BUTTON_ROW = makeActionRowButton([VIEW_STUDENTS_BUTTON_DATA]);
+const VIEW_STAFF_BUTTON_DATA = {
+    label: "View Staff",
+    custom_id: "discussion-view-staff",
+    disabled: true,
+    style: ButtonStyle.Secondary
+}
+
+const PEOPLE_BUTTON_ROW = makeActionRowButton([VIEW_STUDENTS_BUTTON_DATA, VIEW_STAFF_BUTTON_DATA]);
 
 // NAVIGATION ROW BEHAVIOR
 
-export const BACK_BUTTON_BEHAVIOR: ComponentBehavior = {
+const BACK_BUTTON_BEHAVIOR: ComponentBehavior = {
     filter: (customId) => {
         return customId === BACK_BUTTON_ID;
     },
