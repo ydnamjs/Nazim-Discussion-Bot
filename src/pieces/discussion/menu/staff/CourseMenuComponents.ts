@@ -6,6 +6,9 @@ import { updateToStaffMenu } from "./DiscussionStaffMenu";
 
 // CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
+const BACK_BUTTON_LABEL = "back to my courses";
+const BACK_BUTTON_DISABLED = false;
+const BACK_BUTTON_STYLE = ButtonStyle.Secondary
 
 // NAVIGATION ROW
 
@@ -14,9 +17,9 @@ export const customNavOptions: CustomNavOptions = {
     nextButtonOptions: {},
     specialMenuButton: {
         customId: BACK_BUTTON_ID, 
-        label: "back to my courses",
-        disabled: false,
-        style: ButtonStyle.Secondary
+        label: BACK_BUTTON_LABEL,
+        disabled: BACK_BUTTON_DISABLED,
+        style: BACK_BUTTON_STYLE
     }
 };
 
@@ -83,6 +86,8 @@ const BACK_BUTTON_BEHAVIOR: ComponentBehavior = {
 }
 
 // SCORING ROW BEHAVIOR
+
+// PEOPLE ROW BEHAVIOR
 
 // EXPORTS
 export const COURSE_MENU_ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
