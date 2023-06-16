@@ -35,6 +35,11 @@ const VIEW_STUDENTS_BUTTON_LABEL = "View Students";
 const VIEW_STUDENTS_BUTTON_DISABLED = true;
 const VIEW_STUDENTS_BUTTON_STYLE = ButtonStyle.Secondary
 
+const VIEW_STAFF_BUTTON_ID = "discussion-view-staff";
+const VIEW_STAFF_BUTTON_LABEL = "View Staff";
+const VIEW_STAFF_BUTTON_DISABLED = true;
+const VIEW_STAFF_BUTTON_STYLE = ButtonStyle.Secondary
+
 // NAVIGATION ROW
 
 export const customNavOptions: CustomNavOptions = {
@@ -90,10 +95,10 @@ const VIEW_STUDENTS_BUTTON_DATA = {
 }
 
 const VIEW_STAFF_BUTTON_DATA = {
-    label: "View Staff",
-    custom_id: "discussion-view-staff",
-    disabled: true,
-    style: ButtonStyle.Secondary
+    custom_id: VIEW_STAFF_BUTTON_ID,
+    label: VIEW_STAFF_BUTTON_LABEL,
+    disabled: VIEW_STAFF_BUTTON_DISABLED,
+    style: VIEW_STAFF_BUTTON_STYLE
 }
 
 const PEOPLE_BUTTON_ROW = makeActionRowButton([VIEW_STUDENTS_BUTTON_DATA, VIEW_STAFF_BUTTON_DATA]);
