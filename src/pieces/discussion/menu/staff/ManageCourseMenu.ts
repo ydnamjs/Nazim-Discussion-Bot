@@ -26,12 +26,19 @@ const BACK_BUTTON_BEHAVIOR: ComponentBehavior = {
 
 const GET_SCORES_BUTTON_DATA = {
     label: "Get Scores CSV",
-    custom_id: "test",
+    custom_id: "discussion-get-scores-button",
     disabled: true,
     style: ButtonStyle.Primary
 };
 
-const SCORE_BUTTON_ROW = makeActionRowButton([GET_SCORES_BUTTON_DATA])
+const MANAGE_POST_SCORING_BUTTON_DATA = {
+    label: "Manage Post Scoring",
+    custom_id: "discussion-manage-post-scoring",
+    disabled: true,
+    style: ButtonStyle.Secondary
+}
+
+const SCORE_BUTTON_ROW = makeActionRowButton([GET_SCORES_BUTTON_DATA, MANAGE_POST_SCORING_BUTTON_DATA])
 
 export class ManageCourseMenu extends NavigatedMenu {
     constructor(tempTitle: string) {
