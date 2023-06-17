@@ -4,6 +4,11 @@ import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow"
 import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { ComponentBehavior } from "../BaseMenu";
 
+// MENU TEXT CONSTANTS
+const COURSE_NAME_PREFIX = "CISC ";
+const COURSE_NAME_SUFFIX = " MAIN MENU";
+const MENU_DESCRIPTION = "Welcome to the course expanded menu! Below this you will find a collection of buttons to manage various parts of your course. Please click the button the corresponds to the action you would like to take";
+
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
 const BACK_BUTTON_LABEL = "back to my courses";
@@ -43,8 +48,8 @@ const VIEW_STAFF_BUTTON_STYLE = ButtonStyle.Secondary
 // NAVIGATION ROW
 
 const customNavOptions: CustomNavOptions = {
-    prevButtonOptions: {exists: false},
-    nextButtonOptions: {exists: false},
+    prevButtonOptions: {exists: true},
+    nextButtonOptions: {exists: true},
     specialMenuButton: {
         customId: BACK_BUTTON_ID, 
         label: BACK_BUTTON_LABEL,
@@ -113,7 +118,7 @@ export async function updateToManageCourseMenu(name: string, message: Message, c
 }
 
 export class ManageCourseMenu extends NavigatedMenu {
-    constructor(tempTitle: string) {
+    constructor(courseTitle: string) {
         
         // generate the fields of basic info for each course and the select menu options
         let fields: { name: string; value: string; }[] = [];
@@ -196,8 +201,8 @@ export class ManageCourseMenu extends NavigatedMenu {
 
         // data to be fed into super class navigated menu
         const menuData: NavigatedMenuData = {
-            title: tempTitle,
-            description: "MANAGE COURSE TEMP DESC",
+            title: COURSE_NAME_PREFIX + courseTitle.toUpperCase() + COURSE_NAME_SUFFIX,
+            description: MENU_DESCRIPTION,
             fields: fields,
             additionalComponents: COURSE_MENU_ADDITIONAL_COMPONENTS,
             additionalComponentBehaviors: COURSE_MENU_ADDITIONAL_BEHAVIORS
