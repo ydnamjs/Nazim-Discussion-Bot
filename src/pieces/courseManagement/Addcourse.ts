@@ -2,6 +2,7 @@ import { OverwriteResolvable, CommandInteraction, Client, PermissionsBitField, C
 import { Course, courseModel } from '../../generalModels/Course';
 import { Command } from '../../command/Command';
 import { GUILDS, ROLES } from '../../secret';
+import { DEFAULT_DISCUSSION_SPECS } from './DiscussionRulesDefaults';
 
 export const addCourse: Command = {
     
@@ -108,9 +109,11 @@ export const addCourse: Command = {
             reason: reason
         });
 
+        const isDiscussion = interaction.options.get('is-discussion') !== undefined && interaction.options.get('is-discussion')?.value
+
         let discussionChannel = undefined
 
-        if(interaction.options.get('is-discussion') !== undefined && interaction.options.get('is-discussion')?.value) {
+        if(isDiscussion) {
             discussionChannel = await interaction.guild.channels.create({
                 name: `${course}_discussion`,
                 type: ChannelType.GuildForum,
@@ -149,7 +152,8 @@ export const addCourse: Command = {
 				staff: staffRole.id,
 				student: studentRole.id
 			},
-			assignments: ['hw1', 'hw2', 'hw3', 'hw4', 'hw5', 'lab1', 'lab2', 'lab3', 'lab4', 'lab5']
+			assignments: ['hw1', 'hw2', 'hw3', 'hw4', 'hw5', 'lab1', 'lab2', 'lab3', 'lab4', 'lab5'],
+            discussionSpecs: isDiscussion? DEFAULT_DISCUSSION_SPECS : null
 		};
 
 		await new courseModel(newCourse).save();
