@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/_Bot.ts",
-    "reg-global": "ts-node src/interaction/command/script.CommandRegistration.ts register global",
-    "reg-ydna": "ts-node src/interaction/command/script.CommandRegistration.ts register ydna",
-    "reg-nazim": "ts-node src/interaction/command/script.CommandRegistration.ts register nazim",
-    "unreg-global": "ts-node src/interaction/command/script.CommandRegistration.ts unregister global",
-    "unreg-ydna": "ts-node src/interaction/command/script.CommandRegistration.ts unregister ydna",
-    "unreg-nazim": "ts-node src/interaction/command/script.CommandRegistration.ts unregister nazim"
+    "reg-global": "ts-node src/command/CommandRegistration.ts register global",
+    "reg-ydna": "ts-node src/command/CommandRegistration.ts register ydna",
+    "reg-nazim": "ts-node src/command/CommandRegistration.ts register nazim",
+    "unreg-global": "ts-node src/command/CommandRegistration.ts unregister global",
+    "unreg-ydna": "ts-node src/command/CommandRegistration.ts unregister ydna",
+    "unreg-nazim": "ts-node src/command/CommandRegistration.ts unregister nazim"
   },
   "author": "Michael Snead",
   "license": "GPLV3",
