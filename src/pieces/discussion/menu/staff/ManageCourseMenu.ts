@@ -4,11 +4,6 @@ import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow"
 import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { ComponentBehavior } from "../BaseMenu";
 
-// MENU TEXT CONSTANTS
-const COURSE_NAME_PREFIX = "CISC ";
-const COURSE_NAME_SUFFIX = " MAIN MENU";
-const MENU_DESCRIPTION = "Welcome to the course expanded menu! Below this you will find a collection of buttons to manage various parts of your course. Please click the button the corresponds to the action you would like to take";
-
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
 const BACK_BUTTON_LABEL = "back to my courses";
@@ -117,11 +112,55 @@ export async function updateToManageCourseMenu(name: string, message: Message, c
     manageCourseMenu.collectMenuInteraction(componentInteraction, message);
 }
 
+// MENU TEXT CONSTANTS
+const COURSE_NAME_PREFIX = "CISC ";
+const COURSE_NAME_SUFFIX = " - COURSE MENU";
+const MENU_DESCRIPTION = "**Welcome to the course expanded menu! Below this you will find a description of each button in the menu. Please read the descriptions and click the button that corresponds to the action you would like to take**";
+
+const GET_SCORES_CSV_DESCRIPTION = "Click the \"" + GET_SCORES_BUTTON_LABEL + "\" button to open a modal for recieving scores as a comma separated values file";
+const MANAGE_POST_SCORING_DESCRIPTION = "Click the \"" + MANAGE_POST_SCORING_BUTTON_LABEL + "\" button to open a menu for managing the points, requirements, and awards settings for posts";
+const MANAGE_COMMENT_SCORING_DESCRIPTION = "Click the \"" + MANAGE_COMMENT_SCORING_BUTTON_LABEL + "\" button to open a menu for managing the points, requirements, and awards settings for comments";
+const MANAGE_SCORE_PERIODS_DESCRIPTION = "Click the \"" + MANAGE_SCORE_PERIODS_BUTTON_LABEL + "\" button to open a menu for viewing and editing the score periods for the course";
+const VIEW_STUDENTS_DESCRIPTION = "Click the \"" + VIEW_STUDENTS_BUTTON_LABEL + "\" button to open a menu for viewing a list of students with various stats about them";
+const VIEW_STAFF_DESCRIPTION = "Click the \"" + VIEW_STAFF_BUTTON_LABEL + "\" button to open a menu for viewing a list of staff members with various stats about them";
+
+
 export class ManageCourseMenu extends NavigatedMenu {
     constructor(courseTitle: string) {
         
         // generate the fields of basic info for each course and the select menu options
-        let fields: { name: string; value: string; }[] = [];
+        let fields: { name: string; value: string; }[] = [
+            // get scores csv button explanation
+            {
+                name: GET_SCORES_BUTTON_LABEL,
+                value: GET_SCORES_CSV_DESCRIPTION
+            },
+            // manage post scoring button explanation
+            {
+                name: MANAGE_POST_SCORING_BUTTON_LABEL,
+                value: MANAGE_POST_SCORING_DESCRIPTION
+            },
+            // manage comment scoring button explanation
+            {
+                name: MANAGE_COMMENT_SCORING_BUTTON_LABEL,
+                value: MANAGE_COMMENT_SCORING_DESCRIPTION
+            },
+            // manage score periods button explanation
+            {
+                name: MANAGE_SCORE_PERIODS_BUTTON_LABEL,
+                value: MANAGE_SCORE_PERIODS_DESCRIPTION
+            },
+            // view students button explanation
+            {
+                name: VIEW_STUDENTS_BUTTON_LABEL,
+                value: VIEW_STUDENTS_DESCRIPTION
+            },
+            // view staff button explanation
+            {
+                name: VIEW_STAFF_BUTTON_LABEL,
+                value: VIEW_STAFF_DESCRIPTION
+            }
+        ];
 
         // list of additional components
         const COURSE_MENU_ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
