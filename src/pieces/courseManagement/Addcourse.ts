@@ -149,7 +149,8 @@ export const addCourse: Command = {
 				staff: staffRole.id,
 				student: studentRole.id
 			},
-			assignments: ['hw1', 'hw2', 'hw3', 'hw4', 'hw5', 'lab1', 'lab2', 'lab3', 'lab4', 'lab5']
+			assignments: ['hw1', 'hw2', 'hw3', 'hw4', 'hw5', 'lab1', 'lab2', 'lab3', 'lab4', 'lab5'],
+            discussionSpecs: null
 		};
 
 		await new courseModel(newCourse).save();

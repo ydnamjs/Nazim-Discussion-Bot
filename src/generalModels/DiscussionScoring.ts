@@ -4,7 +4,7 @@
  * @property {number} points - the number of points given to the maker of the post or comment
  * @property {boolean} trackStudents - whether students can give this award or not
  */
-interface Award {
+export interface Award {
     reaction: string,
     points: number,
     trackStudents: boolean
@@ -19,7 +19,7 @@ interface Award {
  * @property {number} minLinks - the minimum number of links needed for a post to earn points
  * @property {Award[]} awards - a list of all the awards that posts are elligible to earn
  */
-interface PostSpecs {
+export interface PostSpecs {
     points: number,
     commentPoints: number,
     minLength: number,
@@ -36,7 +36,7 @@ interface PostSpecs {
  * @property {number} minLinks - the minimum number of links needed for a comment to earn points
  * @property {Award[]} awards - a list of all the awards that comments are elligible to earn
  */
-interface CommentSpecs {
+export interface CommentSpecs {
     points: number,
     minLength: number,
     minParagraphs: number,
@@ -51,7 +51,7 @@ interface CommentSpecs {
  * @property {number} goalPoints - the number of points the instructor defined as the target to meet
  * @property {number} maxPoints - the maximum number of points that can be earned in a score period (should not be less than goalPoints)
  */
-interface ScorePeriod {
+export interface ScorePeriod {
     start: Date,
     end: Date,
     goalPoints: number,
@@ -64,7 +64,7 @@ interface ScorePeriod {
  * @property {CommentSpecs} commentSpecs - the specification on how comments should be scored
  * @property {ScorePeriod[]} scorePeriods - a list of score periods for when posts should be scored
  */
-interface discussionSpecs {
+export interface DiscussionSpecs {
     postSpecs: PostSpecs,
     commentSpecs: CommentSpecs,
     scorePeriods: ScorePeriod[]

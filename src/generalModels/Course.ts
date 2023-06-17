@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { DiscussionSpecs } from "./DiscussionScoring";
 
 // from udcis/sage https://github.com/ud-cis-discord/Sage
 export interface Course {
@@ -15,6 +16,7 @@ export interface Course {
 		staff: string;
 	}
 	assignments: Array<string>;
+    discussionSpecs: DiscussionSpecs | null
 }
 
 //schema
@@ -32,6 +34,37 @@ export const course_schema: Schema = new mongoose.Schema({
 		staff: String,
 	},
 	assignments: Array<String>,
+    discussionSpecs: {
+        postSpecs: {
+            points: Number,
+            commentPoints: Number,
+            minLength: Number,
+            minParagraphs: Number,
+            minLinks: Number,
+            awards: Array<{
+                reaction: string,
+                points: number,
+                trackStudents: boolean
+            }>,
+        },
+        commentSpecs: {
+            points: Number,
+            minLength: Number,
+            minParagraphs: Number,
+            minLinks: Number,
+            awards: Array<{
+                reaction: string,
+                points: number,
+                trackStudents: boolean
+            }>,
+        },
+        scorePeriods: Array<{
+            start: Date,
+            end: Date,
+            goalPoints: number,
+            maxPoints: number
+        }>
+    }
 },
 {
     versionKey: false
