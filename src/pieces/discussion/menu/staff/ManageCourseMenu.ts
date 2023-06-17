@@ -3,6 +3,7 @@ import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../Navigated
 import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
 import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { ComponentBehavior } from "../BaseMenu";
+import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
@@ -32,7 +33,7 @@ const MANAGE_SCORE_PERIODS_BUTTON_STYLE = ButtonStyle.Secondary
 
 const VIEW_STUDENTS_BUTTON_ID = "discussion-view-students";
 const VIEW_STUDENTS_BUTTON_LABEL = "View Students";
-const VIEW_STUDENTS_BUTTON_DISABLED = true;
+const VIEW_STUDENTS_BUTTON_DISABLED = false;
 const VIEW_STUDENTS_BUTTON_STYLE = ButtonStyle.Secondary
 
 const VIEW_STAFF_BUTTON_ID = "discussion-view-staff";
@@ -223,7 +224,7 @@ export class ManageCourseMenu extends NavigatedMenu {
                     return customId === VIEW_STUDENTS_BUTTON_ID;
                 },
                 resultingAction: (message, componentInteraction) => {
-                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                    updateToViewStudentsMenu(courseTitle, message, componentInteraction);
                 }
             },
 
