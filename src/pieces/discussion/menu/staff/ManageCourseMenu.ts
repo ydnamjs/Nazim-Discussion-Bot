@@ -1,4 +1,4 @@
-import { ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { ButtonStyle, Component, InteractionUpdateOptions, Message, MessageComponentInteraction, messageLink } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
 import { updateToStaffMenu } from "./DiscussionStaffMenu";
@@ -103,18 +103,6 @@ const VIEW_STAFF_BUTTON_DATA = {
 
 const PEOPLE_BUTTON_ROW = makeActionRowButton([VIEW_STUDENTS_BUTTON_DATA, VIEW_STAFF_BUTTON_DATA]);
 
-// NAVIGATION ROW BEHAVIOR
-
-const BACK_BUTTON_BEHAVIOR: ComponentBehavior = {
-    filter: (customId) => {
-        return customId === BACK_BUTTON_ID;
-    },
-    resultingAction: (message, componentInteraction) => {
-        updateToStaffMenu(message, componentInteraction);
-    }
-
-}
-
 // UPDATE FUNCTION
 export async function updateToManageCourseMenu(name: string, message: Message, componentInteraction: MessageComponentInteraction) {
 
@@ -133,11 +121,77 @@ export class ManageCourseMenu extends NavigatedMenu {
         // list of additional components
         const COURSE_MENU_ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
         
-        
-
         // list of component behaviors
-        const COURSE_MENU_ADDITIONAL_BEHAVIORS = [
-            BACK_BUTTON_BEHAVIOR,
+        const COURSE_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
+            // BACK TO MY COURSES BUTTON BEHAVIOR
+            {
+                filter: (customId) => {
+                    return customId === BACK_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    updateToStaffMenu(message, componentInteraction);
+                }
+            },
+
+            // GET SCORES CSV BUTTON BEHAVIOR
+            {
+                filter: (customId) => {
+                    return customId === GET_SCORES_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                }
+            },
+
+            // MANAGE POST SCORING BUTTON BEHAVIOR
+            {
+                filter: (customId) => {
+                    return customId === MANAGE_POST_SCORING_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                }
+            },
+
+            // MANAGE COMMENT SCORING BUTTON BEHAVIOR
+            {
+                filter: (customId) => {
+                    return customId === MANAGE_COMMENT_SCORING_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                }
+            },
+
+            // MANAGE SCORE PERIODS BUTTON BEHAVIOR
+            {
+                filter: (customId) => {
+                    return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                }
+            },
+
+            // VIEW STUDENTS BUTTON BEHAVIOR
+            {
+                filter: (customId) => {
+                    return customId === VIEW_STUDENTS_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                }
+            },
+
+            // VIEW STAFF BUTTON BEHAVIOR
+            {
+                filter: (customId) => {
+                    return customId === VIEW_STAFF_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                }
+            },
         ]
 
         // data to be fed into super class navigated menu
