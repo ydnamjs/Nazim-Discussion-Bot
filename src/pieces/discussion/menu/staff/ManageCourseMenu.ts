@@ -6,27 +6,27 @@ import { ComponentBehavior } from "../BaseMenu";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
-const BACK_BUTTON_LABEL = "back to my courses";
+const BACK_BUTTON_LABEL = "Back To My Courses";
 const BACK_BUTTON_DISABLED = false;
 const BACK_BUTTON_STYLE = ButtonStyle.Secondary
 
 const GET_SCORES_BUTTON_ID = "discussion-get-scores-button";
-const GET_SCORES_BUTTON_LABEL = "Get Scores CSV";
+const GET_SCORES_BUTTON_LABEL = "Get Scores";
 const GET_SCORES_BUTTON_DISABLED = true;
 const GET_SCORES_BUTTON_STYLE = ButtonStyle.Primary
 
 const MANAGE_POST_SCORING_BUTTON_ID = "discussion-manage-post-scoring";
-const MANAGE_POST_SCORING_BUTTON_LABEL = "Manage Post Scoring";
+const MANAGE_POST_SCORING_BUTTON_LABEL = "Post Scoring";
 const MANAGE_POST_SCORING_BUTTON_DISABLED = true;
 const MANAGE_POST_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
 
 const MANAGE_COMMENT_SCORING_BUTTON_ID = "discussion-manage-comment-scoring";
-const MANAGE_COMMENT_SCORING_BUTTON_LABEL = "Manage Comment Scoring";
+const MANAGE_COMMENT_SCORING_BUTTON_LABEL = "Comment Scoring";
 const MANAGE_COMMENT_SCORING_BUTTON_DISABLED = true;
 const MANAGE_COMMENT_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
 
 const MANAGE_SCORE_PERIODS_BUTTON_ID = "discussion-manage-score-periods";
-const MANAGE_SCORE_PERIODS_BUTTON_LABEL = "Manage Score Periods";
+const MANAGE_SCORE_PERIODS_BUTTON_LABEL = "Score Periods";
 const MANAGE_SCORE_PERIODS_BUTTON_DISABLED = true;
 const MANAGE_SCORE_PERIODS_BUTTON_STYLE = ButtonStyle.Secondary
 
