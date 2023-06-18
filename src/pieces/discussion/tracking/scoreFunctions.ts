@@ -1,5 +1,5 @@
-import { Message, MessageReaction, ReactionEmoji } from "discord.js";
-import { AwardSpecs, CommentSpecs } from "../../../generalModels/DiscussionScoring";
+import { BaseChannel, ChannelType, Message, MessageReaction, ThreadChannel } from "discord.js";
+import { AwardSpecs, CommentSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
 import { userHasRoleWithId } from "src/generalUtilities/GetRolesOfUserInGuild";
 
 /**
@@ -8,7 +8,7 @@ import { userHasRoleWithId } from "src/generalUtilities/GetRolesOfUserInGuild";
  * @property {boolean} passedParagraph - whether the post or comment met the paragraph requirement specified in the course it belongs to
  * @property {boolean} passedLinks = whether the post or comment met the link requirement specified in the course it belongs to
  */
-interface ScoreChecks {
+export interface ScoreChecks {
     passedLength: boolean,
     passedParagraph: boolean,
     passedLinks: boolean
@@ -26,9 +26,9 @@ interface ScoreChecks {
 export function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, staffId: string): {score: number, scoreChecks: ScoreChecks} {
     
     // score the content of the comment
-    const scoreInfo = scoreCommentContent(comment.content, commentSpecs)
+    const scoreInfo = scoreDiscussionContent(comment.content, commentSpecs)
 
-    // score the awards of the comment
+    // add score for the awards of the comment
     const reactions = [...comment.reactions.cache.values()];
     const awards = commentSpecs.awards;
     scoreInfo.score += scoreAllAwards(reactions, awards, staffId);
@@ -37,14 +37,41 @@ export function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, 
 }
 
 /**
- * @function calculates the score of the comment's content based on the requirements specified in the comment specs
- * @param {string} content - the content of the message to be scored
- * @param {CommentSpecs} commentSpecs - the specifications to score the comment with 
- * @returns {object} scoreInfo - object containing information about the scoring of the comment
- * @property {number} scoreInfo.score - the number of points that the content of the comment earned based on the scoring specification
- * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment met (useful for giving feedback to students whose comments did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
+ * @function calculates the entire score of a post
+ * @param {Message} post - the discord message of the post being scored
+ * @param {postSpecs} postSpecs - the specification used to score this post (should be based on the course this post was made for)
+ * @param {string} staffId - the id that can give staff awards (should be based on the course this post was made for)
+ * @returns {object} scoreInfo - object containing information about the scoring of the post
+ * @property {number} scoreInfo.score - the number of points that the post earned based on the scoring specification
+ * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the post met (useful for giving feedback to students whose posts did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
  */
-export function scoreCommentContent(content: string, commentSpecs: CommentSpecs): {score: number, scoreChecks: ScoreChecks} {
+export async function scoreWholePost(post: Message, postSpecs: PostSpecs, staffId: string): Promise<{ score: number; scoreChecks: ScoreChecks; }> {
+    // score the content of the post
+    const scoreInfo = scoreDiscussionContent(post.content, postSpecs)
+
+    // add score for the awards of the post
+    const reactions = [...post.reactions.cache.values()];
+    const awards = postSpecs.awards;
+    scoreInfo.score += scoreAllAwards(reactions, awards, staffId);
+
+    // add score for the comments that the post spawned
+    const postChannel = await post.client.channels.fetch(post.id);
+    if(postChannel && (postChannel.type === ChannelType.PublicThread || postChannel.type === ChannelType.PrivateThread) && (postChannel.messageCount)) {
+        scoreInfo.score += postChannel.messageCount * postSpecs.commentPoints;
+    }
+
+    return scoreInfo;
+}
+
+/**
+ * @function calculates the score of the comment or post's content based on the requirements specified in the specs
+ * @param {string} content - the content of the post or comment to be scored
+ * @param {CommentSpecs | PostSpecs} specs - the specifications to score the comment or post with
+ * @returns {object} scoreInfo - object containing information about the scoring of the comment or post
+ * @property {number} scoreInfo.score - the number of points that the content of the comment or post earned based on the scoring specification
+ * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment or post met (useful for giving feedback to students whose comments or posts did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
+ */
+export function scoreDiscussionContent(content: string, specs: CommentSpecs | PostSpecs): {score: number, scoreChecks: ScoreChecks} {
     // remove multiple new lines in a row and newlines and spaces at the end
     const contentTrimmed = (content.replace(/[\r\n]+/g, '\n')).trim();
     // remove all empty spaces
@@ -52,14 +79,14 @@ export function scoreCommentContent(content: string, commentSpecs: CommentSpecs)
 
     let score = 0;
     const scoreChecks = {
-        passedLength: contentNoEmpty.length >= commentSpecs.minLength,
-        passedParagraph: countParagraphs(contentTrimmed) >= commentSpecs.minParagraphs,
-        passedLinks: countLinks(contentTrimmed) >= commentSpecs.minLinks
+        passedLength: contentNoEmpty.length >= specs.minLength,
+        passedParagraph: countParagraphs(contentTrimmed) >= specs.minParagraphs,
+        passedLinks: countLinks(contentTrimmed) >= specs.minLinks
     }
 
     // if all the checks are met, award the points
     if(scoreChecks.passedLength && scoreChecks.passedParagraph && scoreChecks.passedLinks) {
-        score = commentSpecs.points;    
+        score = specs.points;    
     }
 
     return {score: score, scoreChecks: scoreChecks}
