@@ -1,5 +1,5 @@
-import { Message, ReactionEmoji } from "discord.js";
-import { CommentSpecs } from "../../../generalModels/DiscussionScoring";
+import { Message, MessageReaction, ReactionEmoji } from "discord.js";
+import { AwardSpecs, CommentSpecs } from "../../../generalModels/DiscussionScoring";
 import { userHasRoleWithId } from "src/generalUtilities/GetRolesOfUserInGuild";
 
 /**
@@ -14,7 +14,16 @@ interface ScoreChecks {
     passedLinks: boolean
 }
 
-function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, staffId: string): {score: number, scoreChecks: ScoreChecks} {
+/**
+ * @function calculates the entire score of a comment
+ * @param {Message} comment - the discord message of the comment being scored
+ * @param {CommentSpecs} commentSpecs - the specification used to score this comment (should be based on the course this comment was made for)
+ * @param {string} staffId - the id that can give staff awards (should be based on the course this comment was made for)
+ * @returns {object} scoreInfo - object containing information about the scoring of the comment
+ * @property {number} scoreInfo.score - the number of points that the comment earned based on the scoring specification
+ * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the post met (useful for giving feedback to students whose comments did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
+ */
+export function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, staffId: string): {score: number, scoreChecks: ScoreChecks} {
     
     // remove multiple new lines in a row and newlines and spaces at the end
     const contentTrimmed = (comment.content.replace(/[\r\n]+/g, '\n')).trim();
@@ -34,30 +43,10 @@ function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, staffId
     }
 
     // count award points
-    const reactions = [...comment.reactions.cache.values()]
-    reactions.forEach(async (reaction) => {
+    const reactions = [...comment.reactions.cache.values()];
+    const awards = commentSpecs.awards;
 
-        const awardSpecs = commentSpecs.awards.get(reaction.emoji.toString())
-
-        // if the reaction is a valid award
-        if(awardSpecs) {
-
-            // award points for everyone if everyone can add
-            if(awardSpecs.trackStudents){
-                score += awardSpecs.points * [...(await reaction.users.fetch())].length
-            }
-            // award points only for staff members that reacted if only staff can react
-            else {
-                let numStaff = 0;
-                [...(await reaction.users.fetch()).values()].forEach(async (user) => {
-                    if( await userHasRoleWithId(user, staffId)) {
-                        numStaff += 1;
-                    }
-                })
-                score += awardSpecs.points * numStaff;
-            }
-        }
-    })
+    score += scoreAllAwards(reactions, awards, staffId);
 
     return {score: score, scoreChecks: scoreChecks};
 }
@@ -90,4 +79,44 @@ function countLinks(content: string):number {
     }
     
     return countArr.length;
+}
+
+/**
+ * @function calculates the score for the awards of a given post or comment
+ * @param {MessageReaction[]} reactions - all of the reactions that exist on the post or comment whose awards are being calculated for
+ * @param {Map<string, AwardSpecs>} awards - the map of awards to check for and score based on
+ * @param {string} staffId - the id of the role that can give staff only awards
+ * @returns {number} - the amount of points earned for all awards on a post
+ */
+function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, AwardSpecs>, staffId: string): number {
+    
+    let totalAwardScore = 0;
+    
+    reactions.forEach(async (reaction) => {
+
+        // get the award specs for the given award
+        const awardSpecs = awards.get(reaction.emoji.toString())
+
+        // if the award specs exist, then the reaction is a real award
+        if(awardSpecs) {
+
+            // if students can give the award, then every person who reacted counts
+            if(awardSpecs.trackStudents){
+                totalAwardScore += awardSpecs.points * [...(await reaction.users.fetch())].length
+            }
+
+            // award points only for staff members that reacted
+            else {
+                const reactors = [...(await reaction.users.fetch()).values()];
+                
+                reactors.forEach(async (user) => {
+                    if( await userHasRoleWithId(user, staffId)) {
+                        totalAwardScore += awardSpecs.points;
+                    }
+                })
+            }
+        }
+    })
+
+    return totalAwardScore;
 }
