@@ -21,12 +21,32 @@ interface ScoreChecks {
  * @param {string} staffId - the id that can give staff awards (should be based on the course this comment was made for)
  * @returns {object} scoreInfo - object containing information about the scoring of the comment
  * @property {number} scoreInfo.score - the number of points that the comment earned based on the scoring specification
- * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the post met (useful for giving feedback to students whose comments did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
+ * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment met (useful for giving feedback to students whose comments did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
  */
 export function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, staffId: string): {score: number, scoreChecks: ScoreChecks} {
     
+    // score the content of the comment
+    const scoreInfo = scoreCommentContent(comment.content, commentSpecs)
+
+    // score the awards of the comment
+    const reactions = [...comment.reactions.cache.values()];
+    const awards = commentSpecs.awards;
+    scoreInfo.score += scoreAllAwards(reactions, awards, staffId);
+
+    return scoreInfo;
+}
+
+/**
+ * @function calculates the score of the comment's content based on the requirements specified in the comment specs
+ * @param {string} content - the content of the message to be scored
+ * @param {CommentSpecs} commentSpecs - the specifications to score the comment with 
+ * @returns {object} scoreInfo - object containing information about the scoring of the comment
+ * @property {number} scoreInfo.score - the number of points that the content of the comment earned based on the scoring specification
+ * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment met (useful for giving feedback to students whose comments did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
+ */
+export function scoreCommentContent(content: string, commentSpecs: CommentSpecs): {score: number, scoreChecks: ScoreChecks} {
     // remove multiple new lines in a row and newlines and spaces at the end
-    const contentTrimmed = (comment.content.replace(/[\r\n]+/g, '\n')).trim();
+    const contentTrimmed = (content.replace(/[\r\n]+/g, '\n')).trim();
     // remove all empty spaces
     const contentNoEmpty = contentTrimmed.replace(/[\s]+/g, '');
 
@@ -42,13 +62,8 @@ export function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, 
         score = commentSpecs.points;    
     }
 
-    // count award points
-    const reactions = [...comment.reactions.cache.values()];
-    const awards = commentSpecs.awards;
+    return {score: score, scoreChecks: scoreChecks}
 
-    score += scoreAllAwards(reactions, awards, staffId);
-
-    return {score: score, scoreChecks: scoreChecks};
 }
 
 /**
