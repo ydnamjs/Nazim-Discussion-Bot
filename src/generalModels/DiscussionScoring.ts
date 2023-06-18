@@ -4,8 +4,7 @@
  * @property {number} points - the number of points given to the maker of the post or comment
  * @property {boolean} trackStudents - whether students can give this award or not
  */
-export interface Award {
-    reaction: string,
+export interface AwardSpecs {
     points: number,
     trackStudents: boolean
 }
@@ -17,7 +16,7 @@ export interface Award {
  * @property {number} minLength - the minimum number of characters needed for a post to earn points
  * @property {number} minParagraphs - the minimum number of paragraphs needed for a post to earn points
  * @property {number} minLinks - the minimum number of links needed for a post to earn points
- * @property {Award[]} awards - a list of all the awards that posts are elligible to earn
+ * @property {Map<string, AwardSpecs>} awards - a map of all the awards (key is the to string of the emoji for the award. values are the specs for the award)
  */
 export interface PostSpecs {
     points: number,
@@ -25,7 +24,7 @@ export interface PostSpecs {
     minLength: number,
     minParagraphs: number,
     minLinks: number,
-    awards: Award[],
+    awards: Map<string, AwardSpecs>,
 }
 
 /**
@@ -41,7 +40,7 @@ export interface CommentSpecs {
     minLength: number,
     minParagraphs: number,
     minLinks: number,
-    awards: Award[],
+    awards: Map<string, AwardSpecs>,
 }
 
 /**

@@ -44,19 +44,17 @@ export const course_schema: Schema = new mongoose.Schema({
             minLength: Number,
             minParagraphs: Number,
             minLinks: Number,
-            awards: Array<{
-                reaction: string,
+            awards: Map<string, {
                 points: number,
                 trackStudents: boolean
-            }>,
+            }>
         },
         commentSpecs: {
             points: Number,
             minLength: Number,
             minParagraphs: Number,
             minLinks: Number,
-            awards: Array<{
-                reaction: string,
+            awards: Map<string, {
                 points: number,
                 trackStudents: boolean
             }>,
