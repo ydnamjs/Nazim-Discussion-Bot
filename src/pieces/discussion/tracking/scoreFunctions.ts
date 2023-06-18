@@ -1,6 +1,6 @@
-import { BaseChannel, ChannelType, Message, MessageReaction, ThreadChannel } from "discord.js";
+import { ChannelType, Message, MessageReaction } from "discord.js";
 import { AwardSpecs, CommentSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
-import { userHasRoleWithId } from "src/generalUtilities/GetRolesOfUserInGuild";
+import { userHasRoleWithId } from "../../../generalUtilities/GetRolesOfUserInGuild";
 
 /**
  * @interface collection of what requirements were met for a comment or post
