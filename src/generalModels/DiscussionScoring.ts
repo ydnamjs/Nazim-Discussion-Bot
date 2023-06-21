@@ -49,12 +49,22 @@ export interface CommentSpecs {
  * @property {Date} end - the date and time that posts and comments have to be made before to be in this score period
  * @property {number} goalPoints - the number of points the instructor defined as the target to meet
  * @property {number} maxPoints - the maximum number of points that can be earned in a score period (should not be less than goalPoints)
+ * @property {Map} studentScores - the score info of each student for that score periods stored in a map of discord ids to score info
  */
 export interface ScorePeriod {
     start: Date,
     end: Date,
     goalPoints: number,
-    maxPoints: number
+    maxPoints: number,
+    studentScores: Map<string, {
+        score: number,
+        numPosts: number,
+        numIncomPost: number,
+        numComments: number,
+        numIncomComment: number,
+        awardsRecieved: number,
+        awardsGiven: number
+    }>
 }
 
 /**
