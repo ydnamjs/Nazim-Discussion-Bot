@@ -4,7 +4,7 @@ import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow"
 import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { ComponentBehavior } from "../BaseMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
-import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { updateToManageScorePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
