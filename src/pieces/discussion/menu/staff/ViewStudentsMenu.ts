@@ -43,7 +43,7 @@ export async function updateToViewStudentsMenu(courseTitle: string, message: Mes
     // replace the old menu with the view students menu
     const viewStudentsMenu = new ViewStudentsMenu(courseTitle, studentData);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
-    viewStudentsMenu.collectMenuInteraction(componentInteraction, message);
+    viewStudentsMenu.collectMenuInteraction(componentInteraction.user, message);
 }
 
 /** 

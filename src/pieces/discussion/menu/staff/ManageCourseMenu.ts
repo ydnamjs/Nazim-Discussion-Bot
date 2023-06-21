@@ -111,7 +111,7 @@ export async function updateToManageCourseMenu(name: string, message: Message, c
     // replace the old menu with the manage course menu
     const manageCourseMenu = new ManageCourseMenu(name);
     componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
-    manageCourseMenu.collectMenuInteraction(componentInteraction, message);
+    manageCourseMenu.collectMenuInteraction(componentInteraction.user, message);
 }
 
 // MENU TEXT CONSTANTS
@@ -215,7 +215,7 @@ export class ManageCourseMenu extends NavigatedMenu {
                     return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
                 },
                 resultingAction: (message, componentInteraction) => {
-                    updateToManageScorePeriodsMenu(courseTitle, message, componentInteraction)
+                    updateToManageScorePeriodsMenu(courseTitle, message, componentInteraction, true);
                 }
             },
 
