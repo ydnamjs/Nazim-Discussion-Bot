@@ -1,10 +1,11 @@
-import { ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { ButtonInteraction, ButtonStyle, InteractionType, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { ComponentBehavior } from "../../BaseMenu";
 import { updateToStaffMenu } from "../DiscussionStaffMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
+import { openAddScorePeriodModal } from "./AddScorePeriodModal";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_manage_score_periods_menu_back_button";
@@ -135,13 +136,26 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
             })
         });
 
+        // button behaviors
         const MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
+            // BACK BUTTON
             {
                 filter: (customId) => {
                     return customId === BACK_BUTTON_ID;
                 },
                 resultingAction: (message, componentInteraction) => {
                     updateToManageCourseMenu(courseTitle, message, componentInteraction);
+                }
+            },
+
+            // ADD SCORE PERIOD BUTTON
+            {
+                filter: (customId) => {
+                    return customId === ADD_SCORE_PERIOD_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    if(componentInteraction instanceof ButtonInteraction)
+                    openAddScorePeriodModal(courseTitle, message, componentInteraction);
                 }
             }
         ]
