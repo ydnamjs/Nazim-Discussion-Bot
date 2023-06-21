@@ -1,4 +1,4 @@
-import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction, User } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
@@ -129,12 +129,12 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
 }
 
 /**
- * @function updates a menu so that it is now a staff menu
+ * @function updates a menu so that it is now a staff menu (updates the interaction if supplied, otherwise just updates the message)
  * @param {string} courseTitle - the title of the course whose students are to be viewed
- * @param {Message} message - the message to have the menu be replaced on
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
+ * @param {boolean} isInteractionUpdate - whether to update the interaction (true) or just edit the message (false)
  */
-export async function updateToManageScorePeriodsMenu(courseTitle: string, message: Message, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
+export async function updateToManageScorePeriodsMenu(courseTitle: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
 
     // get the ids of all students in the course
     let course: Course | null = null;
@@ -147,7 +147,7 @@ export async function updateToManageScorePeriodsMenu(courseTitle: string, messag
 
     // if the course was not found there was a problem getting it from the database
     if(!course) {
-        isInteractionUpdate ? componentInteraction.reply("Database error. Please message admin") : 0;
+        isInteractionUpdate ? componentInteraction.reply("Database error. Please message admin") : componentInteraction.message.reply("Database error. Please message admin");
         return;
     }
 
@@ -168,6 +168,6 @@ export async function updateToManageScorePeriodsMenu(courseTitle: string, messag
 
     // replace the old menu with the view students menu
     const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseTitle, scorePeriodData);
-    isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
-    manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, message);
+    isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
+    manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }

@@ -63,7 +63,7 @@ const maxPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [
 
 export async function openAddScorePeriodModal(courseTitle: string, message: Message, interaction: ButtonInteraction) {
     
-    await updateToManageScorePeriodsMenu(courseTitle, message, interaction, false);
+    await updateToManageScorePeriodsMenu(courseTitle, interaction, false);
     
     // MODAL
     const addScorePeriodModal = new ModalBuilder({
