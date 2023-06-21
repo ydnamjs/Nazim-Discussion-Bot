@@ -146,7 +146,6 @@ async function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, 
             // if students can give the award, then every person who reacted counts
             if(awardSpecs.trackStudents){
                 totalAwardScore += awardSpecs.points * [...(await reaction.users.fetch())].length;
-                console.log( "adding poitns")
             }
 
             // award points only for staff members that reacted
