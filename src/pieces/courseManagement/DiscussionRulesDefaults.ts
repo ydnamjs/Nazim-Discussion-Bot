@@ -1,7 +1,7 @@
 import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs } from "../../generalModels/DiscussionScoring";
 
 let DEFAULT_AWARDS = new Map<string, AwardSpecs>([
-    [":first_place:", { points: 100, trackStudents: false }],
+    ["🥇", { points: 100, trackStudents: false }],
     [":second_place:", { points: 50, trackStudents: false }],
     [":third_place:", { points: 20, trackStudents: false }],
 ]);

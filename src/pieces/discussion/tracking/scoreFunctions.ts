@@ -23,7 +23,7 @@ export interface ScoreChecks {
  * @property {number} scoreInfo.score - the number of points that the comment earned based on the scoring specification
  * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment met (useful for giving feedback to students whose comments did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
  */
-export function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, staffId: string): {score: number, scoreChecks: ScoreChecks} {
+export async function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, staffId: string): Promise<{ score: number; scoreChecks: ScoreChecks; }> {
     
     // score the content of the comment
     const scoreInfo = scoreDiscussionContent(comment.content, commentSpecs)
@@ -31,7 +31,7 @@ export function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, 
     // add score for the awards of the comment
     const reactions = [...comment.reactions.cache.values()];
     const awards = commentSpecs.awards;
-    scoreInfo.score += scoreAllAwards(reactions, awards, staffId);
+    scoreInfo.score += await scoreAllAwards(reactions, awards, staffId);
 
     return scoreInfo;
 }
@@ -49,15 +49,16 @@ export async function scoreWholePost(post: Message, postSpecs: PostSpecs, staffI
     // score the content of the post
     const scoreInfo = scoreDiscussionContent(post.content, postSpecs)
 
+
     // add score for the awards of the post
     const reactions = [...post.reactions.cache.values()];
     const awards = postSpecs.awards;
-    scoreInfo.score += scoreAllAwards(reactions, awards, staffId);
+    scoreInfo.score = scoreInfo.score + await scoreAllAwards(reactions, awards, staffId);
 
     // add score for the comments that the post spawned
     const postChannel = await post.client.channels.fetch(post.id);
     if(postChannel && (postChannel.type === ChannelType.PublicThread || postChannel.type === ChannelType.PrivateThread) && (postChannel.messageCount)) {
-        scoreInfo.score += postChannel.messageCount * postSpecs.commentPoints;
+        scoreInfo.score = scoreInfo.score + (postChannel.messageCount * postSpecs.commentPoints);
     }
 
     return scoreInfo;
@@ -102,10 +103,10 @@ function countParagraphs(content: string):number {
     const countArr =  content.match(/\n+/g || [])
     
     if(!countArr) {
-        return 0;
+        return 1;
     }
     
-    return countArr.length;
+    return countArr.length + 1;
 }
 
 /**
@@ -130,18 +131,18 @@ function countLinks(content: string):number {
  * @param {string} staffId - the id of the role that can give staff only awards
  * @returns {number} - the amount of points earned for all awards on a post
  */
-function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, AwardSpecs>, staffId: string): number {
+async function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, AwardSpecs>, staffId: string): Promise<number> {
     
     let totalAwardScore = 0;
     
-    reactions.forEach(async (reaction) => {
+     for (const reaction of reactions) {
 
         // get the award specs for the given award
         const awardSpecs = awards.get(reaction.emoji.toString())
 
         // if the award specs exist, then the reaction is a real award
         if(awardSpecs) {
-
+            
             // if students can give the award, then every person who reacted counts
             if(awardSpecs.trackStudents){
                 totalAwardScore += awardSpecs.points * [...(await reaction.users.fetch())].length
@@ -151,14 +152,14 @@ function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, AwardS
             else {
                 const reactors = [...(await reaction.users.fetch()).values()];
                 
-                reactors.forEach(async (user) => {
-                    if( await userHasRoleWithId(user, staffId)) {
+                for (const reactor of reactors) {
+                    if( await userHasRoleWithId(reactor, staffId)) {
                         totalAwardScore += awardSpecs.points;
                     }
-                })
+                }
             }
         }
-    })
+    }
 
     return totalAwardScore;
 }
