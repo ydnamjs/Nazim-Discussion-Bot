@@ -37,9 +37,9 @@ export const testScore: Command = {
 
         const messageId = interaction.options.get('message')?.value as string
 
-        const message = await forum.threads.cache.get(messageId)?.messages.fetch(messageId) as Message
+        const message = await forum.threads.cache.get("1120907827947520102")?.messages.fetch(messageId) as Message
 
-        const str = await scoreWholePost(message, course?.discussionSpecs?.postSpecs as PostSpecs, course?.roles.staff as string)
+        const str = await scoreWholeComment(message, course?.discussionSpecs?.commentSpecs as CommentSpecs, course?.roles.staff as string)
 
         interaction.followUp(str.score.toString());
     }

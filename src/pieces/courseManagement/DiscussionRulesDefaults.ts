@@ -2,12 +2,13 @@ import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs } from "../../gene
 
 let DEFAULT_AWARDS = new Map<string, AwardSpecs>([
     ["🥇", { points: 100, trackStudents: false }],
-    [":second_place:", { points: 50, trackStudents: false }],
-    [":third_place:", { points: 20, trackStudents: false }],
+    ["🥈", { points: 50, trackStudents: false }],
+    ["🥉", { points: 20, trackStudents: false }],
+    ["👍", {points: 10, trackStudents: true }]
 ]);
 
 const DEFAULT_POST_SPECS: PostSpecs = {
-    points: 250,
+    points: 270,
     commentPoints: 60,
     minLength: 50,
     minParagraphs: 0,
@@ -16,7 +17,7 @@ const DEFAULT_POST_SPECS: PostSpecs = {
 }
 
 const DEFAULT_COMMENT_SPECS: CommentSpecs = {
-    points: 250,
+    points: 210,
     minLength: 25,
     minParagraphs: 0,
     minLinks: 0,
