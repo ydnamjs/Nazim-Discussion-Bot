@@ -1,5 +1,8 @@
 import { ActionRowBuilder, ButtonInteraction, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { DateTime } from "luxon";
+import { Course, courseModel } from "../../../../../generalModels/Course";
+import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
 
 // CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
@@ -61,7 +64,29 @@ const endDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [en
 const goalPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [goalPointsInput]});
 const maxPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [maxPointsInput]});
 
-export async function openAddScorePeriodModal(courseTitle: string, message: Message, interaction: ButtonInteraction) {
+interface scorePeriodInputData {
+    startDate: Date | undefined, 
+    endDate: Date | undefined,  
+    goalPoints: number, 
+    maxPoints: number
+}
+
+function validateInput(submittedModal: ModalSubmitInteraction): scorePeriodInputData {
+    const startDateString = submittedModal.fields.getTextInputValue(START_DATE_INPUT_ID);
+    const startDateTime = DateTime.fromFormat(startDateString, "yyyy-MM-dd hh:mm a")
+    const startDate = startDateTime.isValid ? startDateTime.toJSDate() : undefined;
+
+    const endDateString = submittedModal.fields.getTextInputValue(END_DATE_INPUT_ID);
+    const endDateTime = DateTime.fromFormat(endDateString, "yyyy-MM-dd hh:mm a")
+    const endDate = startDateTime.isValid ? endDateTime.toJSDate() : undefined;
+
+    const goalPoints = parseInt(submittedModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
+    const maxPoints = parseInt(submittedModal.fields.getTextInputValue(MAX_POINTS_INPUT_ID));
+
+    return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
+}
+
+export async function openAddScorePeriodModal(courseTitle: string, interaction: ButtonInteraction) {
     
     await updateToManageScorePeriodsMenu(courseTitle, interaction, false);
     
@@ -86,9 +111,66 @@ export async function openAddScorePeriodModal(courseTitle: string, message: Mess
     catch {}
 
     if (submittedModal !== undefined) {
-        submittedModal.reply("you submitted this");
+        const modalData = validateInput(submittedModal);
+
+        if(modalData.startDate && modalData.endDate && !Number.isNaN(modalData.goalPoints) && !Number.isNaN(modalData.maxPoints)) {
+            
+            const newStart = modalData.startDate;
+            const newEnd = modalData.endDate;
+
+            let course: Course | null = null;
+            try {
+                course = await courseModel.findOne({name: courseTitle});
+            }
+            catch(error: any) {
+                console.error(error);
+            }
+            
+            modalData.startDate
+
+            if(course) {
+                const scorePeriods = course.discussionSpecs?.scorePeriods;
+                let hasOverlap = false;
+
+                scorePeriods?.forEach((scorePeriod) => {
+                    if(scorePeriod.start.valueOf() <= newEnd.valueOf() && scorePeriod.end.valueOf() >= newStart.valueOf()) {
+                        hasOverlap = true;
+                    }
+                })
+
+                if(hasOverlap) {
+                    submittedModal.reply("New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added");
+                }
+                else {
+                    
+                    const disc = course.discussionSpecs;
+                    
+                    disc?.scorePeriods.push({   
+                        start: newStart,
+                        end: newEnd,
+                        goalPoints: modalData.goalPoints,
+                        maxPoints: modalData.maxPoints,
+                        studentScores: new Map()
+                    });
+
+                    await courseModel.findOneAndUpdate( 
+                        {name: courseTitle}, 
+                        {discussionSpecs: disc}
+                    )
+                    submittedModal.reply("New Score Period Added!");
+                }
+
+            }
+        }
+        else {
+            submittedModal.reply("Invalid Input Format. New Score Period Was Not Added");
+        }
+
     }
 
     // PROCESS INPUT
     // TODO: implement me
+
+
+
 }

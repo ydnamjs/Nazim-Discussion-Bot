@@ -1,4 +1,4 @@
-import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction, User } from "discord.js";
+import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
@@ -108,9 +108,9 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
                 filter: (customId) => {
                     return customId === ADD_SCORE_PERIOD_BUTTON_ID;
                 },
-                resultingAction: (message, componentInteraction) => {
+                resultingAction: (_message, componentInteraction) => {
                     if(componentInteraction instanceof ButtonInteraction)
-                    openAddScorePeriodModal(courseTitle, message, componentInteraction);
+                    openAddScorePeriodModal(courseTitle, componentInteraction);
                 }
             }
         ]
