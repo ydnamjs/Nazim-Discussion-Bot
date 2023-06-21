@@ -1,58 +1,27 @@
-import { CommentSpecs, DiscussionSpecs, PostSpecs } from "../../generalModels/DiscussionScoring";
+import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs } from "../../generalModels/DiscussionScoring";
+
+let DEFAULT_AWARDS = new Map<string, AwardSpecs>([
+    ["🥇", { points: 100, trackStudents: false }],
+    ["🥈", { points: 50, trackStudents: false }],
+    ["🥉", { points: 20, trackStudents: false }],
+    ["👍", {points: 10, trackStudents: true }]
+]);
 
 const DEFAULT_POST_SPECS: PostSpecs = {
-    points: 250,
+    points: 270,
     commentPoints: 60,
     minLength: 50,
     minParagraphs: 0,
     minLinks: 0,
-    awards: [
-        // default gold award
-        {
-            reaction: ":first_place:",
-            points: 100,
-            trackStudents: false
-        },
-        // default silver award
-        {
-            reaction: ":second_place:",
-            points: 50,
-            trackStudents: false
-        },
-        // default bronze award
-        {
-            reaction: ":third_place:",
-            points: 20,
-            trackStudents: false
-        },
-    ]
+    awards: DEFAULT_AWARDS
 }
 
 const DEFAULT_COMMENT_SPECS: CommentSpecs = {
-    points: 250,
+    points: 210,
     minLength: 25,
     minParagraphs: 0,
     minLinks: 0,
-    awards: [
-        // default gold award
-        {
-            reaction: ":first_place:",
-            points: 100,
-            trackStudents: false
-        },
-        // default silver award
-        {
-            reaction: ":second_place:",
-            points: 50,
-            trackStudents: false
-        },
-        // default bronze award
-        {
-            reaction: ":third_place:",
-            points: 20,
-            trackStudents: false
-        },
-    ]   
+    awards: DEFAULT_AWARDS
 }
 
 export const DEFAULT_DISCUSSION_SPECS: DiscussionSpecs = {
