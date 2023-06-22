@@ -3,28 +3,33 @@ import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 
-// CONSTANTS
-const ADD_SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000;
-const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm a";
-
+// MODAL TEXT CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
+
+// MODAL BEHAVIOR CONSTANTS
+const ADD_SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
+const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
+const ADD_SCORE_MODAL_ID = "add-score-period-modal";
+
+// MODAL NOTIFICATION CONSTANTS
 const SUCCESS_MESSAGE = "New Score Period Added!";
 const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
 const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added.";
 const INVALID_INPUT_PREFIX = "Invalid Input Format. New Score Period Was Not Added\nReasons(s):";
-const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2004-06-08 12:00 AM";
-const INVALID_END_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2001-10-23 11:59 PM";
-const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 1000";
-const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1350";
+const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 1970-01-01 12:00:00 AM";
+const INVALID_END_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2036-08-26 11:59:59 PM";
+const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 800";
+const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1000";
 
+// INPUT FIELD CONSTANTS
 const START_DATE_INPUT_ID = "discussion_add_score_period_start_input";
-const START_DATE_INPUT_LABEL = "start date and time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
-const START_DATE_INPUT_PLACEHOLDER = DATE_STRING_FORMAT.toUpperCase();
+const START_DATE_INPUT_LABEL = "start date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
+const START_DATE_INPUT_PLACEHOLDER = "1970-01-01 12:00:00 AM";
 const START_DATE_INPUT_STYLE = TextInputStyle.Short;
 
 const END_DATE_INPUT_ID = "discussion_add_score_period_end_input";
-const END_DATE_INPUT_LABEL = "end date and time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
-const END_DATE_INPUT_PLACEHOLDER =  DATE_STRING_FORMAT.toUpperCase();
+const END_DATE_INPUT_LABEL = "end date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
+const END_DATE_INPUT_PLACEHOLDER =  "2036-08-26 11:59:59 PM";
 const END_DATE_INPUT_STYLE = TextInputStyle.Short;
 
 const GOAL_POINTS_INPUT_ID = "discussion_add_score_period_goal_input";
@@ -134,7 +139,7 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
     
     // give the user an add score modal to input data to
     const addScorePeriodModal = new ModalBuilder({
-        customId: "add-score-period-modal", // FIXME: constantify me
+        customId: ADD_SCORE_MODAL_ID,
         title: ADD_SCORE_MODAL_TITLE_PREFIX + courseTitle,
         components: [
             startDateActionRow,
