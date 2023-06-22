@@ -79,20 +79,6 @@ const goalPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: 
 const maxPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [maxPointsInput]});
 
 /**
- * @interface defines the scorePeriod data that has been input. Used for after it has been converted from strings
- * @property {Date | undefined} startDate - If valid, the start date and time of the score period Undefined. if invalid input
- * @property {Date | undefined} endDate - If valid, the end date and time of the score period. Undefined if invalid input
- * @property {number} goalPoints - The target score that students are expected to earn in the score period. NaN if invalid input
- * @property {number} maxPoints - The maximum number of points that students can in earn in the score period. NaN if invalid input
- */
-interface ScorePeriodInputData {
-    startDate: Date | undefined, 
-    endDate: Date | undefined,  
-    goalPoints: number, 
-    maxPoints: number
-}
-
-/**
  * @function opens an add score period modal for the given course as a result of the given interaction
  * @param courseTitle - the title of the corse that the score period is to be added to 
  * @param interaction - the interaction that triggered the opening of this modal
@@ -128,6 +114,22 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
     }
 }
 
+// INPUT DATA INTERFACE
+/**
+ * @interface defines the scorePeriod data that has been input. Used for after it has been converted from strings
+ * @property {Date | undefined} startDate - If valid, the start date and time of the score period Undefined. if invalid input
+ * @property {Date | undefined} endDate - If valid, the end date and time of the score period. Undefined if invalid input
+ * @property {number} goalPoints - The target score that students are expected to earn in the score period. NaN if invalid input
+ * @property {number} maxPoints - The maximum number of points that students can in earn in the score period. NaN if invalid input
+ */
+interface ScorePeriodInputData {
+    startDate: Date | undefined, 
+    endDate: Date | undefined,  
+    goalPoints: number, 
+    maxPoints: number
+}
+
+// PROCESS ADD MODAL INPUT HELPER FUNCTION
 /**
  * @function processes the data of an add score period modal
  * @param {string} courseTitle - the name of the course that the score period will be added to
@@ -180,6 +182,7 @@ async function processAddModalInput(courseTitle: string, submittedModal: ModalSu
     }
 }
 
+// VALIDATE DATA HELPER FUNCTION
 /**
  * @function validates the input of an add score period modal
  * @param addScorePeriodModal the submitted modal whose input is to be validated
@@ -216,6 +219,7 @@ function validateInput(addScorePeriodModal: ModalSubmitInteraction): ScorePeriod
     return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
 }
 
+// INSERT NEW SCORE PERIOD HELPER FUNCTION
 /**
  * @function attempts to insert the score period into the courses score periods
  * @param {Course} course - the course the score period is being added to
