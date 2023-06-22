@@ -88,8 +88,8 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
             fields.push({
                 name: "Score Period #" + (index + 1),
                 value: 
-                    "Start: " + scorePeriodsData[index].start.toDateString() + 
-                    "\nEnd: " + scorePeriodsData[index].end.toDateString() + 
+                    "Start: " + scorePeriodsData[index].start.toDateString() + " " + scorePeriodsData[index].start.toLocaleTimeString() + 
+                    "\nEnd: " + scorePeriodsData[index].end.toDateString() + " " + scorePeriodsData[index].end.toLocaleTimeString() + 
                     "\nGoal Points: " + scorePeriodsData[index].goalPoints + 
                     "\nMax Points: " + scorePeriodsData[index].maxPoints
             })
