@@ -151,7 +151,7 @@ export async function updateToManageScorePeriodsMenu(courseTitle: string, compon
 
     let scorePeriodData: ScorePeriodData[] = [];
 
-    if(course.discussionSpecs) {
+    if(course.discussionSpecs !== null && course.discussionSpecs.scorePeriods) {
         
         scorePeriodData = course.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
             return {
@@ -162,6 +162,9 @@ export async function updateToManageScorePeriodsMenu(courseTitle: string, compon
             };
         })
     }
+
+    scorePeriodData = scorePeriodData.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
+
     // replace the old menu with the view students menu
     const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseTitle, scorePeriodData);
     isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
