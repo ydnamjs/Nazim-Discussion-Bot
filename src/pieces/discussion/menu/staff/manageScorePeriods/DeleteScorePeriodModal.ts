@@ -2,7 +2,7 @@ import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 import { Course, courseModel } from "../../../../../generalModels/Course";
-import { DATABASE_ERROR_MESSAGE, INVALID_INDEX_PERIOD_MESSAGE, PERIOD_NUM_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, scorePeriodNumActionRow } from "./generalScorePeriodModal";
+import { DATABASE_ERROR_MESSAGE, INVALID_INDEX_PERIOD_MESSAGE, PERIOD_NUM_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, scorePeriodNumActionRow } from "./GeneralScorePeriodModal";
 
 // MODAL BEHAVIOR CONSTANTS
 const DELETE_SCORE_PERIOD_MODAL_ID = "delete_score_period_modal"

@@ -2,7 +2,7 @@ import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, SCORE_PERIOD_MODAL_EXPIRATION_TIME, ScorePeriodInputData, addScorePeriodToDataBase, endDateActionRow, goalPointsActionRow, maxPointsActionRow, processScorePeriodValidationData, startDateActionRow, validateScorePeriodInput } from "./generalScorePeriodModal";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, SCORE_PERIOD_MODAL_EXPIRATION_TIME, ScorePeriodInputData, addScorePeriodToDataBase, endDateActionRow, goalPointsActionRow, maxPointsActionRow, processScorePeriodValidationData, startDateActionRow, validateScorePeriodInput } from "./GeneralScorePeriodModal";
 
 // MODAL TEXT CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
