@@ -4,21 +4,26 @@ import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 
 // CONSTANTS
-const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
 const ADD_SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000;
 const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm a";
+
+const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
 const SUCCESS_MESSAGE = "New Score Period Added!";
-const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added"
-const INVALID_INPUT_MESSAGE = "Invalid Input Format. New Score Period Was Not Added";
+const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added."
+const INVALID_INPUT_PREFIX = "Invalid Input Format. New Score Period Was Not Added\nReasons(s):";
+const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2004-06-08 12:00 AM";
+const INVALID_END_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2001-10-23 11:59 PM";
+const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be an integer. Ex: 1000";
+const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be an integer. Ex: 1350";
 
 const START_DATE_INPUT_ID = "discussion_add_score_period_start_input";
-const START_DATE_INPUT_LABEL = "start date and time: YYYY-MM-DD HH-MM-SS";
-const START_DATE_INPUT_PLACEHOLDER = "YYYY-MM-DD HH-MM-SS";
+const START_DATE_INPUT_LABEL = "start date and time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
+const START_DATE_INPUT_PLACEHOLDER = DATE_STRING_FORMAT.toUpperCase();
 const START_DATE_INPUT_STYLE = TextInputStyle.Short;
 
 const END_DATE_INPUT_ID = "discussion_add_score_period_end_input";
-const END_DATE_INPUT_LABEL = "end date and time: YYYY-MM-DD HH-MM-SS";
-const END_DATE_INPUT_PLACEHOLDER = "YYYY-MM-DD HH-MM-SS";
+const END_DATE_INPUT_LABEL = "end date and time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
+const END_DATE_INPUT_PLACEHOLDER =  DATE_STRING_FORMAT.toUpperCase();
 const END_DATE_INPUT_STYLE = TextInputStyle.Short;
 
 const GOAL_POINTS_INPUT_ID = "discussion_add_score_period_goal_input";
@@ -188,7 +193,24 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
         }
         // if the data is not valid, inform the user
         else {
-            submittedModal.reply(INVALID_INPUT_MESSAGE);
+            
+            // create list of reasons why input failed
+            let reasons = "";
+            
+            if(!modalData.startDate){
+                reasons += INVALID_START_DATE_REASON;
+            }
+            if(!modalData.endDate){
+                reasons += INVALID_END_DATE_REASON;
+            }
+            if(Number.isNaN(modalData.goalPoints)){
+                reasons += INVALID_GOAL_POINTS_REASON;
+            }
+            if(Number.isNaN(modalData.maxPoints)){
+                reasons += INVALID_MAX_POINTS_REASON;
+            }
+
+            submittedModal.reply(INVALID_INPUT_PREFIX + reasons);
         }
 
     }
