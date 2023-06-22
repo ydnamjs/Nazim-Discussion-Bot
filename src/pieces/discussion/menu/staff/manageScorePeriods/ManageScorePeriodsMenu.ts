@@ -6,6 +6,7 @@ import { ComponentBehavior } from "../../BaseMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
 import { openAddScorePeriodModal } from "./AddScorePeriodModal";
 import { openDeleteScorePeriodModal } from "./DeleteScorePeriodModal";
+import { openEditScorePeriodModal } from "./EditScorePeriodModal";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_manage_score_periods_menu_back_button";
@@ -115,6 +116,17 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
                 resultingAction: (_message, componentInteraction) => {
                     if(componentInteraction instanceof ButtonInteraction)
                     openAddScorePeriodModal(courseTitle, componentInteraction);
+                }
+            },
+
+            // EDIT SCORE PERIOD BUTTON
+            {
+                filter: (customId) => {
+                    return customId === EDIT_SCORE_PERIOD_BUTTON_ID;
+                },
+                resultingAction: (_message, componentInteraction) => {
+                    if(componentInteraction instanceof ButtonInteraction)
+                    openEditScorePeriodModal(courseTitle, componentInteraction);
                 }
             },
 

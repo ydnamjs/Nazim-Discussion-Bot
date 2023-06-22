@@ -3,80 +3,16 @@ import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./generalScorePeriodModal";
 
 // MODAL TEXT CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
 
 // MODAL BEHAVIOR CONSTANTS
-const ADD_SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
-const DATE_STRING_FORMAT = "yyyy-MM-dd tt";
 const ADD_SCORE_MODAL_ID = "add-score-period-modal";
 
 // MODAL NOTIFICATION CONSTANTS
 const SUCCESS_MESSAGE = "New Score Period Added!";
-const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
-const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added.";
-const INVALID_INPUT_PREFIX = "Invalid Input Format. New Score Period Was Not Added\nReasons(s):";
-const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 1970-01-01 12:00:00 AM";
-const INVALID_END_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2036-08-26 11:59:59 PM";
-const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 800";
-const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1000";
-
-// INPUT FIELD CONSTANTS
-const START_DATE_INPUT_ID = "discussion_add_score_period_start_input";
-const START_DATE_INPUT_LABEL = "start date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
-const START_DATE_INPUT_PLACEHOLDER = "1970-01-01 12:00:00 AM";
-const START_DATE_INPUT_STYLE = TextInputStyle.Short;
-
-const END_DATE_INPUT_ID = "discussion_add_score_period_end_input";
-const END_DATE_INPUT_LABEL = "end date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
-const END_DATE_INPUT_PLACEHOLDER =  "2036-08-26 11:59:59 PM";
-const END_DATE_INPUT_STYLE = TextInputStyle.Short;
-
-const GOAL_POINTS_INPUT_ID = "discussion_add_score_period_goal_input";
-const GOAL_POINTS_INPUT_LABEL = "goal points";
-const GOAL_POINTS_INPUT_PLACEHOLDER = "";
-const GOAL_POINTS_INPUT_STYLE = TextInputStyle.Short;
-
-const MAX_POINTS_INPUT_ID = "discussion_add_score_period_max_input";
-const MAX_POINTS_INPUT_LABEL = "max points";
-const MAX_POINTS_INPUT_PLACEHOLDER = "";
-const MAX_POINTS_INPUT_STYLE = TextInputStyle.Short;
-
-// INPUT FIELDS
-const startDateInput = new TextInputBuilder({
-    customId: START_DATE_INPUT_ID,
-    label: START_DATE_INPUT_LABEL,
-    placeholder: START_DATE_INPUT_PLACEHOLDER,
-    style: START_DATE_INPUT_STYLE,
-})
-
-const endDateInput = new TextInputBuilder({
-    customId: END_DATE_INPUT_ID,
-    label: END_DATE_INPUT_LABEL,
-    placeholder: END_DATE_INPUT_PLACEHOLDER,
-    style: END_DATE_INPUT_STYLE
-})
-
-const goalPointsInput = new TextInputBuilder({
-    customId: GOAL_POINTS_INPUT_ID,
-    label: GOAL_POINTS_INPUT_LABEL,
-    placeholder: GOAL_POINTS_INPUT_PLACEHOLDER,
-    style: GOAL_POINTS_INPUT_STYLE
-})
-
-const maxPointsInput = new TextInputBuilder({
-    customId: MAX_POINTS_INPUT_ID,
-    label: MAX_POINTS_INPUT_LABEL,
-    placeholder: MAX_POINTS_INPUT_PLACEHOLDER,
-    style: MAX_POINTS_INPUT_STYLE
-})
-
-// ACTION ROWS
-const startDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [startDateInput]});
-const endDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [endDateInput]});
-const goalPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [goalPointsInput]});
-const maxPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [maxPointsInput]});
 
 // PRIMARY OPEN MODAL FUNCTION
 /**
@@ -105,7 +41,7 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
     // collect data from the modal
     let submittedModal: ModalSubmitInteraction | undefined = undefined;
     try {
-        submittedModal = await interaction.awaitModalSubmit({time: ADD_SCORE_PERIOD_MODAL_EXPIRATION_TIME})
+        submittedModal = await interaction.awaitModalSubmit({time: SCORE_PERIOD_MODAL_EXPIRATION_TIME})
     }
     catch {}
 
@@ -194,12 +130,12 @@ function validateInput(addScorePeriodModal: ModalSubmitInteraction): ScorePeriod
     // get and validate start date
     const startDateString = addScorePeriodModal.fields.getTextInputValue(START_DATE_INPUT_ID);
     const startDateTime = DateTime.fromFormat(startDateString, DATE_STRING_FORMAT)
-    const startDate = startDateTime.toJSDate().getTime() ? undefined : startDateTime.toJSDate();
+    const startDate = startDateTime.toJSDate().getTime() ? startDateTime.toJSDate() : undefined;
 
     // get and validate end date
     const endDateString = addScorePeriodModal.fields.getTextInputValue(END_DATE_INPUT_ID);
     const endDateTime = DateTime.fromFormat(endDateString, DATE_STRING_FORMAT)
-    const endDate = endDateTime.toJSDate().getTime() ? undefined : endDateTime.toJSDate();
+    const endDate = endDateTime.toJSDate().getTime() ? endDateTime.toJSDate() : undefined;
 
     // get goal points
     let goalPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
