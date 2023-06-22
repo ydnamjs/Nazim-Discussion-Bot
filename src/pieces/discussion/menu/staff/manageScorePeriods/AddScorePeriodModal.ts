@@ -78,6 +78,7 @@ const endDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [en
 const goalPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [goalPointsInput]});
 const maxPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [maxPointsInput]});
 
+// PRIMARY OPEN MODAL FUNCTION
 /**
  * @function opens an add score period modal for the given course as a result of the given interaction
  * @param courseTitle - the title of the corse that the score period is to be added to 
