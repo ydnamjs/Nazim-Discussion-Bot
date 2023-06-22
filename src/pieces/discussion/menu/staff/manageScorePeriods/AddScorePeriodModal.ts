@@ -9,7 +9,8 @@ const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm a";
 
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
 const SUCCESS_MESSAGE = "New Score Period Added!";
-const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added."
+const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
+const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added.";
 const INVALID_INPUT_PREFIX = "Invalid Input Format. New Score Period Was Not Added\nReasons(s):";
 const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2004-06-08 12:00 AM";
 const INVALID_END_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2001-10-23 11:59 PM";
@@ -91,18 +92,24 @@ interface ScorePeriodInputData {
  * @returns {ScorePeriodInputData} scorePeriodInputData - the score period input data after validation (see ScorePeriodInputData interface)
  */
 function validateInput(addScorePeriodModal: ModalSubmitInteraction): ScorePeriodInputData {
+    
+    // get and validate start date
     const startDateString = addScorePeriodModal.fields.getTextInputValue(START_DATE_INPUT_ID);
     const startDateTime = DateTime.fromFormat(startDateString, DATE_STRING_FORMAT)
     const startDate = startDateTime.isValid ? startDateTime.toJSDate() : undefined;
 
+    // get and validate end date
     const endDateString = addScorePeriodModal.fields.getTextInputValue(END_DATE_INPUT_ID);
     const endDateTime = DateTime.fromFormat(endDateString, DATE_STRING_FORMAT)
     const endDate = startDateTime.isValid ? endDateTime.toJSDate() : undefined;
 
+    // get goal points
     let goalPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
 
+    // get max points
     let maxPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(MAX_POINTS_INPUT_ID));
     
+    // validate points are non negative integers and that goal is not more than max
     if(goalPoints < 0)
     goalPoints = NaN;
     if(maxPoints < 0 )
@@ -125,9 +132,9 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
     // refresh the manage score periods menu so that after the modal is close/submitted it collects input again
     await updateToManageScorePeriodsMenu(courseTitle, interaction, false, true);
     
-    // give the user a modal to input data to
+    // give the user an add score modal to input data to
     const addScorePeriodModal = new ModalBuilder({
-        customId: "add-score-period-modal",
+        customId: "add-score-period-modal", // FIXME: constantify me
         title: ADD_SCORE_MODAL_TITLE_PREFIX + courseTitle,
         components: [
             startDateActionRow,
@@ -156,27 +163,36 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
             const newStart = modalData.startDate;
             const newEnd = modalData.endDate;
 
+            // get the course from the database
             let course: Course | null = null;
             try {
                 course = await courseModel.findOne({name: courseTitle});
             }
+            // if there was an error getting the course, inform the user that there was a database error
             catch(error: any) {
+                interaction.reply(DATABASE_ERROR_MESSAGE);
                 console.error(error);
             }
 
-            if(course) {
-                const scorePeriods = course.discussionSpecs?.scorePeriods;
-                let hasOverlap = false;
+            // if the course was valid
+            if(course && course.discussionSpecs !== null) {
 
-                scorePeriods?.forEach((scorePeriod) => {
+                // get the score periods from the data base
+                const scorePeriods = course.discussionSpecs.scorePeriods;
+                
+                // determine if the new score period has any overlap with existing ones
+                let hasOverlap = false;
+                scorePeriods.forEach((scorePeriod) => {
                     if(scorePeriod.start.valueOf() <= newEnd.valueOf() && scorePeriod.end.valueOf() >= newStart.valueOf()) {
                         hasOverlap = true;
                     }
                 })
 
+                // if there is overlap, inform the user
                 if(hasOverlap) {
                     submittedModal.reply(CONFLICTING_DATES_MESSAGE);
                 }
+                // other wise, add it to the score periods
                 else {
                     
                     const disc = course.discussionSpecs;
@@ -185,6 +201,7 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                         return
                     }
 
+                    // add the new score periods to the old and sort the list by start date
                     disc.scorePeriods.push({   
                         start: newStart,
                         end: newEnd,
@@ -192,22 +209,34 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                         maxPoints: modalData.maxPoints,
                         studentScores: new Map()
                     });
-
                     disc.scorePeriods = disc.scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
 
-                    await courseModel.findOneAndUpdate( 
-                        {name: courseTitle}, 
-                        {discussionSpecs: disc}
-                    )
-                    submittedModal.reply(SUCCESS_MESSAGE);
+                    // update the database with the new score period
+                    let newCourse: Document | null = null;
+                    try {
+                        newCourse = await courseModel.findOneAndUpdate( 
+                            {name: courseTitle}, 
+                            {discussionSpecs: disc}
+                        )
+                    }
+                    // if there was a database error, inform the user and return
+                    catch {
+                        interaction.reply(DATABASE_ERROR_MESSAGE);
+                        return;
+                    }
 
-                    // refresh the menu to reflect new score periods
-                    await updateToManageScorePeriodsMenu(courseTitle, interaction, false, false);
+                    // otherwise, inform the user that the score period was successfully added
+                    if(newCourse !== null) {
+                        // inform the user of the success
+                        submittedModal.reply(SUCCESS_MESSAGE);
 
-                    //TODO: After a score period is added, score all of the posts and comments that would fall into it (only necessary for score periods that started in the past)
+                        // refresh the menu to reflect new score periods
+                        await updateToManageScorePeriodsMenu(courseTitle, interaction, false, false);
 
+                        //TODO: After a score period is added, score all of the posts and comments that would fall into it (only necessary for score periods that started in the past)
+                        return;
+                    }
                 }
-
             }
         }
         // if the data is not valid, inform the user
@@ -215,7 +244,6 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
             
             // create list of reasons why input failed
             let reasons = "";
-            
             if(!modalData.startDate){
                 reasons += INVALID_START_DATE_REASON;
             }
@@ -229,8 +257,8 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                 reasons += INVALID_MAX_POINTS_REASON;
             }
 
+            // send the user the reasons
             submittedModal.reply(INVALID_INPUT_PREFIX + reasons);
         }
-
     }
 }
