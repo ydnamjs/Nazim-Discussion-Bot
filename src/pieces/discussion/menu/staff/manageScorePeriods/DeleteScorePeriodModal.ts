@@ -1,10 +1,10 @@
-import { ActionRowBuilder, ButtonInteraction, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord.js";
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 import { Course, courseModel } from "../../../../../generalModels/Course";
+import { DATABASE_ERROR_MESSAGE, PERIOD_NUM_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, scorePeriodNumActionRow } from "./generalScorePeriodModal";
 
 // MODAL BEHAVIOR CONSTANTS
-const DELETE_SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
 const DELETE_SCORE_PERIOD_MODAL_ID = "delete_score_period_modal"
 
 // MODAL TEXT CONSTANTS
@@ -12,22 +12,7 @@ const DELETE_SCORE_PERIOD_MODAL_TITLE_PREFIX = "Delete Score Period From CISC ";
 
 // MODAL NOTIFICATION CONSTANTS
 const SUCCESS_MESSAGE = "Score Period Was Successfully Removed!";
-const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
-const INVALID_SCORE_PERIOD_MESSAGE = "Invalid score period input. Please retry with a number in your menu."
-
-// SCORE PERIOD # INPUT FIELD
-const PERIOD_NUM_INPUT_ID = "discussion_delete_score_period_input";
-const PERIOD_NUM_INPUT_LABEL = "score period #";
-const PERIOD_NUM_INPUT_PLACEHOLDER = "0";
-const PERIOD_NUM_INPUT_STYLE = TextInputStyle.Short;
-
-const scorePeriodNumInput = new TextInputBuilder({
-    customId: PERIOD_NUM_INPUT_ID,
-    label: PERIOD_NUM_INPUT_LABEL,
-    placeholder: PERIOD_NUM_INPUT_PLACEHOLDER,
-    style: PERIOD_NUM_INPUT_STYLE,
-})
-const scorePeriodNumActionRow = new ActionRowBuilder<TextInputBuilder>({components: [scorePeriodNumInput]});
+const INVALID_INDEX_PERIOD_MESSAGE = "Invalid score period input. Please retry with a number in your menu."
 
 // PRIMARY OPEN MODAL FUNCTION
 /**
@@ -53,7 +38,7 @@ export async function openDeleteScorePeriodModal(courseTitle: string, interactio
     // collect data from the modal
     let submittedModal: ModalSubmitInteraction | undefined = undefined;
     try {
-        submittedModal = await interaction.awaitModalSubmit({time: DELETE_SCORE_PERIOD_MODAL_EXPIRATION_TIME})
+        submittedModal = await interaction.awaitModalSubmit({time: SCORE_PERIOD_MODAL_EXPIRATION_TIME})
     }
     catch {}
 
@@ -92,7 +77,7 @@ async function processDeleteModalInput(courseTitle: string, submittedModal: Moda
 
         // if the input refers to an invalid score period, inform the user
         if(scorePeriodIndex < 1 || scorePeriodIndex > course.discussionSpecs.scorePeriods.length || Number.isNaN(scorePeriodIndex)) {
-            sendDismissableInteractionReply(submittedModal, INVALID_SCORE_PERIOD_MESSAGE);
+            sendDismissableInteractionReply(submittedModal, INVALID_INDEX_PERIOD_MESSAGE);
             return;
         }
 
