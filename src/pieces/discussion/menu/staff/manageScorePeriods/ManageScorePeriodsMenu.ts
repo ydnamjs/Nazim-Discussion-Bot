@@ -82,12 +82,17 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
         
         // generate the fields of basic info for each course and the select menu options
         let fields: { name: string, value: string }[] = [];
-        scorePeriodsData.forEach(scorePeriod => {
+
+        for(let index = 0; index < scorePeriodsData.length; index++) {
             fields.push({
-                name: scorePeriod.start.toDateString() + " to " + scorePeriod.end.toDateString(),
-                value: "Goal Points: " + scorePeriod.goalPoints + "\nMax Points: " + scorePeriod.maxPoints
+                name: "Score Period #" + (index + 1),
+                value: 
+                    "Start: " + scorePeriodsData[index].start.toDateString() + 
+                    "\nEnd: " + scorePeriodsData[index].end.toDateString() + 
+                    "\nGoal Points: " + scorePeriodsData[index].goalPoints + 
+                    "\nMax Points: " + scorePeriodsData[index].maxPoints
             })
-        });
+        };
 
         // button behaviors
         const MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
