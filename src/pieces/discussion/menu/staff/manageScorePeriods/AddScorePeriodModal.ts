@@ -1,13 +1,15 @@
-import { ActionRowBuilder, ButtonInteraction, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
-import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
 
 // CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
 const ADD_SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000;
-const ADD_SCORE_PERIOD_MODAL_EXPIRTATION_MESSAGE = "Your add score period modal expired due to inactivity. No action was taken"
+const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm a";
+const SUCCESS_MESSAGE = "New Score Period Added!";
+const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added"
+const INVALID_INPUT_MESSAGE = "Invalid Input Format. New Score Period Was Not Added";
 
 const START_DATE_INPUT_ID = "discussion_add_score_period_start_input";
 const START_DATE_INPUT_LABEL = "start date and time: YYYY-MM-DD HH-MM-SS";
@@ -85,11 +87,11 @@ interface ScorePeriodInputData {
  */
 function validateInput(addScorePeriodModal: ModalSubmitInteraction): ScorePeriodInputData {
     const startDateString = addScorePeriodModal.fields.getTextInputValue(START_DATE_INPUT_ID);
-    const startDateTime = DateTime.fromFormat(startDateString, "yyyy-MM-dd hh:mm a")
+    const startDateTime = DateTime.fromFormat(startDateString, DATE_STRING_FORMAT)
     const startDate = startDateTime.isValid ? startDateTime.toJSDate() : undefined;
 
     const endDateString = addScorePeriodModal.fields.getTextInputValue(END_DATE_INPUT_ID);
-    const endDateTime = DateTime.fromFormat(endDateString, "yyyy-MM-dd hh:mm a")
+    const endDateTime = DateTime.fromFormat(endDateString, DATE_STRING_FORMAT)
     const endDate = startDateTime.isValid ? endDateTime.toJSDate() : undefined;
 
     const goalPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
@@ -158,7 +160,7 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                 })
 
                 if(hasOverlap) {
-                    submittedModal.reply("New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added");
+                    submittedModal.reply(CONFLICTING_DATES_MESSAGE);
                 }
                 else {
                     
@@ -176,7 +178,7 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                         {name: courseTitle}, 
                         {discussionSpecs: disc}
                     )
-                    submittedModal.reply("New Score Period Added!");
+                    submittedModal.reply(SUCCESS_MESSAGE);
 
                     //TODO: After a score period is added, score all of the posts and comments that would fall into it (only necessary for score periods that started in the past)
 
@@ -186,7 +188,7 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
         }
         // if the data is not valid, inform the user
         else {
-            submittedModal.reply("Invalid Input Format. New Score Period Was Not Added");
+            submittedModal.reply(INVALID_INPUT_MESSAGE);
         }
 
     }
