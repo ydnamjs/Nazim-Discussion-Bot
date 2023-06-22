@@ -132,7 +132,7 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  * @param {boolean} isInteractionUpdate - whether to update the interaction (true) or just edit the message (false)
  */
-export async function updateToManageScorePeriodsMenu(courseTitle: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
+export async function updateToManageScorePeriodsMenu(courseTitle: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean, shouldCollect: boolean) {
 
     // get the ids of all students in the course
     let course: Course | null = null;
@@ -168,5 +168,7 @@ export async function updateToManageScorePeriodsMenu(courseTitle: string, compon
     // replace the old menu with the view students menu
     const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseTitle, scorePeriodData);
     isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
+    
+    if(shouldCollect)
     manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }

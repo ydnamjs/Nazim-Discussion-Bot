@@ -123,7 +123,7 @@ function validateInput(addScorePeriodModal: ModalSubmitInteraction): ScorePeriod
 export async function openAddScorePeriodModal(courseTitle: string, interaction: ButtonInteraction) {
     
     // refresh the manage score periods menu so that after the modal is close/submitted it collects input again
-    await updateToManageScorePeriodsMenu(courseTitle, interaction, false);
+    await updateToManageScorePeriodsMenu(courseTitle, interaction, false, true);
     
     // give the user a modal to input data to
     const addScorePeriodModal = new ModalBuilder({
@@ -200,6 +200,9 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                         {discussionSpecs: disc}
                     )
                     submittedModal.reply(SUCCESS_MESSAGE);
+
+                    // refresh the menu to reflect new score periods
+                    await updateToManageScorePeriodsMenu(courseTitle, interaction, false, false);
 
                     //TODO: After a score period is added, score all of the posts and comments that would fall into it (only necessary for score periods that started in the past)
 
