@@ -2,6 +2,7 @@ import { ActionRowBuilder, ButtonInteraction, ModalBuilder, ModalSubmitInteracti
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
+import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 
 // MODAL TEXT CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
@@ -175,8 +176,9 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
             }
             // if there was an error getting the course, inform the user that there was a database error
             catch(error: any) {
-                interaction.reply(DATABASE_ERROR_MESSAGE);
+                sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
                 console.error(error);
+                return;
             }
 
             // if the course was valid
@@ -195,7 +197,7 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
 
                 // if there is overlap, inform the user
                 if(hasOverlap) {
-                    submittedModal.reply(CONFLICTING_DATES_MESSAGE);
+                    sendDismissableInteractionReply(submittedModal, CONFLICTING_DATES_MESSAGE);  
                 }
                 // other wise, add it to the score periods
                 else {
@@ -225,15 +227,16 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                         )
                     }
                     // if there was a database error, inform the user and return
-                    catch {
-                        interaction.reply(DATABASE_ERROR_MESSAGE);
+                    catch(error: any) {
+                        sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
+                        console.error(error);
                         return;
                     }
 
                     // otherwise, inform the user that the score period was successfully added
                     if(newCourse !== null) {
                         // inform the user of the success
-                        submittedModal.reply(SUCCESS_MESSAGE);
+                        sendDismissableInteractionReply(submittedModal, SUCCESS_MESSAGE)
 
                         // refresh the menu to reflect new score periods
                         await updateToManageScorePeriodsMenu(courseTitle, interaction, false, false);
@@ -263,7 +266,7 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
             }
 
             // send the user the reasons
-            submittedModal.reply(INVALID_INPUT_PREFIX + reasons);
+            sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + reasons);
         }
     }
 }
