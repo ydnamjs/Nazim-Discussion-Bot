@@ -188,7 +188,7 @@ export function processScorePeriodValidationData(submittedModal: ModalSubmitInte
  * @param {string} courseTitle - the name of the course that the score period is being added to
  * @param {string} successMessage - the message to be used in the reply on successful database insert
  */
-export async function addScorePeriodToDataBase(
+export async function addOneScorePeriodToDataBase(
     discussionSpecs: DiscussionSpecs, 
     newScorePeriodData: {start: Date, end: Date, goalPoints: number, maxPoints: number}, 
     submittedModal: ModalSubmitInteraction,
