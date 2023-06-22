@@ -13,8 +13,8 @@ const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Exi
 const INVALID_INPUT_PREFIX = "Invalid Input Format. New Score Period Was Not Added\nReasons(s):";
 const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2004-06-08 12:00 AM";
 const INVALID_END_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2001-10-23 11:59 PM";
-const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be an integer. Ex: 1000";
-const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be an integer. Ex: 1350";
+const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 1000";
+const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1350";
 
 const START_DATE_INPUT_ID = "discussion_add_score_period_start_input";
 const START_DATE_INPUT_LABEL = "start date and time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
@@ -99,8 +99,18 @@ function validateInput(addScorePeriodModal: ModalSubmitInteraction): ScorePeriod
     const endDateTime = DateTime.fromFormat(endDateString, DATE_STRING_FORMAT)
     const endDate = startDateTime.isValid ? endDateTime.toJSDate() : undefined;
 
-    const goalPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
-    const maxPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(MAX_POINTS_INPUT_ID));
+    let goalPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
+
+    let maxPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(MAX_POINTS_INPUT_ID));
+    
+    if(goalPoints < 0)
+    goalPoints = NaN;
+    if(maxPoints < 0 )
+        maxPoints = NaN;
+    if(goalPoints > maxPoints) {
+        goalPoints = NaN;
+        maxPoints = NaN;
+    }
 
     return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
 }
