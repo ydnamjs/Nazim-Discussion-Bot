@@ -2,7 +2,7 @@ import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, SCORE_PERIOD_MODAL_EXPIRATION_TIME, ScorePeriodInputData, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow, validateScorePeriodInput } from "./generalScorePeriodModal";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, SCORE_PERIOD_MODAL_EXPIRATION_TIME, ScorePeriodInputData, endDateActionRow, goalPointsActionRow, maxPointsActionRow, processScorePeriodValidationData, startDateActionRow, validateScorePeriodInput } from "./generalScorePeriodModal";
 
 // MODAL TEXT CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
@@ -58,32 +58,12 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
  * @param {ButtonInteraction} triggeringInteraction  - the interaction that prompted the adding of a score period
  */
 async function processAddModalInput(courseTitle: string, submittedModal: ModalSubmitInteraction, triggeringInteraction: ButtonInteraction) {
-    
+
     // validate the score period data
     const modalData = validateScorePeriodInput(submittedModal);
 
-    // if the data is not valid, inform the user
-    if(modalData.startDate === undefined || modalData.endDate === undefined || Number.isNaN(modalData.goalPoints) || Number.isNaN(modalData.maxPoints)) {
-        
-        // create list of reasons why input failed
-        let reasons = "";
-        if(!modalData.startDate){
-            reasons += INVALID_START_DATE_REASON;
-        }
-        if(!modalData.endDate){
-            reasons += INVALID_END_DATE_REASON;
-        }
-        if(Number.isNaN(modalData.goalPoints)){
-            reasons += INVALID_GOAL_POINTS_REASON;
-        }
-        if(Number.isNaN(modalData.maxPoints)){
-            reasons += INVALID_MAX_POINTS_REASON;
-        }
-
-        // send the user the reasons
-        sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + reasons);
-        return;
-    }
+    if(processScorePeriodValidationData(submittedModal, modalData))
+        return
 
     // otherwise, get the course from the database
     let course: Course | null = null;
@@ -114,8 +94,7 @@ async function processAddModalInput(courseTitle: string, submittedModal: ModalSu
 async function insertNewScorePeriod(course: Course, submittedModal: ModalSubmitInteraction, newScorePeriodData: {start: Date, end: Date, goalPoints: number, maxPoints: number}, triggeringInteraction: ButtonInteraction) {
     
     // if the discussion specs could not be accessed there is a serious error
-    if(course.discussionSpecs === null)
-    {
+    if(course.discussionSpecs === null) {
         sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
         return;
     }

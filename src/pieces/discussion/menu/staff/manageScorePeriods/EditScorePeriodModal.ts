@@ -1,6 +1,6 @@
 import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord.js";
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { SCORE_PERIOD_MODAL_EXPIRATION_TIME, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow } from "./generalScorePeriodModal";
+import { PERIOD_NUM_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow, validateScorePeriodInput } from "./generalScorePeriodModal";
 
 // MODAL TEXT CONSTANTS
 const EDIT_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
@@ -44,4 +44,11 @@ export async function openEditScorePeriodModal(courseTitle: string, interaction:
     if (submittedModal !== undefined) {
         //processEditModalInput(courseTitle, submittedModal, interaction)
     }
+}
+
+function processEditModalInput(courseTitle: string, submittedModal: ModalSubmitInteraction, interaction: ButtonInteraction) {
+    
+    // validate the index and score period data
+    const scorePeriodIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
+    const modalData = validateScorePeriodInput(submittedModal);
 }

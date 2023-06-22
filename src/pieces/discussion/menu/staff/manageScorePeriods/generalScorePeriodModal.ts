@@ -1,10 +1,12 @@
 import { ActionRowBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import { DateTime } from "luxon";
+import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 
 // MODAL BEHAVIOR CONSTANTS
 export const SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
 export const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
 
+// MODAL NOTIFICATION CONSTANTS
 export const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
 export const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added.";
 export const INVALID_INPUT_PREFIX = "Invalid Input Format. New Score Period Was Not Added\nReasons(s):";
@@ -12,6 +14,7 @@ export const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input s
 export const INVALID_END_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2036-08-26 11:59:59 PM";
 export const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 800";
 export const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1000";
+export const INVALID_INDEX_PERIOD_MESSAGE = "Invalid score period input. Please retry with a number in your menu."
 
 // INPUT FIELD CONSTANTS
 export const PERIOD_NUM_INPUT_ID = "discussion_score_period_input";
@@ -132,4 +135,41 @@ export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction)
     }
 
     return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
+}
+
+/**
+ * @function goes through score period validation data and if there any problems replies to the modal interaction with the reasons the data was invalid
+ * @param {ModalSubmitInteraction} submittedModal - the modal interaction to reply to if any of the input is invalid
+ * @param {ScorePeriodInputData} modalData - the validation data to check
+ * @param {number} index - **optional** - index to also check for validity
+ * @returns {boolean} isInvalid - whether or not any input was invalid
+ */
+export function processScorePeriodValidationData(submittedModal: ModalSubmitInteraction, modalData: ScorePeriodInputData, index?: number): boolean { 
+    
+    // create list of reasons why input failed
+    let reasons = "";
+    if(!modalData.startDate){
+        reasons += INVALID_START_DATE_REASON;
+    }
+    if(!modalData.endDate){
+        reasons += INVALID_END_DATE_REASON;
+    }
+    if(Number.isNaN(modalData.goalPoints)){
+        reasons += INVALID_GOAL_POINTS_REASON;
+    }
+    if(Number.isNaN(modalData.maxPoints)){
+        reasons += INVALID_MAX_POINTS_REASON;
+    }
+    if(index && Number.isNaN(index)) {
+        reasons += INVALID_INDEX_PERIOD_MESSAGE;
+    }
+
+    // if there are any reasons send the user the reasons and return true
+    if(reasons !== "") {
+        sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + reasons);
+        return true;
+    }
+
+    // otherwise return false
+    return false;
 }
