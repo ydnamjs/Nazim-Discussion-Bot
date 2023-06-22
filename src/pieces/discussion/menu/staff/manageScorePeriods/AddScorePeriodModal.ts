@@ -3,7 +3,7 @@ import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./generalScorePeriodModal";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID, ScorePeriodInputData, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow, validateScorePeriodInput } from "./generalScorePeriodModal";
 
 // MODAL TEXT CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
@@ -51,21 +51,6 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
     }
 }
 
-// INPUT DATA INTERFACE
-/**
- * @interface defines the scorePeriod data that has been input. Used for after it has been converted from strings
- * @property {Date | undefined} startDate - If valid, the start date and time of the score period Undefined. if invalid input
- * @property {Date | undefined} endDate - If valid, the end date and time of the score period. Undefined if invalid input
- * @property {number} goalPoints - The target score that students are expected to earn in the score period. NaN if invalid input
- * @property {number} maxPoints - The maximum number of points that students can in earn in the score period. NaN if invalid input
- */
-interface ScorePeriodInputData {
-    startDate: Date | undefined, 
-    endDate: Date | undefined,  
-    goalPoints: number, 
-    maxPoints: number
-}
-
 // PROCESS ADD MODAL INPUT HELPER FUNCTION
 /**
  * @function processes the data of an add score period modal
@@ -75,8 +60,8 @@ interface ScorePeriodInputData {
  */
 async function processAddModalInput(courseTitle: string, submittedModal: ModalSubmitInteraction, triggeringInteraction: ButtonInteraction) {
     
-    // validate the input
-    const modalData = validateInput(submittedModal);
+    // validate the score period data
+    const modalData = validateScorePeriodInput(submittedModal);
 
     // if the data is not valid, inform the user
     if(modalData.startDate === undefined || modalData.endDate === undefined || Number.isNaN(modalData.goalPoints) || Number.isNaN(modalData.maxPoints)) {
@@ -117,43 +102,6 @@ async function processAddModalInput(courseTitle: string, submittedModal: ModalSu
     if(course && course.discussionSpecs !== null) {
         insertNewScorePeriod(course, submittedModal, {start: modalData.startDate as Date, end: modalData.endDate as Date, goalPoints: modalData.goalPoints, maxPoints: modalData.maxPoints}, triggeringInteraction)
     }
-}
-
-// VALIDATE DATA HELPER FUNCTION
-/**
- * @function validates the input of an add score period modal
- * @param addScorePeriodModal the submitted modal whose input is to be validated
- * @returns {ScorePeriodInputData} scorePeriodInputData - the score period input data after validation (see ScorePeriodInputData interface)
- */
-function validateInput(addScorePeriodModal: ModalSubmitInteraction): ScorePeriodInputData {
-    
-    // get and validate start date
-    const startDateString = addScorePeriodModal.fields.getTextInputValue(START_DATE_INPUT_ID);
-    const startDateTime = DateTime.fromFormat(startDateString, DATE_STRING_FORMAT)
-    const startDate = startDateTime.toJSDate().getTime() ? startDateTime.toJSDate() : undefined;
-
-    // get and validate end date
-    const endDateString = addScorePeriodModal.fields.getTextInputValue(END_DATE_INPUT_ID);
-    const endDateTime = DateTime.fromFormat(endDateString, DATE_STRING_FORMAT)
-    const endDate = endDateTime.toJSDate().getTime() ? endDateTime.toJSDate() : undefined;
-
-    // get goal points
-    let goalPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
-
-    // get max points
-    let maxPoints = parseInt(addScorePeriodModal.fields.getTextInputValue(MAX_POINTS_INPUT_ID));
-    
-    // validate points are non negative integers and that goal is not more than max
-    if(goalPoints < 0)
-    goalPoints = NaN;
-    if(maxPoints < 0 )
-        maxPoints = NaN;
-    if(goalPoints > maxPoints) {
-        goalPoints = NaN;
-        maxPoints = NaN;
-    }
-
-    return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
 }
 
 // INSERT NEW SCORE PERIOD HELPER FUNCTION

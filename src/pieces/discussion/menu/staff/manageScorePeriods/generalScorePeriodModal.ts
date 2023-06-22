@@ -1,4 +1,5 @@
-import { ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
+import { DateTime } from "luxon";
 
 // MODAL BEHAVIOR CONSTANTS
 export const SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
@@ -80,3 +81,55 @@ export const startDateActionRow = new ActionRowBuilder<TextInputBuilder>({compon
 export const endDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [endDateInput]});
 export const goalPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [goalPointsInput]});
 export const maxPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [maxPointsInput]});
+
+// INPUT DATA INTERFACE
+/**
+ * @interface defines the scorePeriod data that has been input. Used for after it has been converted from strings
+ * @property {Date | undefined} startDate - If valid, the start date and time of the score period Undefined. if invalid input
+ * @property {Date | undefined} endDate - If valid, the end date and time of the score period. Undefined if invalid input
+ * @property {number} goalPoints - The target score that students are expected to earn in the score period. NaN if invalid input
+ * @property {number} maxPoints - The maximum number of points that students can in earn in the score period. NaN if invalid input
+ */
+export interface ScorePeriodInputData {
+    startDate: Date | undefined, 
+    endDate: Date | undefined,  
+    goalPoints: number, 
+    maxPoints: number
+}
+
+// VALIDATE DATA HELPER FUNCTION
+/**
+ * @function validates the input of an add score period modal
+ * @param submittedModal the submitted modal whose input is to be validated
+ * @returns {ScorePeriodInputData} scorePeriodInputData - the score period input data after validation (see ScorePeriodInputData interface)
+ */
+export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction): ScorePeriodInputData {
+    
+    // get and validate start date
+    const startDateString = submittedModal.fields.getTextInputValue(START_DATE_INPUT_ID);
+    const startDateTime = DateTime.fromFormat(startDateString, DATE_STRING_FORMAT)
+    const startDate = startDateTime.toJSDate().getTime() ? startDateTime.toJSDate() : undefined;
+
+    // get and validate end date
+    const endDateString = submittedModal.fields.getTextInputValue(END_DATE_INPUT_ID);
+    const endDateTime = DateTime.fromFormat(endDateString, DATE_STRING_FORMAT)
+    const endDate = endDateTime.toJSDate().getTime() ? endDateTime.toJSDate() : undefined;
+
+    // get goal points
+    let goalPoints = parseInt(submittedModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
+
+    // get max points
+    let maxPoints = parseInt(submittedModal.fields.getTextInputValue(MAX_POINTS_INPUT_ID));
+    
+    // validate points are non negative integers and that goal is not more than max
+    if(goalPoints < 0)
+    goalPoints = NaN;
+    if(maxPoints < 0 )
+        maxPoints = NaN;
+    if(goalPoints > maxPoints) {
+        goalPoints = NaN;
+        maxPoints = NaN;
+    }
+
+    return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
+}
