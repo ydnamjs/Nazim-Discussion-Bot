@@ -11,13 +11,13 @@ export const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
 
 // MODAL NOTIFICATION CONSTANTS
 export const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
-export const CONFLICTING_DATES_MESSAGE = "New Score Period Has Overlap With Already Existing Score Period(s). New Score Period Was Not Added.";
-export const INVALID_INPUT_PREFIX = "Invalid Input Format. New Score Period Was Not Added\nReasons(s):";
+export const CONFLICTING_DATES_MESSAGE = "Score Period Has Overlap With Already Existing Score Period(s). Nothing Was Changed.";
+export const INVALID_INPUT_PREFIX = "Invalid Input Format. Nothing Was Changed\nReasons(s):";
 export const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 1970-01-01 12:00:00 AM";
 export const INVALID_END_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM Ex: 2036-08-26 11:59:59 PM";
 export const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 800";
 export const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1000";
-export const INVALID_INDEX_PERIOD_MESSAGE = "Invalid score period input. Please retry with a number in your menu."
+export const INVALID_INDEX_PERIOD_MESSAGE = "\n-Invalid score period input. Please retry with a number in your menu."
 
 // INPUT FIELD CONSTANTS
 export const PERIOD_NUM_INPUT_ID = "discussion_score_period_input";
@@ -105,7 +105,7 @@ export interface ScorePeriodInputData {
 
 // VALIDATE DATA HELPER FUNCTION
 /**
- * @function validates the input of an add score period modal
+ * @function validates the input of an add/edit score period modal
  * @param submittedModal the submitted modal whose input is to be validated
  * @returns {ScorePeriodInputData} scorePeriodInputData - the score period input data after validation (see ScorePeriodInputData interface)
  */
@@ -152,6 +152,9 @@ export function processScorePeriodValidationData(submittedModal: ModalSubmitInte
     
     // create list of reasons why input failed
     let reasons = "";
+    if(index !== undefined && (Number.isNaN(index) || index < 1 || (scorePeriodsLength && index > scorePeriodsLength))) {
+        reasons += INVALID_INDEX_PERIOD_MESSAGE;
+    }
     if(!modalData.startDate){
         reasons += INVALID_START_DATE_REASON;
     }
@@ -163,9 +166,6 @@ export function processScorePeriodValidationData(submittedModal: ModalSubmitInte
     }
     if(Number.isNaN(modalData.maxPoints)){
         reasons += INVALID_MAX_POINTS_REASON;
-    }
-    if(index !== undefined && (Number.isNaN(index) || index < 1 || (scorePeriodsLength && index > scorePeriodsLength))) {
-        reasons += "\n" + INVALID_INDEX_PERIOD_MESSAGE;
     }
 
     // if there are any reasons send the user the reasons and return true
