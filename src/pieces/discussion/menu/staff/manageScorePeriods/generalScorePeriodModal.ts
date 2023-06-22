@@ -140,6 +140,7 @@ export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction)
     return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
 }
 
+// PROCESS VALIDATION DATA HELPER FUNCTION
 /**
  * @function goes through score period validation data and if there any problems replies to the modal interaction with the reasons the data was invalid
  * @param {ModalSubmitInteraction} submittedModal - the modal interaction to reply to if any of the input is invalid
@@ -178,8 +179,17 @@ export function processScorePeriodValidationData(submittedModal: ModalSubmitInte
     return false;
 }
 
+/**
+ * @function adds a score period to a course in the database
+ * @param {DiscussionSpecs} discussionSpecs - the discussion specs that are already in place for the course
+ * @param {Object} newScorePeriodData - data for the score period to be added
+ * @param {ModalSubmitInteraction} submittedModal - the modal submit interaction that caused the score period to be added
+ * @param {ButtonInteraction} triggeringInteraction - the interaction that triggered the modal
+ * @param {string} courseTitle - the name of the course that the score period is being added to
+ * @param {string} successMessage - the message to be used in the reply on successful database insert
+ */
 export async function addScorePeriodToDataBase(
-    disc: DiscussionSpecs, 
+    discussionSpecs: DiscussionSpecs, 
     newScorePeriodData: {start: Date, end: Date, goalPoints: number, maxPoints: number}, 
     submittedModal: ModalSubmitInteraction,
     triggeringInteraction: ButtonInteraction,
@@ -187,21 +197,21 @@ export async function addScorePeriodToDataBase(
     successMessage: string
     ) {
         // add the new score periods to the old and sort the list by start date
-        disc.scorePeriods.push({   
+        discussionSpecs.scorePeriods.push({   
             start: newScorePeriodData.start,
             end: newScorePeriodData.end,
             goalPoints: newScorePeriodData.goalPoints,
             maxPoints: newScorePeriodData.maxPoints,
             studentScores: new Map()
         });
-        disc.scorePeriods = disc.scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
+        discussionSpecs.scorePeriods = discussionSpecs.scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
     
         // update the database with the new score period
         let newCourse: Document | null = null;
         try {
             newCourse = await courseModel.findOneAndUpdate( 
                 {name: courseTitle}, 
-                {discussionSpecs: disc}
+                {discussionSpecs: discussionSpecs}
             )
         }
         // if there was a database error, inform the user and return
