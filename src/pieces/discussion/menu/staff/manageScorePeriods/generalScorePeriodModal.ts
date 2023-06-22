@@ -142,9 +142,10 @@ export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction)
  * @param {ModalSubmitInteraction} submittedModal - the modal interaction to reply to if any of the input is invalid
  * @param {ScorePeriodInputData} modalData - the validation data to check
  * @param {number} index - **optional** - index to also check for validity
+ * @param {number} scorePeriodsLength - **optional** length of the score periods list that index is indexing to
  * @returns {boolean} isInvalid - whether or not any input was invalid
  */
-export function processScorePeriodValidationData(submittedModal: ModalSubmitInteraction, modalData: ScorePeriodInputData, index?: number): boolean { 
+export function processScorePeriodValidationData(submittedModal: ModalSubmitInteraction, modalData: ScorePeriodInputData, index?: number, scorePeriodsLength?: number): boolean { 
     
     // create list of reasons why input failed
     let reasons = "";
@@ -160,8 +161,8 @@ export function processScorePeriodValidationData(submittedModal: ModalSubmitInte
     if(Number.isNaN(modalData.maxPoints)){
         reasons += INVALID_MAX_POINTS_REASON;
     }
-    if(index && Number.isNaN(index)) {
-        reasons += INVALID_INDEX_PERIOD_MESSAGE;
+    if(index !== undefined && (Number.isNaN(index) || index < 1 || (scorePeriodsLength && index > scorePeriodsLength))) {
+        reasons += "\n" + INVALID_INDEX_PERIOD_MESSAGE;
     }
 
     // if there are any reasons send the user the reasons and return true
