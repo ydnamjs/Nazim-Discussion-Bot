@@ -28,7 +28,6 @@ const DELETE_SCORE_PERIOD_BUTTON_DISABLED = false;
 const DELETE_SCORE_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
 
 // NAVIGATION ROW
-
 const customNavOptions: CustomNavOptions = {
     prevButtonOptions: {exists: true},
     nextButtonOptions: {exists: true},
@@ -41,7 +40,6 @@ const customNavOptions: CustomNavOptions = {
 };
 
 // SCORE PERIOD ROW
-
 const ADD_SCORE_PERIOD_BUTTON_DATA = {
     custom_id: ADD_SCORE_PERIOD_BUTTON_ID,
     label: ADD_SCORE_PERIOD_BUTTON_LABEL,
@@ -151,21 +149,19 @@ export async function updateToManageScorePeriodsMenu(courseTitle: string, compon
         return;
     }
 
-    const scorePeriodData: ScorePeriodData[] = [
-        {
-            start: new Date("2023-06-21"),
-            end: new Date("2023-06-27"),
-            goalPoints: 1000,
-            maxPoints: 1350
-        },
-        {
-            start: new Date("2023-06-28"),
-            end: new Date("2023-07-04"),
-            goalPoints: 1000,
-            maxPoints: 1350
-        }
-    ]
+    let scorePeriodData: ScorePeriodData[] = [];
 
+    if(course.discussionSpecs) {
+        
+        scorePeriodData = course.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
+            return {
+                start: scorePeriod.start,
+                end: scorePeriod.end,
+                goalPoints: scorePeriod.goalPoints,
+                maxPoints: scorePeriod.maxPoints
+            };
+        })
+    }
     // replace the old menu with the view students menu
     const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseTitle, scorePeriodData);
     isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
