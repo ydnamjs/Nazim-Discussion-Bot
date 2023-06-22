@@ -181,13 +181,19 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                     
                     const disc = course.discussionSpecs;
                     
-                    disc?.scorePeriods.push({   
+                    if(disc === null) {
+                        return
+                    }
+
+                    disc.scorePeriods.push({   
                         start: newStart,
                         end: newEnd,
                         goalPoints: modalData.goalPoints,
                         maxPoints: modalData.maxPoints,
                         studentScores: new Map()
                     });
+
+                    disc.scorePeriods = disc.scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
 
                     await courseModel.findOneAndUpdate( 
                         {name: courseTitle}, 
