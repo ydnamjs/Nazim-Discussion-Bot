@@ -1,6 +1,6 @@
 import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord.js";
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, PERIOD_NUM_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, addScorePeriodToDataBase, endDateActionRow, goalPointsActionRow, maxPointsActionRow, processScorePeriodValidationData, scorePeriodNumActionRow, startDateActionRow, validateScorePeriodInput } from "./GeneralScorePeriodModal";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, PERIOD_NUM_INPUT_ID, SCORE_PERIOD_MODAL_EXPIRATION_TIME, addOneScorePeriodToDataBase, endDateActionRow, goalPointsActionRow, maxPointsActionRow, processScorePeriodValidationData, scorePeriodNumActionRow, startDateActionRow, validateScorePeriodInput } from "./GeneralScorePeriodModal";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 
@@ -113,5 +113,5 @@ async function updateScorePeriod(course: Course, submittedModal: ModalSubmitInte
     disc.scorePeriods.splice(oldScorePeriodIndex - 1, 1);
 
     // add updated score period
-    addScorePeriodToDataBase(disc, newScorePeriodData, submittedModal, triggeringInteraction, course.name, SUCCESS_MESSAGE);
+    addOneScorePeriodToDataBase(disc, newScorePeriodData, submittedModal, triggeringInteraction, course.name, SUCCESS_MESSAGE);
 }
