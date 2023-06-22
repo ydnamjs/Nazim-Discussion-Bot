@@ -1,6 +1,9 @@
-import { ActionRowBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import { DateTime } from "luxon";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
+import { DiscussionSpecs } from "src/generalModels/DiscussionScoring";
+import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { courseModel } from "../../../../../generalModels/Course";
 
 // MODAL BEHAVIOR CONSTANTS
 export const SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
@@ -173,4 +176,51 @@ export function processScorePeriodValidationData(submittedModal: ModalSubmitInte
 
     // otherwise return false
     return false;
+}
+
+export async function addScorePeriodToDataBase(
+    disc: DiscussionSpecs, 
+    newScorePeriodData: {start: Date, end: Date, goalPoints: number, maxPoints: number}, 
+    submittedModal: ModalSubmitInteraction,
+    triggeringInteraction: ButtonInteraction,
+    courseTitle: string,
+    successMessage: string
+    ) {
+        // add the new score periods to the old and sort the list by start date
+        disc.scorePeriods.push({   
+            start: newScorePeriodData.start,
+            end: newScorePeriodData.end,
+            goalPoints: newScorePeriodData.goalPoints,
+            maxPoints: newScorePeriodData.maxPoints,
+            studentScores: new Map()
+        });
+        disc.scorePeriods = disc.scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
+    
+        // update the database with the new score period
+        let newCourse: Document | null = null;
+        try {
+            newCourse = await courseModel.findOneAndUpdate( 
+                {name: courseTitle}, 
+                {discussionSpecs: disc}
+            )
+        }
+        // if there was a database error, inform the user and return
+        catch(error: any) {
+            sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
+            console.error(error);
+            return;
+        }
+    
+        // otherwise, inform the user that the score period was successfully added
+        if(newCourse !== null) {
+            
+            // inform the user of the success
+            sendDismissableInteractionReply(submittedModal, successMessage)
+    
+            // refresh the menu to reflect new score periods
+            await updateToManageScorePeriodsMenu(courseTitle, triggeringInteraction, false, false);
+    
+            //TODO: After a score period is added, score all of the posts and comments that would fall into it (only necessary for score periods that started in the past)
+            return;
+        }
 }

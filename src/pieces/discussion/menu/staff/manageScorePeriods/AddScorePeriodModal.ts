@@ -2,7 +2,7 @@ import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, SCORE_PERIOD_MODAL_EXPIRATION_TIME, ScorePeriodInputData, endDateActionRow, goalPointsActionRow, maxPointsActionRow, processScorePeriodValidationData, startDateActionRow, validateScorePeriodInput } from "./generalScorePeriodModal";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, SCORE_PERIOD_MODAL_EXPIRATION_TIME, ScorePeriodInputData, addScorePeriodToDataBase, endDateActionRow, goalPointsActionRow, maxPointsActionRow, processScorePeriodValidationData, startDateActionRow, validateScorePeriodInput } from "./generalScorePeriodModal";
 
 // MODAL TEXT CONSTANTS
 const ADD_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
@@ -118,48 +118,6 @@ async function insertNewScorePeriod(course: Course, submittedModal: ModalSubmitI
     
     // other wise, add it to the score periods
     const disc = course.discussionSpecs;
-    
-    // if the discussion specs could not be accessed there is a serious error
-    if(disc === null) {
-        sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
-        return;
-    }
 
-    // add the new score periods to the old and sort the list by start date
-    disc.scorePeriods.push({   
-        start: newScorePeriodData.start,
-        end: newScorePeriodData.end,
-        goalPoints: newScorePeriodData.goalPoints,
-        maxPoints: newScorePeriodData.maxPoints,
-        studentScores: new Map()
-    });
-    disc.scorePeriods = disc.scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
-
-    // update the database with the new score period
-    let newCourse: Document | null = null;
-    try {
-        newCourse = await courseModel.findOneAndUpdate( 
-            {name: course.name}, 
-            {discussionSpecs: disc}
-        )
-    }
-    // if there was a database error, inform the user and return
-    catch(error: any) {
-        sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
-        console.error(error);
-        return;
-    }
-
-    // otherwise, inform the user that the score period was successfully added
-    if(newCourse !== null) {
-        
-        // inform the user of the success
-        sendDismissableInteractionReply(submittedModal, SUCCESS_MESSAGE)
-
-        // refresh the menu to reflect new score periods
-        await updateToManageScorePeriodsMenu(course.name, triggeringInteraction, false, false);
-
-        //TODO: After a score period is added, score all of the posts and comments that would fall into it (only necessary for score periods that started in the past)
-        return;
-    } 
+    addScorePeriodToDataBase(disc, newScorePeriodData, submittedModal, triggeringInteraction, course.name, SUCCESS_MESSAGE)
 }
