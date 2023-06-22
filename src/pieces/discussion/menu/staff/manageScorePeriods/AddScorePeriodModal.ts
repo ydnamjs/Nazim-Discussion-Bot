@@ -204,8 +204,10 @@ export async function openAddScorePeriodModal(courseTitle: string, interaction: 
                     
                     const disc = course.discussionSpecs;
                     
+                    // if the discussion specs could not be accessed there is a serious error
                     if(disc === null) {
-                        return
+                        sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
+                        return;
                     }
 
                     // add the new score periods to the old and sort the list by start date
