@@ -5,9 +5,9 @@ import { Course, courseModel } from "../../../../../generalModels/Course";
 
 // MODAL BEHAVIOR CONSTANTS
 const DELETE_SCORE_PERIOD_MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
-
-// MODAL
 const DELETE_SCORE_PERIOD_MODAL_ID = "delete_score_period_modal"
+
+// MODAL TEXT CONSTANTS
 const DELETE_SCORE_PERIOD_MODAL_TITLE_PREFIX = "Delete Score Period From CISC ";
 
 // MODAL NOTIFICATION CONSTANTS
@@ -29,7 +29,12 @@ const scorePeriodNumInput = new TextInputBuilder({
 })
 const scorePeriodNumActionRow = new ActionRowBuilder<TextInputBuilder>({components: [scorePeriodNumInput]});
 
-//FUNCTION
+// PRIMARY OPEN MODAL FUNCTION
+/**
+ * @function creates a modal for deleting a score period
+ * @param {string} courseTitle - the name of the course from which a score period is being deleted
+ * @param {ButtonInteraction} interaction - the interaction that prompted the deleting of a score period
+ */
 export async function openDeleteScorePeriodModal(courseTitle: string, interaction: ButtonInteraction) {
     
     // refresh the manage score periods menu so that after the modal is close/submitted it collects input again
@@ -54,67 +59,79 @@ export async function openDeleteScorePeriodModal(courseTitle: string, interactio
 
     // if the modal is submitted, process the data given
     if (submittedModal !== undefined) {
-        
-        const scorePeriodIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
+        processDeleteModalInput(courseTitle, submittedModal, interaction)
+    }
+}
 
-        // get the course from the database
-        let course: Course | null = null;
-        try {
-            course = await courseModel.findOne({name: courseTitle});
+// PROCESS DELETE MODAL INPUT HELPER FUNCTION
+/**
+ * @function processes the input of a delete score period modal
+ * @param {string} courseTitle - the name of the course from which a score period is being deleted
+ * @param {ModalSubmitInteraction} submittedModal - the submitted delete score period modal interaction that will be processed
+ * @param {ButtonInteraction} triggeringInteraction - the interaction that prompted the deleting of a score period
+ */
+async function processDeleteModalInput(courseTitle: string, submittedModal: ModalSubmitInteraction, triggeringInteraction: ButtonInteraction) {
+    
+    // get the input index from the modal
+    const scorePeriodIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
+
+    // get the course from the database
+    let course: Course | null = null;
+    try {
+        course = await courseModel.findOne({name: courseTitle});
+    }
+    // if there was an error getting the course, inform the user that there was a database error
+    catch(error: any) {
+        sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
+        console.error(error);
+        return;
+    }
+
+    // if the course was valid
+    if(course && course.discussionSpecs !== null) {
+
+        // if the input refers to an invalid score period, inform the user
+        if(scorePeriodIndex < 1 || scorePeriodIndex > course.discussionSpecs.scorePeriods.length || Number.isNaN(scorePeriodIndex)) {
+            sendDismissableInteractionReply(submittedModal, INVALID_SCORE_PERIOD_MESSAGE);
+            return;
         }
-        // if there was an error getting the course, inform the user that there was a database error
+
+        // otherwise delete the score period at that index
+        const disc = course.discussionSpecs;
+            
+        // if the discussion specs could not be accessed there is a serious error
+        if(disc === null) {
+            sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
+            return;
+        }
+
+        // remove the score period at specified index and sort the list by start date
+        disc.scorePeriods.splice(scorePeriodIndex - 1, 1);
+        disc.scorePeriods = disc.scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() });
+
+        // update the database with the score period now removed
+        let newCourse: Document | null = null;
+        try {
+            newCourse = await courseModel.findOneAndUpdate( 
+                {name: courseTitle}, 
+                {discussionSpecs: disc}
+            )
+        }
+        // if there was a database error, inform the user and return
         catch(error: any) {
             sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
             console.error(error);
             return;
         }
 
-        // if the course was valid
-        if(course && course.discussionSpecs !== null) {
+        // otherwise, inform the user that the score period was successfully removed
+        if(newCourse !== null) {
+            // inform the user of the success
+            sendDismissableInteractionReply(submittedModal, SUCCESS_MESSAGE)
 
-            // if the input refers to an invalid score period, inform the user
-            if(scorePeriodIndex < 1 || scorePeriodIndex > course.discussionSpecs.scorePeriods.length || Number.isNaN(scorePeriodIndex)) {
-                sendDismissableInteractionReply(submittedModal, INVALID_SCORE_PERIOD_MESSAGE);
-                return;
-            }
-
-            // otherwise delete the score period at that index
-            const disc = course.discussionSpecs;
-            
-            // if the discussion specs could not be accessed there is a serious error
-            if(disc === null) {
-                sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
-                return;
-            }
-
-            // remove the score period at specified index and sort the list by start date
-            disc.scorePeriods.splice(scorePeriodIndex - 1, 1);
-            disc.scorePeriods = disc.scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() });
-
-            // update the database with the score period now removed
-            let newCourse: Document | null = null;
-            try {
-                newCourse = await courseModel.findOneAndUpdate( 
-                    {name: courseTitle}, 
-                    {discussionSpecs: disc}
-                )
-            }
-            // if there was a database error, inform the user and return
-            catch(error: any) {
-                sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
-                console.error(error);
-                return;
-            }
-
-            // otherwise, inform the user that the score period was successfully removed
-            if(newCourse !== null) {
-                // inform the user of the success
-                sendDismissableInteractionReply(submittedModal, SUCCESS_MESSAGE)
-
-                // refresh the menu to reflect new score period list
-                await updateToManageScorePeriodsMenu(courseTitle, interaction, false, false);
-                return;
-            }
+            // refresh the menu to reflect new score period list
+            await updateToManageScorePeriodsMenu(courseTitle, triggeringInteraction, false, false);
+            return;
         }
     }
 }
