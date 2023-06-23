@@ -12,19 +12,19 @@ const MODAL_ID_PREFIX = "discussion_add_score_period_modal";
 const MODAL_TITLE_PREFIX = "Add Score Period To CISC ";
 const SUCCESS_MESSAGE = "New Score Period Added!";
 
-export async function createScorePeriodModal( courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
+export async function createScorePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
     // the modal id has to be generated based on time 
     // because if it isnt and the user cancels the modal and opens another one
     // we have to filter that it matches the id otherwise the canceled modal will also be processed
     // and we'll have duplicates and that behavior is VERY undefined
-    const MODAL_ID = MODAL_ID_PREFIX + new Date().getMilliseconds()
+    const MODAL_ID = idPrefix + new Date().getMilliseconds()
 
     updateToManageScorePeriodsMenu(courseName, triggerInteraction, false, true);
 
     const addScorePeriodModal = new ModalBuilder({
         customId: MODAL_ID,
-        title: MODAL_TITLE_PREFIX + courseName,
+        title: titlePrefix + courseName,
         components: components
     })
     

@@ -23,8 +23,8 @@ export async function openAddScorePeriodModal(courseName: string, triggerInterac
         maxPointsActionRow
     ];
     
-    await createScorePeriodModal( courseName, triggerInteraction, components, handleModalInput);
-    //await createScorePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
+    //await createScorePeriodModal( courseName, triggerInteraction, components, handleModalInput);
+    await createScorePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 
 async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
