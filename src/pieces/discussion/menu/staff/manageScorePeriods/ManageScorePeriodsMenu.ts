@@ -1,4 +1,4 @@
-import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
+import { BaseInteraction, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction, User } from "discord.js";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
@@ -212,4 +212,75 @@ export async function updateToManageScorePeriodsMenu(courseTitle: string, compon
     
     if(shouldCollect)
     manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
+}
+
+export async function refreshMenu(courseName: string, message: Message, user: User) {
+
+    let course: Course | null = null;
+    try {
+        course = await courseModel.findOne({name: courseName});
+    }
+    catch(error: any) {
+        console.error(error);
+    }
+    
+    if(!course) {
+        return;
+    }
+    
+    let scorePeriodData: ScorePeriodData[] = [];
+    
+    if(course.discussionSpecs === null)  {
+        return;
+    }
+            
+    scorePeriodData = course.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
+        return {
+            start: scorePeriod.start,
+            end: scorePeriod.end,
+            goalPoints: scorePeriod.goalPoints,
+            maxPoints: scorePeriod.maxPoints
+        };
+    })
+
+    //if (message.deletable) message.delete()
+    
+    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseName, scorePeriodData);
+    const newSentMessage = await user.send(manageScorePeriodsMenu.menuMessageData);
+    manageScorePeriodsMenu.collectMenuInteraction(user, newSentMessage)
+
+    return newSentMessage;
+}
+
+export async function refreshMenuInteraction(courseName: string, interaction: MessageComponentInteraction) {
+
+    let course: Course | null = null;
+    try {
+        course = await courseModel.findOne({name: courseName});
+    }
+    catch(error: any) {
+        console.error(error);
+    }
+    
+    if(!course) {
+        return;
+    }
+    
+    let scorePeriodData: ScorePeriodData[] = [];
+    
+    if(course.discussionSpecs === null)  {
+        return;
+    }
+            
+    scorePeriodData = course.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
+        return {
+            start: scorePeriod.start,
+            end: scorePeriod.end,
+            goalPoints: scorePeriod.goalPoints,
+            maxPoints: scorePeriod.maxPoints
+        };
+    })
+    
+    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseName, scorePeriodData);
+    interaction.message.edit({embeds: manageScorePeriodsMenu.menuMessageData.embeds});
 }

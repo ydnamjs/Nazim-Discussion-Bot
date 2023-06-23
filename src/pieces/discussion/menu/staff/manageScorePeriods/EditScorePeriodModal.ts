@@ -1,7 +1,7 @@
-import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord.js";
+import { ButtonInteraction, Message, ModalBuilder, ModalSubmitInteraction, User } from "discord.js";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { ScorePeriodData, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { ScorePeriodData, refreshMenu, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow } from "./ModalComponents";
 import { checkAgainstCurrentPeriods, handleIndexValidation, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
 
@@ -40,12 +40,11 @@ export async function openEditScorePeriodModal(courseName: string, triggerIntera
     catch {}
 
     if (submittedModal !== undefined) {
-        await handleModalInput(courseName, submittedModal);
-        //TODO: add a refresh function once that is implemented
+        handleModalInput(courseName, submittedModal, triggerInteraction.message);
     }
 }
 
-async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction) {
+async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction, triggerMessage: Message) {
 
     const toEditIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
     const periodValidationData = validateScorePeriodInput(submittedModal);
@@ -55,6 +54,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
         course = await courseModel.findOne({name: courseName});
     }
     catch(error: any) {
+        refreshMenu(courseName, triggerMessage, submittedModal.user);
         sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
         console.error(error);
         return true;
@@ -67,6 +67,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
         const reasonsForFailure = handleIndexValidation(toEditIndex, currentScorePeriods.length) + handlePeriodValidation(periodValidationData)
 
         if(reasonsForFailure !== "") {
+            refreshMenu(courseName, triggerMessage, submittedModal.user);
             sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + reasonsForFailure);
             return
         }

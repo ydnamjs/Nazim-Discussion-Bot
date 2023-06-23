@@ -1,9 +1,50 @@
-import { ModalSubmitInteraction } from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
 import { DateTime } from "luxon";
 import { courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
-import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, START_DATE_INPUT_ID } from "./ModalComponents";
+import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
+import { refreshMenu, refreshMenuInteraction, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+
+export type ModalInputHandler = (courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
+
+const MODAL_ID_PREFIX = "discussion_add_score_period_modal";
+const MODAL_TITLE_PREFIX = "Add Score Period To CISC ";
+const SUCCESS_MESSAGE = "New Score Period Added!";
+
+export async function createScorePeriodModal( courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
+    
+    // the modal id has to be generated based on time 
+    // because if it isnt and the user cancels the modal and opens another one
+    // we have to filter that it matches the id otherwise the canceled modal will also be processed
+    // and we'll have duplicates and that behavior is VERY undefined
+    const MODAL_ID = MODAL_ID_PREFIX + new Date().getMilliseconds()
+
+    updateToManageScorePeriodsMenu(courseName, triggerInteraction, false, true);
+
+    const addScorePeriodModal = new ModalBuilder({
+        customId: MODAL_ID,
+        title: MODAL_TITLE_PREFIX + courseName,
+        components: components
+    })
+    
+    triggerInteraction.showModal(addScorePeriodModal);
+
+    let submittedModal: ModalSubmitInteraction | undefined = undefined;
+    try {
+        // we have to filter that it matches the id because if it isnt and the user cancels the modal and opens another one the
+        // canceled modal will also be processed and we'll have duplicates and that behavior is VERY undefined
+        // (this is unlike message component interactions! and thus weird)
+        submittedModal = await triggerInteraction.awaitModalSubmit({filter: (modal)=> {return modal.customId === MODAL_ID}, time: MODAL_EXPIRATION_TIME});
+    }
+    catch {}
+
+    if (submittedModal !== undefined) {
+        const replyText = await modalInputHandler(courseName, submittedModal);
+        refreshMenuInteraction(courseName, triggerInteraction);
+        sendDismissableInteractionReply(submittedModal, replyText);
+    }
+}
 
 export interface ScorePeriodValidationData {
     startDate: Date | undefined, 
@@ -107,14 +148,12 @@ export async function checkAgainstCurrentPeriods(newScorePeriodData: ScorePeriod
 
 /**
  * @function inserts a score period to a course in the database
- * @param {DiscussionSpecs} discussionSpecs - the discussion specs that are already in place for the course
  * @param {Object} newScorePeriodData - data for the score period to be added
  * @param {ModalSubmitInteraction} submittedModal - the modal submit interaction that caused the score period to be added
- * @param {ButtonInteraction} triggeringInteraction - the interaction that triggered the modal
- * @param {string} courseTitle - the name of the course that the score period is being added to
+ * @param {string} courseName - the name of the course that the score period is being added to
  * @param {string} successMessage - the message to be used in the reply on successful database insert
  */
-export async function insertOnePeriod( courseTitle: string, newScorePeriodData: ScorePeriodData, scorePeriods: ScorePeriod[], submittedModal: ModalSubmitInteraction, successMessage: string ) {
+export async function insertOnePeriod( courseName: string, newScorePeriodData: ScorePeriodData, scorePeriods: ScorePeriod[], submittedModal: ModalSubmitInteraction, successMessage: string ) {
 
     scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
     scorePeriods = scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
@@ -122,7 +161,7 @@ export async function insertOnePeriod( courseTitle: string, newScorePeriodData: 
     let newCourse: Document | null = null;
     try {
         newCourse = await courseModel.findOneAndUpdate( 
-            {name: courseTitle}, 
+            {name: courseName}, 
             {"discussionSpecs.scorePeriods": scorePeriods}
         )
     }
@@ -133,8 +172,9 @@ export async function insertOnePeriod( courseTitle: string, newScorePeriodData: 
     }
     
     if(newCourse !== null) {
-          
-        sendDismissableInteractionReply(submittedModal, successMessage)
+        const newMenuMessage = await refreshMenu(courseName, submittedModal.message as Message, submittedModal.user);
+        if(newMenuMessage)
+            sendDismissableReply(newMenuMessage, successMessage)
     
         //TODO: After a score period is added, score all of the posts and comments that would fall into it (only necessary for score periods that started in the past)
         return;

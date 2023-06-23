@@ -1,12 +1,12 @@
-import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, User } from "discord.js";
 import { Course, courseModel } from "../../../../../generalModels/Course";
-import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
-import { ScorePeriodData, checkAgainstCurrentPeriods, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
+import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
+import { refreshMenu, refreshMenuInteraction, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
+import { ScorePeriodData, checkAgainstCurrentPeriods, createScorePeriodModal, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
 
-const MODAL_ID = "discussion_add_score_period_modal";
-const TITLE_PREFIX = "Add Score Period To CISC ";
+const MODAL_ID_PREFIX = "discussion_add_score_period_modal";
+const MODAL_TITLE_PREFIX = "Add Score Period To CISC ";
 const SUCCESS_MESSAGE = "New Score Period Added!";
 
 /**
@@ -15,44 +15,26 @@ const SUCCESS_MESSAGE = "New Score Period Added!";
  * @param triggerInteraction - the interaction that triggered the opening of this modal
  */
 export async function openAddScorePeriodModal(courseName: string, triggerInteraction: ButtonInteraction) {
-    
-    //TODO: replace with a refresh function once that is implemented
-    updateToManageScorePeriodsMenu(courseName, triggerInteraction, false, true);
-    
-    const addScorePeriodModal = new ModalBuilder({
-        customId: MODAL_ID,
-        title: TITLE_PREFIX + courseName,
-        components: [
-            startDateActionRow,
-            endDateActionRow,
-            goalPointsActionRow,
-            maxPointsActionRow
-        ]
-    })
-    
-    triggerInteraction.showModal(addScorePeriodModal);
 
-    let submittedModal: ModalSubmitInteraction | undefined = undefined;
-    try {
-        submittedModal = await triggerInteraction.awaitModalSubmit({time: MODAL_EXPIRATION_TIME})
-    }
-    catch {}
-
-    if (submittedModal !== undefined) {
-        await handleModalInput(courseName, submittedModal);
-        //TODO: add a refresh function once that is implemented
-    }
+    const components = [
+        startDateActionRow,
+        endDateActionRow,
+        goalPointsActionRow,
+        maxPointsActionRow
+    ];
+    
+    await createScorePeriodModal( courseName, triggerInteraction, components, handleModalInput);
+    //await createScorePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 
-async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction) {
+async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
 
     const periodValidationData = validateScorePeriodInput(submittedModal);
 
     const reasonsForFailure = handlePeriodValidation(periodValidationData)
 
     if(reasonsForFailure !== "") {
-        sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + reasonsForFailure);
-        return;
+        return INVALID_INPUT_PREFIX + reasonsForFailure;
     }
     
     const newScorePeriod: ScorePeriodData = {
@@ -67,9 +49,8 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
         course = await courseModel.findOne({name: courseName});
     }
     catch(error: any) {
-        sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
         console.error(error);
-        return true;
+        return DATABASE_ERROR_MESSAGE;
     }
 
     if(course && course.discussionSpecs !== null) {
@@ -78,9 +59,10 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
         const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods, submittedModal)
 
         if(conflictsWithCurrentPeriods) {
-            return
+            return CONFLICTING_DATES_MESSAGE;
         }
 
         insertOnePeriod(courseName, newScorePeriod, currentScorePeriods, submittedModal, SUCCESS_MESSAGE)
     }
+    return SUCCESS_MESSAGE;
 }

@@ -83,6 +83,7 @@ export class BaseMenu {
     /** @member list of all the behaviors for the menu components */
     private componentBehaviors: ComponentBehavior[];
 
+    // TODO: Update js doc it is currently wrong
     /** 
      * @function handles the collection of interactions on the menu when it is sent
      * @param {Client} client - the client that the bot is logged in as

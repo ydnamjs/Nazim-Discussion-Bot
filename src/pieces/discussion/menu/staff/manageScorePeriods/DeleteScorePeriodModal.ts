@@ -1,7 +1,7 @@
-import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord.js";
+import { ButtonInteraction, Message, ModalBuilder, ModalSubmitInteraction, User } from "discord.js";
 import { Course, courseModel } from "../../../../../generalModels/Course";
-import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
+import { refreshMenu, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, INVALID_INDEX_PERIOD_REASON, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, PERIOD_NUM_INPUT_ID, scorePeriodNumActionRow } from "./ModalComponents";
 import { handleIndexValidation } from "./ModalUtilities";
 
@@ -36,12 +36,11 @@ export async function openDeleteScorePeriodModal(courseName: string, triggerInte
     catch {}
 
     if (submittedModal !== undefined) {
-        await handleModalInput(courseName, submittedModal);
-        //TODO: add a refresh function once that is implemented
+        handleModalInput(courseName, submittedModal, triggerInteraction.message );
     }
 }
 
-async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction) {
+async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction, triggerMessage: Message) {
 
     const toDeleteIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
 
@@ -50,7 +49,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
         fetchedCourse = await courseModel.findOne({name: courseName});
     }
     catch(error: any) {
-        sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
+            sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
         console.error(error);
         return true;
     }
@@ -62,7 +61,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
         const reasonForFailure = handleIndexValidation(toDeleteIndex, scorePeriods.length)
 
         if(reasonForFailure !== "") {
-            sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + INVALID_INDEX_PERIOD_REASON);
+                sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + INVALID_INDEX_PERIOD_REASON);
             return;
         }
 
@@ -73,11 +72,13 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
             newCourse = await courseModel.findOneAndUpdate( {name: courseName}, {"discussionSpecs.scorePeriods": scorePeriods})
         }
         catch(error: any) {
-            sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
+                sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
             console.error(error);
             return;
         }
 
-        sendDismissableInteractionReply(submittedModal, SUCCESS_MESSAGE);
+        const newMenuMessage = await refreshMenu(courseName, triggerMessage, submittedModal.user);
+        if(newMenuMessage)
+            sendDismissableReply(newMenuMessage, SUCCESS_MESSAGE);
     }
 }
