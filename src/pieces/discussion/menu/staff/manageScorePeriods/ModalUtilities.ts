@@ -85,7 +85,6 @@ export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction)
     return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
 }
 
-    // TODO: rename function to better reflect that it also validates index
 /**
  * @function goes through score period validation data and if there any problems replies to the modal interaction with the reasons the data was invalid
  * @param {ModalSubmitInteraction} submittedModal - the modal interaction to reply to if any of the input is invalid

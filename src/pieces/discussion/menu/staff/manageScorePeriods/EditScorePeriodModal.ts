@@ -3,6 +3,7 @@ import { Course, courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriodData } from "./ManageScorePeriodsMenu";
 import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow } from "./ModalComponents";
 import { checkAgainstCurrentPeriods, createScorePeriodModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
+import { getCourseByName } from "src/generalUtilities/getCourseByName";
 
 const MODAL_ID_PREFIX = "edit_score_period_modal";
 const MODAL_TITLE_PREFIX = "Add Score Period To ";
@@ -32,18 +33,11 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
     const toEditIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
     const periodValidationData = validateScorePeriodInput(submittedModal);
 
-    let course: Course | null = null;
-    try {
-        course = await courseModel.findOne({name: courseName});
-    }
-    catch(error: any) {
-        console.error(error);
-        return DATABASE_ERROR_MESSAGE;
-    }
+    const fetchedCourse = await getCourseByName(courseName);
     
-    if(course && course.discussionSpecs !== null) {
+    if(fetchedCourse && fetchedCourse.discussionSpecs !== null) {
 
-        const currentScorePeriods = course.discussionSpecs.scorePeriods;
+        const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
 
         const reasonsForFailure = handleIndexValidation(toEditIndex, currentScorePeriods.length) + handlePeriodValidation(periodValidationData)
 
