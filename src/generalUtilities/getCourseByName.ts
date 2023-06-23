@@ -1,4 +1,4 @@
-import { Course, courseModel } from "src/generalModels/Course";
+import { Course, courseModel } from "../generalModels/Course";
 
 export async function getCourseByName(courseName: string) {
     let course: Course | null = null;

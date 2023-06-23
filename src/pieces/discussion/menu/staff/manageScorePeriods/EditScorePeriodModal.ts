@@ -1,9 +1,8 @@
 import { ButtonInteraction, ModalSubmitInteraction } from "discord.js";
-import { Course, courseModel } from "../../../../../generalModels/Course";
+import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { ScorePeriodData } from "./ManageScorePeriodsMenu";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow } from "./ModalComponents";
+import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow } from "./ModalComponents";
 import { checkAgainstCurrentPeriods, createScorePeriodModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
-import { getCourseByName } from "src/generalUtilities/getCourseByName";
 
 const MODAL_ID_PREFIX = "edit_score_period_modal";
 const MODAL_TITLE_PREFIX = "Add Score Period To ";
@@ -53,7 +52,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
         }
 
         currentScorePeriods.splice(toEditIndex - 1, 1);
-        const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods, submittedModal)
+        const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods)
 
         if(conflictsWithCurrentPeriods) {
             return CONFLICTING_DATES_MESSAGE;

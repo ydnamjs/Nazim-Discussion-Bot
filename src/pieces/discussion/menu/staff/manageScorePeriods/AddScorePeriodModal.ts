@@ -1,8 +1,7 @@
 import { ButtonInteraction, ModalSubmitInteraction } from "discord.js";
-import { Course, courseModel } from "../../../../../generalModels/Course";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
+import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
 import { ScorePeriodData, checkAgainstCurrentPeriods, createScorePeriodModal, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
-import { getCourseByName } from "src/generalUtilities/getCourseByName";
 
 const MODAL_ID_PREFIX = "discussion_add_score_period_modal";
 const MODAL_TITLE_PREFIX = "Add Score Period To CISC ";
@@ -47,7 +46,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
     if(fetchedCourse && fetchedCourse.discussionSpecs !== null) {
     
         const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
-        const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods, submittedModal)
+        const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods)
 
         if(conflictsWithCurrentPeriods) {
             return CONFLICTING_DATES_MESSAGE;

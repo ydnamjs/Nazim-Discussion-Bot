@@ -1,10 +1,10 @@
-import { ActionRowBuilder, ButtonInteraction, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, ModalBuilder, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
 import { DateTime } from "luxon";
-import { courseModel } from "../../../../../generalModels/Course";
+import { Course, courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
-import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
-import { refreshMenu, refreshMenuInteraction, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
+import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
+import { refreshMenuInteraction, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
 
 export type ModalInputHandler = (courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
 
@@ -42,6 +42,13 @@ export async function createScorePeriodModal(idPrefix: string, titlePrefix: stri
     }
 }
 
+/**
+ * @interface information about the validity of a score period
+ * @property {Date | undefined} startDate - the starting date of a score period if valid (undefined if invalid)
+ * @property {Date | undefined} endDate - the ending date of a score period if valid (undefined if invalid)
+ * @property {number} goalPoints - the goal points of a score period if valid (NaN if invalid)
+ * @property {number} maxPoints - the maximum points of a score period if valid (NaN if invalid)
+ */
 export interface ScorePeriodValidationData {
     startDate: Date | undefined, 
     endDate: Date | undefined,  
@@ -50,33 +57,29 @@ export interface ScorePeriodValidationData {
 }
 
 /**
- * @function validates the input of an add/edit score period modal
- * @param submittedModal the submitted modal whose input is to be validated
- * @returns {ScorePeriodInputData} scorePeriodInputData - the score period input data after validation (see ScorePeriodInputData interface)
+ * @function generates validation data for the given score period
+ * @param {ModalSubmitInteraction} submittedModal - the submitted modal interaction whose input is to be validated
+ * @returns {ScorePeriodValidationData} scorePeriodInputData - data about the validity of each property of the score period
  */
 export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction): ScorePeriodValidationData {
     
-    // get and validate start date
     const startDateString = submittedModal.fields.getTextInputValue(START_DATE_INPUT_ID);
     const startDateTime = DateTime.fromFormat(startDateString, DATE_STRING_FORMAT)
     const startDate = startDateTime.toJSDate().getTime() ? startDateTime.toJSDate() : undefined;
 
-    // get and validate end date
     const endDateString = submittedModal.fields.getTextInputValue(END_DATE_INPUT_ID);
     const endDateTime = DateTime.fromFormat(endDateString, DATE_STRING_FORMAT)
     const endDate = endDateTime.toJSDate().getTime() ? endDateTime.toJSDate() : undefined;
 
-    // get goal points
     let goalPoints = parseInt(submittedModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
-
-    // get max points
     let maxPoints = parseInt(submittedModal.fields.getTextInputValue(MAX_POINTS_INPUT_ID));
     
-    // validate points are non negative integers and that goal is not more than max
     if(goalPoints < 0)
     goalPoints = NaN;
+
     if(maxPoints < 0 )
         maxPoints = NaN;
+    
     if(goalPoints > maxPoints) {
         goalPoints = NaN;
         maxPoints = NaN;
@@ -86,10 +89,9 @@ export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction)
 }
 
 /**
- * @function goes through score period validation data and if there any problems replies to the modal interaction with the reasons the data was invalid
- * @param {ModalSubmitInteraction} submittedModal - the modal interaction to reply to if any of the input is invalid
- * @param {ScorePeriodInputData} modalData - the validation data to check
- * @returns {boolean} isInvalid - whether or not the input was invalid
+ * @function goes through score period validation data and assembles a string detailing why it the data is invalid if at all
+ * @param {ScorePeriodInputData} modalData - the validation data to handle
+ * @returns {string} reasonsForFailure - the reasons why the data was invalid
  */
 export function handlePeriodValidation(modalData: ScorePeriodValidationData): string { 
     
@@ -109,6 +111,12 @@ export function handlePeriodValidation(modalData: ScorePeriodValidationData): st
     return reasonsForFailure;
 }
 
+/**
+ * @function validates and handles a score period index against the length of the list it is indexing
+ * @param {number} scorePeriodIndex - the index being validated
+ * @param {number} scorePeriodsLength - the length of the score period list being indexed
+ * @returns {string} reasonsForFailure - the reason the input was not valid if there was one
+ */
 export function handleIndexValidation(scorePeriodIndex: number, scorePeriodsLength: number): string {
     
     if( Number.isNaN(scorePeriodIndex) || scorePeriodIndex < 1 || (scorePeriodsLength && scorePeriodIndex > scorePeriodsLength) ) {
@@ -117,6 +125,13 @@ export function handleIndexValidation(scorePeriodIndex: number, scorePeriodsLeng
     return "";
 }
 
+/**
+ * @interface data used to construct a new score period
+ * @property {Date} start: the start of the new score period
+ * @property {Date} end: the end of the new score period
+ * @property {number} goalPoints: the target number of points that can be earned in the new score period
+ * @property {number} maxPoints: the maximum number of points that can be earned in the new score period
+ */
 export interface ScorePeriodData {
     start: Date, 
     end: Date,  
@@ -124,8 +139,13 @@ export interface ScorePeriodData {
     maxPoints: number
 }
 
-//TODO: JSDocify
-export async function checkAgainstCurrentPeriods(newScorePeriodData: ScorePeriodData, currentScorePeriods: ScorePeriod[], submittedModal: ModalSubmitInteraction): Promise<boolean> {
+/**
+ * @function determines if the new score period provided has any issues with the current ones
+ * @param newScorePeriodData - the new score period to be added
+ * @param currentScorePeriods - the old score periods being checked against
+ * @returns {boolean} hasConflict - whether or not the new score Period has a conflict with the current ones
+ */
+export async function checkAgainstCurrentPeriods(newScorePeriodData: ScorePeriodData, currentScorePeriods: ScorePeriod[]): Promise<boolean> {
 
     let hasConflict = false;
     currentScorePeriods.forEach((scorePeriod) => {
@@ -133,12 +153,7 @@ export async function checkAgainstCurrentPeriods(newScorePeriodData: ScorePeriod
             hasConflict = true;
         }
     })
-
-    if(hasConflict) {
-        sendDismissableInteractionReply(submittedModal, CONFLICTING_DATES_MESSAGE);
-        return true;
-    }
-    return false;
+    return hasConflict;
 }
 
 /**
@@ -148,12 +163,24 @@ export async function checkAgainstCurrentPeriods(newScorePeriodData: ScorePeriod
  * @param {string} courseName - the name of the course that the score period is being added to
  * @param {string} successMessage - the message to be used in the reply on successful database insert
  */
-export async function insertOnePeriod( courseName: string, newScorePeriodData: ScorePeriodData, scorePeriods: ScorePeriod[], submittedModal: ModalSubmitInteraction, successMessage: string ) {
+export async function insertOnePeriod( courseName: string, newScorePeriodData: ScorePeriodData, scorePeriods: ScorePeriod[], submittedModal: ModalSubmitInteraction, successMessage: string ): Promise<string> {
 
     scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
     scorePeriods = scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
     
-    let newCourse: Document | null = null;
+    const insertErrors = await overwritePeriods(courseName, scorePeriods)
+
+    return insertErrors;
+}
+
+/**
+ * @function overwrites the score periods of the given course
+ * @param {string} courseName - the name of the course to overwrite the score periods of
+ * @param {ScorePeriod[]} scorePeriods - the new score periods that will overwrite the ones in the course
+ * @returns {string} reasonsForFailure - the reasons that the overwrite failed if any
+ */
+async function overwritePeriods(courseName: string, scorePeriods: ScorePeriod[]): Promise<string> {
+    let newCourse: Course | null = null;
     try {
         newCourse = await courseModel.findOneAndUpdate( 
             {name: courseName}, 
@@ -161,17 +188,8 @@ export async function insertOnePeriod( courseName: string, newScorePeriodData: S
         )
     }
     catch(error: any) {
-        sendDismissableInteractionReply(submittedModal, DATABASE_ERROR_MESSAGE);
         console.error(error);
-        return;
+        return DATABASE_ERROR_MESSAGE;
     }
-    
-    if(newCourse !== null) {
-        const newMenuMessage = await refreshMenu(courseName, submittedModal.message as Message, submittedModal.user);
-        if(newMenuMessage)
-            sendDismissableReply(newMenuMessage, successMessage)
-    
-        //TODO: After a score period is added, score all of the posts and comments that would fall into it (only necessary for score periods that started in the past)
-        return;
-    }
+    return "";
 }
