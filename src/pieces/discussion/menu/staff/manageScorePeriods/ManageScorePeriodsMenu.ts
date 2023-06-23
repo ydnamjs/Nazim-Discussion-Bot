@@ -14,11 +14,6 @@ const BACK_BUTTON_LABEL = "Back To Course";
 const BACK_BUTTON_DISABLED = false;
 const BACK_BUTTON_STYLE = ButtonStyle.Secondary
 
-const BULK_ADD_SCORE_PERIOD_BUTTON_ID = "discussion-bulk-add-score-period-button";
-const BULK_ADD_SCORE_PERIOD_BUTTON_LABEL = "Bulk Add Score Periods";
-const BULK_ADD_SCORE_PERIOD_BUTTON_DISABLED = false;
-const BULK_ADD_SCORE_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
-
 const ADD_SCORE_PERIOD_BUTTON_ID = "discussion-add-score-period-button";
 const ADD_SCORE_PERIOD_BUTTON_LABEL = "Add Score Period";
 const ADD_SCORE_PERIOD_BUTTON_DISABLED = false;
@@ -47,12 +42,6 @@ const customNavOptions: CustomNavOptions = {
 };
 
 // SCORE PERIOD ROW
-const BULK_ADD_SCORE_PERIOD_BUTTON_DATA = {
-    customId: BULK_ADD_SCORE_PERIOD_BUTTON_ID,
-    label: BULK_ADD_SCORE_PERIOD_BUTTON_LABEL,
-    disabled: BULK_ADD_SCORE_PERIOD_BUTTON_DISABLED,
-    style: BULK_ADD_SCORE_PERIOD_BUTTON_STYLE
-}
 
 const ADD_SCORE_PERIOD_BUTTON_DATA = {
     custom_id: ADD_SCORE_PERIOD_BUTTON_ID,
@@ -75,7 +64,7 @@ const DELETE_SCORE_PERIOD_BUTTON_DATA = {
     style: DELETE_SCORE_PERIOD_BUTTON_STYLE
 }
 
-const SCORE_PERIOD_BUTTON_ROW = makeActionRowButton([BULK_ADD_SCORE_PERIOD_BUTTON_DATA, ADD_SCORE_PERIOD_BUTTON_DATA, EDIT_SCORE_PERIOD_BUTTON_DATA, DELETE_SCORE_PERIOD_BUTTON_DATA]);
+const SCORE_PERIOD_BUTTON_ROW = makeActionRowButton([ADD_SCORE_PERIOD_BUTTON_DATA, EDIT_SCORE_PERIOD_BUTTON_DATA, DELETE_SCORE_PERIOD_BUTTON_DATA]);
 
 /** 
  * @interface basic information about a score period - intended to be used in the ManageScorePeriodsMenu
