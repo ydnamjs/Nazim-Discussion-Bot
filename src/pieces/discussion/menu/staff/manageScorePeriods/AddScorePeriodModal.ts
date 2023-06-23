@@ -2,7 +2,7 @@ import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { DATABASE_ERROR_MESSAGE, MODAL_EXPIRATION_TIME, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
+import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
 import { ScorePeriodData, checkAgainstCurrentPeriods, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
 
 const MODAL_ID = "discussion_add_score_period_modal";
@@ -48,11 +48,13 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
 
     const periodValidationData = validateScorePeriodInput(submittedModal);
 
-    const hasInvalidInput = handlePeriodValidation(submittedModal, periodValidationData)
+    const reasonsForFailure = handlePeriodValidation(periodValidationData)
 
-    if(hasInvalidInput)
-        return
-
+    if(reasonsForFailure !== "") {
+        sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + reasonsForFailure);
+        return;
+    }
+    
     const newScorePeriod: ScorePeriodData = {
         start: periodValidationData.startDate as Date, 
         end: periodValidationData.endDate as Date, 

@@ -3,6 +3,7 @@ import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, INVALID_INDEX_PERIOD_REASON, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, PERIOD_NUM_INPUT_ID, scorePeriodNumActionRow } from "./ModalComponents";
+import { handleIndexValidation } from "./ModalUtilities";
 
 const MODAL_ID = "delete_score_period_modal"
 const TITLE_PREFIX = "Delete Score Period From CISC ";
@@ -58,9 +59,9 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
     
         let scorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
 
-        const isDeleteIndexInvalid = toDeleteIndex !== undefined && (Number.isNaN(toDeleteIndex) || toDeleteIndex < 1 || (toDeleteIndex && toDeleteIndex > scorePeriods.length))
+        const reasonForFailure = handleIndexValidation(toDeleteIndex, scorePeriods.length)
 
-        if(isDeleteIndexInvalid) {
+        if(reasonForFailure !== "") {
             sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + INVALID_INDEX_PERIOD_REASON);
             return;
         }

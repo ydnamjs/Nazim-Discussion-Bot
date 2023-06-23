@@ -53,16 +53,11 @@ export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction)
  * @function goes through score period validation data and if there any problems replies to the modal interaction with the reasons the data was invalid
  * @param {ModalSubmitInteraction} submittedModal - the modal interaction to reply to if any of the input is invalid
  * @param {ScorePeriodInputData} modalData - the validation data to check
- * @param {number} scorePeriodIndex - **optional** - index to also check for validity
- * @param {number} scorePeriodsLength - **optional** length of the score periods list that index is indexing to
  * @returns {boolean} isInvalid - whether or not the input was invalid
  */
-export function handlePeriodValidation(submittedModal: ModalSubmitInteraction, modalData: ScorePeriodValidationData, scorePeriodIndex?: number, scorePeriodsLength?: number): boolean { 
+export function handlePeriodValidation(modalData: ScorePeriodValidationData): string { 
     
     let reasonsForFailure = "";
-    if(scorePeriodIndex !== undefined && (Number.isNaN(scorePeriodIndex) || scorePeriodIndex < 1 || (scorePeriodsLength && scorePeriodIndex > scorePeriodsLength))) {
-        reasonsForFailure += INVALID_INDEX_PERIOD_REASON;
-    }
     if(!modalData.startDate){
         reasonsForFailure += INVALID_START_DATE_REASON;
     }
@@ -75,13 +70,15 @@ export function handlePeriodValidation(submittedModal: ModalSubmitInteraction, m
     if(Number.isNaN(modalData.maxPoints)){
         reasonsForFailure += INVALID_MAX_POINTS_REASON;
     }
+    return reasonsForFailure;
+}
 
-    if(reasonsForFailure !== "") {
-        sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + reasonsForFailure);
-        return true;
+export function handleIndexValidation(scorePeriodIndex: number, scorePeriodsLength: number): string {
+    
+    if( Number.isNaN(scorePeriodIndex) || scorePeriodIndex < 1 || (scorePeriodsLength && scorePeriodIndex > scorePeriodsLength) ) {
+        return INVALID_INDEX_PERIOD_REASON;
     }
-
-    return false;
+    return "";
 }
 
 export interface ScorePeriodData {

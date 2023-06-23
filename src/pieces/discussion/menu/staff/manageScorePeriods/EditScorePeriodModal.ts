@@ -2,8 +2,8 @@ import { ButtonInteraction, ModalBuilder, ModalSubmitInteraction } from "discord
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 import { ScorePeriodData, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { DATABASE_ERROR_MESSAGE, MODAL_EXPIRATION_TIME, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow } from "./ModalComponents";
-import { checkAgainstCurrentPeriods, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
+import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow } from "./ModalComponents";
+import { checkAgainstCurrentPeriods, handleIndexValidation, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
 
 const MODAL_ID = "edit_score_period_modal";
 const TITLE_PREFIX = "Add Score Period To ";
@@ -64,9 +64,12 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
 
         const currentScorePeriods = course.discussionSpecs.scorePeriods;
 
-        // TODO: rename function to better reflect that it also validates index
-        if(handlePeriodValidation(submittedModal, periodValidationData, toEditIndex, currentScorePeriods.length))
-        return
+        const reasonsForFailure = handleIndexValidation(toEditIndex, currentScorePeriods.length) + handlePeriodValidation(periodValidationData)
+
+        if(reasonsForFailure !== "") {
+            sendDismissableInteractionReply(submittedModal, INVALID_INPUT_PREFIX + reasonsForFailure);
+            return
+        }
 
         const newScorePeriod: ScorePeriodData = {
             start: periodValidationData.startDate as Date, 
