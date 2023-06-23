@@ -1,8 +1,6 @@
-import { ActionRowBuilder, ButtonInteraction, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, User } from "discord.js";
+import { ButtonInteraction, ModalSubmitInteraction } from "discord.js";
 import { Course, courseModel } from "../../../../../generalModels/Course";
-import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
-import { refreshMenu, refreshMenuInteraction, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
 import { ScorePeriodData, checkAgainstCurrentPeriods, createScorePeriodModal, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
 
 const MODAL_ID_PREFIX = "discussion_add_score_period_modal";
@@ -23,7 +21,6 @@ export async function openAddScorePeriodModal(courseName: string, triggerInterac
         maxPointsActionRow
     ];
     
-    //await createScorePeriodModal( courseName, triggerInteraction, components, handleModalInput);
     await createScorePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 

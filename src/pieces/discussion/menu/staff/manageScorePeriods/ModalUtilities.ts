@@ -3,14 +3,10 @@ import { DateTime } from "luxon";
 import { courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
 import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
-import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_INPUT_PREFIX, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
 import { refreshMenu, refreshMenuInteraction, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { CONFLICTING_DATES_MESSAGE, DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
 
 export type ModalInputHandler = (courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
-
-const MODAL_ID_PREFIX = "discussion_add_score_period_modal";
-const MODAL_TITLE_PREFIX = "Add Score Period To CISC ";
-const SUCCESS_MESSAGE = "New Score Period Added!";
 
 export async function createScorePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
@@ -18,12 +14,12 @@ export async function createScorePeriodModal(idPrefix: string, titlePrefix: stri
     // because if it isnt and the user cancels the modal and opens another one
     // we have to filter that it matches the id otherwise the canceled modal will also be processed
     // and we'll have duplicates and that behavior is VERY undefined
-    const MODAL_ID = idPrefix + new Date().getMilliseconds()
+    const modalId = idPrefix + new Date().getMilliseconds()
 
     updateToManageScorePeriodsMenu(courseName, triggerInteraction, false, true);
 
     const addScorePeriodModal = new ModalBuilder({
-        customId: MODAL_ID,
+        customId: modalId,
         title: titlePrefix + courseName,
         components: components
     })
@@ -35,7 +31,7 @@ export async function createScorePeriodModal(idPrefix: string, titlePrefix: stri
         // we have to filter that it matches the id because if it isnt and the user cancels the modal and opens another one the
         // canceled modal will also be processed and we'll have duplicates and that behavior is VERY undefined
         // (this is unlike message component interactions! and thus weird)
-        submittedModal = await triggerInteraction.awaitModalSubmit({filter: (modal)=> {return modal.customId === MODAL_ID}, time: MODAL_EXPIRATION_TIME});
+        submittedModal = await triggerInteraction.awaitModalSubmit({filter: (modal)=> {return modal.customId === modalId}, time: MODAL_EXPIRATION_TIME});
     }
     catch {}
 
