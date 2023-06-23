@@ -5,12 +5,8 @@ import { ScorePeriodData, updateToManageScorePeriodsMenu } from "./ManageScorePe
 import { DATABASE_ERROR_MESSAGE, MODAL_EXPIRATION_TIME, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, scorePeriodNumActionRow, startDateActionRow } from "./ModalComponents";
 import { checkAgainstCurrentPeriods, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
 
-// MODAL TEXT CONSTANTS
-const EDIT_SCORE_MODAL_TITLE_PREFIX = "Add Score Period To ";
-
-// MODAL BEHAVIOR CONSTANTS
-const EDIT_SCORE_MODAL_ID = "edit-score-period-modal";
-
+const MODAL_ID = "edit_score_period_modal";
+const TITLE_PREFIX = "Add Score Period To ";
 const SUCCESS_MESSAGE = "Score Period Successfully Updated";
 
 // PRIMARY OPEN MODAL FUNCTION
@@ -25,8 +21,8 @@ export async function openEditScorePeriodModal(courseName: string, triggerIntera
     updateToManageScorePeriodsMenu(courseName, triggerInteraction, false, true);
     
     const editScorePeriodModal = new ModalBuilder({
-        customId: EDIT_SCORE_MODAL_ID,
-        title: EDIT_SCORE_MODAL_TITLE_PREFIX + courseName,
+        customId: MODAL_ID,
+        title: TITLE_PREFIX + courseName,
         components: [
             scorePeriodNumActionRow,
             startDateActionRow,

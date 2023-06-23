@@ -5,8 +5,8 @@ import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, MODAL_EXPIRATION_TIME, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
 import { ScorePeriodData, checkAgainstCurrentPeriods, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
 
-const TITLE_PREFIX = "Add Score Period To CISC ";
 const MODAL_ID = "discussion_add_score_period_modal";
+const TITLE_PREFIX = "Add Score Period To CISC ";
 const SUCCESS_MESSAGE = "New Score Period Added!";
 
 /**

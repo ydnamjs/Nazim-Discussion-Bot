@@ -4,13 +4,8 @@ import { sendDismissableInteractionReply } from "../../../../../generalUtilities
 import { updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, INVALID_INDEX_PERIOD_REASON, INVALID_INPUT_PREFIX, MODAL_EXPIRATION_TIME, PERIOD_NUM_INPUT_ID, scorePeriodNumActionRow } from "./ModalComponents";
 
-// MODAL BEHAVIOR CONSTANTS
 const MODAL_ID = "delete_score_period_modal"
-
-// MODAL TEXT CONSTANTS
 const TITLE_PREFIX = "Delete Score Period From CISC ";
-
-// MODAL NOTIFICATION CONSTANTS
 const SUCCESS_MESSAGE = "Score Period Was Successfully Removed!";
 
 // PRIMARY OPEN MODAL FUNCTION
