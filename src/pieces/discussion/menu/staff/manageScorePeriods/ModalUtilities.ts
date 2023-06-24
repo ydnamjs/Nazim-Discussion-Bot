@@ -40,7 +40,7 @@ export async function createManagePeriodModal(idPrefix: string, titlePrefix: str
 
     if (submittedModal !== undefined) {
         const replyText = await modalInputHandler(courseName, submittedModal);
-        refreshManagePeriodsMenu(courseName, triggerInteraction); console.log("menu refreshed");
+        refreshManagePeriodsMenu(courseName, triggerInteraction);
         sendDismissableInteractionReply(submittedModal, replyText);
     }
 }
@@ -68,11 +68,16 @@ export function validatePeriodInput(submittedModal: ModalSubmitInteraction): Per
     
     const startDateString = submittedModal.fields.getTextInputValue(START_DATE_INPUT_ID);
     const startDateTime = DateTime.fromFormat(startDateString, DATE_STRING_FORMAT)
-    const startDate = startDateTime.toJSDate().getTime() ? startDateTime.toJSDate() : undefined;
+    let startDate = startDateTime.toJSDate().getTime() ? startDateTime.toJSDate() : undefined;
 
     const endDateString = submittedModal.fields.getTextInputValue(END_DATE_INPUT_ID);
     const endDateTime = DateTime.fromFormat(endDateString, DATE_STRING_FORMAT)
-    const endDate = endDateTime.toJSDate().getTime() ? endDateTime.toJSDate() : undefined;
+    let endDate = endDateTime.toJSDate().getTime() ? endDateTime.toJSDate() : undefined;
+
+    if(startDate && endDate && startDate.valueOf() >= endDate.valueOf()) {
+        startDate = undefined;
+        endDate = undefined;
+    }
 
     let goalPoints = parseInt(submittedModal.fields.getTextInputValue(GOAL_POINTS_INPUT_ID));
     let maxPoints = parseInt(submittedModal.fields.getTextInputValue(MAX_POINTS_INPUT_ID));
