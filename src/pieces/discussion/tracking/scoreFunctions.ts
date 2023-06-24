@@ -16,8 +16,18 @@ export interface ScoreThreadOptions {
     after: Date
 }
 
-//TODO: JSDOC
-export async function scoreThread(client: Client, threadId: string, discussionSpecs: DiscussionSpecs, staffId: string, options: Partial<ScoreThreadOptions>): Promise<ScorePeriod[]> {
+/**
+ * @function scores every post and comment in a thread
+ * @param {Client} client - the client performing the scoring functions
+ * @param {string} threadId - the id of the thread being scored
+ * @param {DiscussionSpecs} discussionSpecs - the specification used to score posts and comments
+ * @param {string} staffId - the id of the role for staff members of the course
+ * @param {Partial<ScoreThreadOptions>} options - **optional** custom options to alter how the thread is scored
+ * @param {Date} options.before **optional** the date which the post / all comments have to be made before to be counted in scoring
+ * @param {Date} options.after **optional** the date which the post / all comments have to be made after to be counted in scoring
+ * @returns {Promise<ScorePeriod[]>}
+ */
+export async function scoreThread(client: Client, threadId: string, discussionSpecs: DiscussionSpecs, staffId: string, options?: Partial<ScoreThreadOptions>): Promise<ScorePeriod[]> {
     
     const postSpecs = discussionSpecs.postSpecs;
     const commentSpecs = discussionSpecs.commentSpecs;
@@ -263,6 +273,7 @@ function isIncomplete(scoreData: MessageScoreData): boolean {
  * @param {string} content - the content of the post or comment to be scored
  * @param {CommentSpecs | PostSpecs} specs - the specifications to score the comment or post with
  * @returns {MessageScoreData} messageScoreData - data containing information about the scoring of the comment or post
+ * @returns {number} messageScoreData.score - the amount of points awarded to the student for the post or comment
  */
 export function scoreDiscussionContent(content: string, specs: CommentSpecs | PostSpecs): MessageScoreData {
 
