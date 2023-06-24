@@ -1,5 +1,5 @@
 import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
-import { Course, courseModel } from "../../../../../generalModels/Course";
+import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { ComponentBehavior } from "../../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
@@ -7,7 +7,6 @@ import { updateToManageCourseMenu } from "../ManageCourseMenu";
 import { openAddScorePeriodModal } from "./AddScorePeriodModal";
 import { openDeleteScorePeriodModal } from "./DeleteScorePeriodModal";
 import { openEditScorePeriodModal } from "./EditScorePeriodModal";
-import { getCourseByName } from "src/generalUtilities/getCourseByName";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_manage_score_periods_menu_back_button";
@@ -15,20 +14,20 @@ const BACK_BUTTON_LABEL = "Back To Course";
 const BACK_BUTTON_DISABLED = false;
 const BACK_BUTTON_STYLE = ButtonStyle.Secondary
 
-const ADD_SCORE_PERIOD_BUTTON_ID = "discussion-add-score-period-button";
-const ADD_SCORE_PERIOD_BUTTON_LABEL = "Add Score Period";
-const ADD_SCORE_PERIOD_BUTTON_DISABLED = false;
-const ADD_SCORE_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
+const ADD_PERIOD_BUTTON_ID = "discussion-add-score-period-button";
+const ADD_PERIOD_BUTTON_LABEL = "Add Score Period";
+const ADD_PERIOD_BUTTON_DISABLED = false;
+const ADD_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
 
-const EDIT_SCORE_PERIOD_BUTTON_ID = "discussion-edit-score-period-button";
-const EDIT_SCORE_PERIOD_BUTTON_LABEL = "Edit Score Period";
-const EDIT_SCORE_PERIOD_BUTTON_DISABLED = false;
-const EDIT_SCORE_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
+const EDIT_PERIOD_BUTTON_ID = "discussion-edit-score-period-button";
+const EDIT_PERIOD_BUTTON_LABEL = "Edit Score Period";
+const EDIT_PERIOD_BUTTON_DISABLED = false;
+const EDIT_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
 
-const DELETE_SCORE_PERIOD_BUTTON_ID = "discussion-delete-score-period-button";
-const DELETE_SCORE_PERIOD_BUTTON_LABEL = "Delete Score Period";
-const DELETE_SCORE_PERIOD_BUTTON_DISABLED = false;
-const DELETE_SCORE_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
+const DELETE_PERIOD_BUTTON_ID = "discussion-delete-score-period-button";
+const DELETE_PERIOD_BUTTON_LABEL = "Delete Score Period";
+const DELETE_PERIOD_BUTTON_DISABLED = false;
+const DELETE_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
 
 // NAVIGATION ROW
 const customNavOptions: CustomNavOptions = {
@@ -44,50 +43,49 @@ const customNavOptions: CustomNavOptions = {
 
 // SCORE PERIOD ROW
 
-const ADD_SCORE_PERIOD_BUTTON_DATA = {
-    custom_id: ADD_SCORE_PERIOD_BUTTON_ID,
-    label: ADD_SCORE_PERIOD_BUTTON_LABEL,
-    disabled: ADD_SCORE_PERIOD_BUTTON_DISABLED,
-    style: ADD_SCORE_PERIOD_BUTTON_STYLE
+const ADD_PERIOD_BUTTON_DATA = {
+    custom_id: ADD_PERIOD_BUTTON_ID,
+    label: ADD_PERIOD_BUTTON_LABEL,
+    disabled: ADD_PERIOD_BUTTON_DISABLED,
+    style: ADD_PERIOD_BUTTON_STYLE
 }
 
-const EDIT_SCORE_PERIOD_BUTTON_DATA = {
-    custom_id: EDIT_SCORE_PERIOD_BUTTON_ID,
-    label: EDIT_SCORE_PERIOD_BUTTON_LABEL,
-    disabled: EDIT_SCORE_PERIOD_BUTTON_DISABLED,
-    style: EDIT_SCORE_PERIOD_BUTTON_STYLE
+const EDIT_PERIOD_BUTTON_DATA = {
+    custom_id: EDIT_PERIOD_BUTTON_ID,
+    label: EDIT_PERIOD_BUTTON_LABEL,
+    disabled: EDIT_PERIOD_BUTTON_DISABLED,
+    style: EDIT_PERIOD_BUTTON_STYLE
 }
 
-const DELETE_SCORE_PERIOD_BUTTON_DATA = {
-    custom_id: DELETE_SCORE_PERIOD_BUTTON_ID,
-    label: DELETE_SCORE_PERIOD_BUTTON_LABEL,
-    disabled: DELETE_SCORE_PERIOD_BUTTON_DISABLED,
-    style: DELETE_SCORE_PERIOD_BUTTON_STYLE
+const DELETE_PERIOD_BUTTON_DATA = {
+    custom_id: DELETE_PERIOD_BUTTON_ID,
+    label: DELETE_PERIOD_BUTTON_LABEL,
+    disabled: DELETE_PERIOD_BUTTON_DISABLED,
+    style: DELETE_PERIOD_BUTTON_STYLE
 }
 
-const SCORE_PERIOD_BUTTON_ROW = makeActionRowButton([ADD_SCORE_PERIOD_BUTTON_DATA, EDIT_SCORE_PERIOD_BUTTON_DATA, DELETE_SCORE_PERIOD_BUTTON_DATA]);
+const MANAGE_PERIODS_BUTTON_ROW = makeActionRowButton([ADD_PERIOD_BUTTON_DATA, EDIT_PERIOD_BUTTON_DATA, DELETE_PERIOD_BUTTON_DATA]);
 
 /**
  * @function updates a menu so that it is now a staff menu (updates the interaction if supplied, otherwise just updates the message)
- * @param {string} courseTitle - the title of the course whose students are to be viewed
+ * @param {string} courseName - the title of the course whose students are to be viewed
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  * @param {boolean} isInteractionUpdate - whether to update the interaction (true) or just edit the message (false)
  */
-export async function updateToManageScorePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
+export async function updateToManagePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
 
     const scorePeriodData = await getScorePeriodData(courseName)
 
-    // replace the old menu with the view students menu
-    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseName, scorePeriodData);
+    const manageScorePeriodsMenu = new ManagePeriodsMenu(courseName, scorePeriodData);
     isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
     manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }
 
-export async function refreshMenuInteraction(courseName: string, interaction: MessageComponentInteraction) {
+export async function refreshManagePeriodsMenu(courseName: string, interaction: MessageComponentInteraction) {
 
     const scorePeriodData = await getScorePeriodData(courseName)
     
-    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseName, scorePeriodData);
+    const manageScorePeriodsMenu = new ManagePeriodsMenu(courseName, scorePeriodData);
     interaction.message.edit({embeds: manageScorePeriodsMenu.menuMessageData.embeds});
 }
 
@@ -129,7 +127,7 @@ async function getScorePeriodData (courseName: string) {
     return scorePeriodData;
 }
 
-export class ManageScorePeriodsMenu extends NavigatedMenu {
+export class ManagePeriodsMenu extends NavigatedMenu {
     constructor(courseTitle: string, scorePeriodsData: ScorePeriodData[]) {
         
         // generate the fields of basic info for each course and the select menu options
@@ -161,7 +159,7 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
             // ADD SCORE PERIOD BUTTON
             {
                 filter: (customId) => {
-                    return customId === ADD_SCORE_PERIOD_BUTTON_ID;
+                    return customId === ADD_PERIOD_BUTTON_ID;
                 },
                 resultingAction: (_message, componentInteraction) => {
                     if(componentInteraction instanceof ButtonInteraction)
@@ -172,7 +170,7 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
             // EDIT SCORE PERIOD BUTTON
             {
                 filter: (customId) => {
-                    return customId === EDIT_SCORE_PERIOD_BUTTON_ID;
+                    return customId === EDIT_PERIOD_BUTTON_ID;
                 },
                 resultingAction: (_message, componentInteraction) => {
                     if(componentInteraction instanceof ButtonInteraction)
@@ -183,7 +181,7 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
             // DELETE SCORE PERIOD BUTTON
             {
                 filter: (customId) => {
-                    return customId === DELETE_SCORE_PERIOD_BUTTON_ID;
+                    return customId === DELETE_PERIOD_BUTTON_ID;
                 },
                 resultingAction: (_message, componentInteraction) => {
                     if(componentInteraction instanceof ButtonInteraction)
@@ -197,7 +195,7 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
             title: courseTitle.toUpperCase() + "Manage Score Periods",
             description: "replace me",
             fields: fields,
-            additionalComponents: [SCORE_PERIOD_BUTTON_ROW],
+            additionalComponents: [MANAGE_PERIODS_BUTTON_ROW],
             additionalComponentBehaviors: MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS,
         }
 

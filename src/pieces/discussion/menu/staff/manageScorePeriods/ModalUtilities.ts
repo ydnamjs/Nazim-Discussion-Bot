@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
-import { refreshMenuInteraction, updateToManageScorePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
 
 export type ModalInputHandler = (courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
@@ -16,7 +16,7 @@ export async function createScorePeriodModal(idPrefix: string, titlePrefix: stri
     // and we'll have duplicates and that behavior is VERY undefined
     const modalId = idPrefix + new Date().getMilliseconds()
 
-    updateToManageScorePeriodsMenu(courseName, triggerInteraction, false);
+    updateToManagePeriodsMenu(courseName, triggerInteraction, false);
 
     const addScorePeriodModal = new ModalBuilder({
         customId: modalId,
@@ -37,7 +37,7 @@ export async function createScorePeriodModal(idPrefix: string, titlePrefix: stri
 
     if (submittedModal !== undefined) {
         const replyText = await modalInputHandler(courseName, submittedModal);
-        refreshMenuInteraction(courseName, triggerInteraction);
+        refreshManagePeriodsMenu(courseName, triggerInteraction);
         sendDismissableInteractionReply(submittedModal, replyText);
     }
 }

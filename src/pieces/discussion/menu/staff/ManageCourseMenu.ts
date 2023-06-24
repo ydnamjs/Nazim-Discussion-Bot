@@ -4,7 +4,7 @@ import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow"
 import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { ComponentBehavior } from "../BaseMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
-import { updateToManageScorePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
+import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
@@ -215,7 +215,7 @@ export class ManageCourseMenu extends NavigatedMenu {
                     return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
                 },
                 resultingAction: (message, componentInteraction) => {
-                    updateToManageScorePeriodsMenu(courseTitle, componentInteraction, true, true);
+                    updateToManagePeriodsMenu(courseTitle, componentInteraction, true, true);
                 }
             },
 
