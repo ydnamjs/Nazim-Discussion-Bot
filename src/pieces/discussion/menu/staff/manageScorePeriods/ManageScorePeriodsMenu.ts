@@ -132,18 +132,7 @@ async function getScorePeriodData (courseName: string) {
 class ManagePeriodsMenu extends NavigatedMenu {
     constructor(courseTitle: string, scorePeriodsData: ScorePeriodDisplayData[]) {
         
-        let fields: APIEmbedField[] = [];
-
-        for(let index = 0; index < scorePeriodsData.length; index++) {
-            fields.push({
-                name: FIELD_TITLE_PREFIX + (index + 1),
-                value: 
-                    FIELD_START_PREFIX + scorePeriodsData[index].start.toDateString() + " " + scorePeriodsData[index].start.toLocaleTimeString() + 
-                    FIELD_END_PREFIX + scorePeriodsData[index].end.toDateString() + " " + scorePeriodsData[index].end.toLocaleTimeString() + 
-                    FIELD_GOAL_POINTS_PREFIX + scorePeriodsData[index].goalPoints + 
-                    FIELD_MAX_POINTS_PREFIX + scorePeriodsData[index].maxPoints
-            })
-        };
+        let fields = makeScorePeriodFields(scorePeriodsData)
 
         const MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
             {
@@ -193,4 +182,22 @@ class ManagePeriodsMenu extends NavigatedMenu {
 
         super(menuData, 0, customNavOptions);
     }
+}
+
+function makeScorePeriodFields(periodDisplayData: ScorePeriodDisplayData[]): APIEmbedField[] {
+    
+    let fields: APIEmbedField[] = [];
+    
+    for(let index = 0; index < periodDisplayData.length; index++) {
+        fields.push({
+            name: FIELD_TITLE_PREFIX + (index + 1),
+            value: 
+                FIELD_START_PREFIX + periodDisplayData[index].start.toDateString() + " " + periodDisplayData[index].start.toLocaleTimeString() + 
+                FIELD_END_PREFIX + periodDisplayData[index].end.toDateString() + " " + periodDisplayData[index].end.toLocaleTimeString() + 
+                FIELD_GOAL_POINTS_PREFIX + periodDisplayData[index].goalPoints + 
+                FIELD_MAX_POINTS_PREFIX + periodDisplayData[index].maxPoints
+        })
+    };
+
+    return fields;
 }
