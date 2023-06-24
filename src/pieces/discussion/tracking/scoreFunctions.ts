@@ -218,9 +218,7 @@ function isIncomplete(scoreData: MessageScoreData): boolean {
  * @function calculates the score of the comment or post's content based on the requirements specified in the specs
  * @param {string} content - the content of the post or comment to be scored
  * @param {CommentSpecs | PostSpecs} specs - the specifications to score the comment or post with
- * @returns {object} scoreInfo - object containing information about the scoring of the comment or post
- * @property {number} scoreInfo.score - the number of points that the content of the comment or post earned based on the scoring specification
- * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment or post met (useful for giving feedback to students whose comments or posts did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
+ * @returns {MessageScoreData} messageScoreData - data containing information about the scoring of the comment or post
  */
 export function scoreDiscussionContent(content: string, specs: CommentSpecs | PostSpecs): MessageScoreData {
 
