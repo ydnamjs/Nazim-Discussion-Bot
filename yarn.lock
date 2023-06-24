@@ -129,6 +129,11 @@
   "resolved" "https://registry.npmjs.org/@tsconfig/node16/-/node16-1.0.4.tgz"
   "version" "1.0.4"
 
+"@types/lodash@^4.14.195":
+  "integrity" "sha512-Hwx9EUgdwf2GLarOjQp5ZH8ZmblzcbTBC2wtQWNKARBSxM9ezRIAUpeDTgoQRAFB0+8CNWXVA9+MaSOzOF3nPg=="
+  "resolved" "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.195.tgz"
+  "version" "4.14.195"
+
 "@types/luxon@^3.3.0":
   "integrity" "sha512-uKRI5QORDnrGFYgcdAVnHvEIvEZ8noTpP/Bg+HeUzZghwinDlIS87DEenV5r1YoOF9G4x600YsUXLWZ19rmTmg=="
   "resolved" "https://registry.npmjs.org/@types/luxon/-/luxon-3.3.0.tgz"

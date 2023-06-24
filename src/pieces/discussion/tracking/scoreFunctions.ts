@@ -3,6 +3,8 @@ import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, Stud
 import { userHasRoleWithId } from "../../../generalUtilities/GetRolesOfUserInGuild";
 import { GUILDS } from "../../../secret";
 import { wait } from "../../../generalUtilities/wait";
+import loadDash from "lodash"
+
 
 /**
  * @interface - options for scoring a thread
@@ -19,7 +21,7 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
     
     const postSpecs = discussionSpecs.postSpecs;
     const commentSpecs = discussionSpecs.commentSpecs;
-    const periods = [...discussionSpecs.scorePeriods]; // unpack the periods to make a deep copy so we dont overwrite the real ones in a shallow copy
+    const periods = loadDash.cloneDeep(discussionSpecs.scorePeriods) // Make a deep copy so we dont overwrite when scoring multiple threads
 
     periods.forEach((period) => wipeStudentScores(period));
 
@@ -27,9 +29,19 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
 
     console.log(messages.length);
 
-    const commentScores = await scoreComments(messages, periods, commentSpecs, staffId)
+    const commentScoredPeriods = await scoreComments(messages, periods, commentSpecs, staffId)
 
-    console.log(commentScores[0].studentScores);
+    //TODO: THIS IS NOT A SAFE WAY OF GETTING THE POST IM JUST LAZY
+    const originalPost = messages[messages.length - 1]
+
+    const postPeriod = commentScoredPeriods.find((period) => {
+        return originalPost.createdAt.valueOf() > period.start.valueOf() && originalPost.createdAt.valueOf() < period.end.valueOf()
+    })
+
+    if(postPeriod){
+        const postScoreData = await scorePost(originalPost, messages, postSpecs, staffId)
+        handlePeriodPostScoreUpdate(postPeriod, originalPost.author.id, postScoreData)
+    }
 
     //TODO: Implement adding of scores to periods
     return periods
@@ -156,6 +168,20 @@ async function scoreComment(message: Message, periods: ScorePeriod[], commentSpe
     }
 }
 
+async function scorePost(message: Message, comments: Message[], postSpecs: PostSpecs, staffId: string) {
+    
+    const postAuthor = message.author
+    const scoreData = await scoreDiscussionMessage(message, postSpecs, staffId);
+
+    // we wouldnt want posters to recieve extra points for comments they leave
+    const commentsFiltered = comments.filter(comment => comment.author.id !== postAuthor.id)
+
+    scoreData.score += commentsFiltered.length * postSpecs.commentPoints;
+
+    return scoreData;
+
+}
+
 /**
  * @function scores a post or comment based on the specs provided (DOES NOT SCORE POST COMMENT POINTS)
  * @param message - the post or comment to be scored
@@ -175,9 +201,6 @@ export async function scoreDiscussionMessage(message: Message, messageSpecs: Com
     messageScoreData.score += awardScoreData.score;
     messageScoreData.numAwards += awardScoreData.numAwards;
     messageScoreData.numPenalties += awardScoreData.numPenalties;
-
-    if(messageScoreData.score > 0)
-        console.log(messageScoreData)
 
     return messageScoreData;
 }
@@ -206,6 +229,35 @@ function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, 
             numIncomPost: 0,
             awardsRecieved: commentScoreData.numAwards,
             penaltiesRecieved: commentScoreData.numPenalties
+        }
+    )
+}
+
+function handlePeriodPostScoreUpdate(period: ScorePeriod, studentId: string, postScoreData: MessageScoreData) {
+    
+    //TODO: convert this to function since it's almost the same thing as the comment equivilant?
+    let studentScoreData = period.studentScores.get(studentId)
+    
+    if(studentScoreData) {
+
+        studentScoreData.score += postScoreData.score;
+        studentScoreData.numPosts += 1;
+        if(isIncomplete(postScoreData)) 
+            studentScoreData.numIncomPost += 1;
+        studentScoreData.awardsRecieved += postScoreData.numAwards;
+        studentScoreData.penaltiesRecieved += postScoreData.numPenalties;
+        return
+    }
+    
+    period.studentScores.set(studentId,
+        {
+            score: postScoreData.score,
+            numPosts: 1,
+            numIncomPost: isIncomplete(postScoreData) ? 1 : 0,
+            numComments: 0,
+            numIncomComment: 0,
+            awardsRecieved: postScoreData.numAwards,
+            penaltiesRecieved: postScoreData.numPenalties
         }
     )
 }
