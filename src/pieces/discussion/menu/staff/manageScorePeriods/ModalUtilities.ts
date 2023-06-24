@@ -16,7 +16,7 @@ export async function createScorePeriodModal(idPrefix: string, titlePrefix: stri
     // and we'll have duplicates and that behavior is VERY undefined
     const modalId = idPrefix + new Date().getMilliseconds()
 
-    updateToManageScorePeriodsMenu(courseName, triggerInteraction, false, true);
+    updateToManageScorePeriodsMenu(courseName, triggerInteraction, false);
 
     const addScorePeriodModal = new ModalBuilder({
         customId: modalId,

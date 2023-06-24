@@ -1,12 +1,13 @@
-import { BaseInteraction, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction, User } from "discord.js";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
+import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { ComponentBehavior } from "../../BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
 import { openAddScorePeriodModal } from "./AddScorePeriodModal";
 import { openDeleteScorePeriodModal } from "./DeleteScorePeriodModal";
 import { openEditScorePeriodModal } from "./EditScorePeriodModal";
+import { getCourseByName } from "src/generalUtilities/getCourseByName";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_manage_score_periods_menu_back_button";
@@ -66,6 +67,30 @@ const DELETE_SCORE_PERIOD_BUTTON_DATA = {
 
 const SCORE_PERIOD_BUTTON_ROW = makeActionRowButton([ADD_SCORE_PERIOD_BUTTON_DATA, EDIT_SCORE_PERIOD_BUTTON_DATA, DELETE_SCORE_PERIOD_BUTTON_DATA]);
 
+/**
+ * @function updates a menu so that it is now a staff menu (updates the interaction if supplied, otherwise just updates the message)
+ * @param {string} courseTitle - the title of the course whose students are to be viewed
+ * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
+ * @param {boolean} isInteractionUpdate - whether to update the interaction (true) or just edit the message (false)
+ */
+export async function updateToManageScorePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
+
+    const scorePeriodData = await getScorePeriodData(courseName)
+
+    // replace the old menu with the view students menu
+    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseName, scorePeriodData);
+    isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
+    manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
+}
+
+export async function refreshMenuInteraction(courseName: string, interaction: MessageComponentInteraction) {
+
+    const scorePeriodData = await getScorePeriodData(courseName)
+    
+    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseName, scorePeriodData);
+    interaction.message.edit({embeds: manageScorePeriodsMenu.menuMessageData.embeds});
+}
+
 /** 
  * @interface basic information about a score period - intended to be used in the ManageScorePeriodsMenu
  * @property {Date} start - the exact date and time the score period starts
@@ -78,6 +103,30 @@ export interface ScorePeriodData {
     end: Date,
     goalPoints: number,
     maxPoints: number
+}
+
+async function getScorePeriodData (courseName: string) {
+    
+    let fetchedCourse = await getCourseByName(courseName)
+    
+    if(!fetchedCourse || fetchedCourse.discussionSpecs === null) {
+        return [];
+    }
+    
+    let scorePeriodData: ScorePeriodData[] = [];
+            
+    scorePeriodData = fetchedCourse.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
+        return {
+            start: scorePeriod.start,
+            end: scorePeriod.end,
+            goalPoints: scorePeriod.goalPoints,
+            maxPoints: scorePeriod.maxPoints
+        };
+    })
+
+    scorePeriodData = scorePeriodData.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
+
+    return scorePeriodData;
 }
 
 export class ManageScorePeriodsMenu extends NavigatedMenu {
@@ -154,122 +203,4 @@ export class ManageScorePeriodsMenu extends NavigatedMenu {
 
         super(menuData, 0, customNavOptions);
     }
-}
-
-/**
- * @function updates a menu so that it is now a staff menu (updates the interaction if supplied, otherwise just updates the message)
- * @param {string} courseTitle - the title of the course whose students are to be viewed
- * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
- * @param {boolean} isInteractionUpdate - whether to update the interaction (true) or just edit the message (false)
- */
-export async function updateToManageScorePeriodsMenu(courseTitle: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean, shouldCollect: boolean) {
-
-    // get the ids of all students in the course
-    let course: Course | null = null;
-    try {
-        course = await courseModel.findOne({name: courseTitle});
-    }
-    catch(error: any) {
-        console.error(error);
-    }
-
-    // if the course was not found there was a problem getting it from the database
-    if(!course) {
-        isInteractionUpdate ? componentInteraction.reply("Database error. Please message admin") : componentInteraction.message.reply("Database error. Please message admin");
-        return;
-    }
-
-    let scorePeriodData: ScorePeriodData[] = [];
-
-    if(course.discussionSpecs !== null && course.discussionSpecs.scorePeriods) {
-        
-        scorePeriodData = course.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
-            return {
-                start: scorePeriod.start,
-                end: scorePeriod.end,
-                goalPoints: scorePeriod.goalPoints,
-                maxPoints: scorePeriod.maxPoints
-            };
-        })
-    }
-
-    scorePeriodData = scorePeriodData.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
-
-    // replace the old menu with the view students menu
-    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseTitle, scorePeriodData);
-    isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
-    
-    if(shouldCollect)
-    manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
-}
-
-export async function refreshMenu(courseName: string, message: Message, user: User) {
-
-    let course: Course | null = null;
-    try {
-        course = await courseModel.findOne({name: courseName});
-    }
-    catch(error: any) {
-        console.error(error);
-    }
-    
-    if(!course) {
-        return;
-    }
-    
-    let scorePeriodData: ScorePeriodData[] = [];
-    
-    if(course.discussionSpecs === null)  {
-        return;
-    }
-            
-    scorePeriodData = course.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
-        return {
-            start: scorePeriod.start,
-            end: scorePeriod.end,
-            goalPoints: scorePeriod.goalPoints,
-            maxPoints: scorePeriod.maxPoints
-        };
-    })
-
-    //if (message.deletable) message.delete()
-    
-    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseName, scorePeriodData);
-    const newSentMessage = await user.send(manageScorePeriodsMenu.menuMessageData);
-    manageScorePeriodsMenu.collectMenuInteraction(user, newSentMessage)
-
-    return newSentMessage;
-}
-
-export async function refreshMenuInteraction(courseName: string, interaction: MessageComponentInteraction) {
-
-    let course: Course | null = null;
-    try {
-        course = await courseModel.findOne({name: courseName});
-    }
-    catch(error: any) {
-        console.error(error);
-    }
-    
-    if(!course) {
-        return;
-    }
-    
-    let scorePeriodData: ScorePeriodData[] = [];
-    
-    if(course.discussionSpecs === null)  {
-        return;
-    }
-            
-    scorePeriodData = course.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
-        return {
-            start: scorePeriod.start,
-            end: scorePeriod.end,
-            goalPoints: scorePeriod.goalPoints,
-            maxPoints: scorePeriod.maxPoints
-        };
-    })
-    
-    const manageScorePeriodsMenu = new ManageScorePeriodsMenu(courseName, scorePeriodData);
-    interaction.message.edit({embeds: manageScorePeriodsMenu.menuMessageData.embeds});
 }
