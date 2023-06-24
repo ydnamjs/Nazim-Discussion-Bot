@@ -1,67 +1,126 @@
-import { ChannelType, Message, MessageReaction } from "discord.js";
-import { AwardSpecs, CommentSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
+import { ChannelType, Client, Message, MessageReaction } from "discord.js";
+import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, StudentScoreData as StudentScoreData } from "../../../generalModels/DiscussionScoring";
 import { userHasRoleWithId } from "../../../generalUtilities/GetRolesOfUserInGuild";
+import { GUILDS } from "../../../secret";
+import { wait } from "../../../generalUtilities/wait";
+
+//TODO: JSDOC
+export interface ScoreThreadOptions {
+    before: Date,
+    after: Date
+}
+
+//TODO: JSDOC
+export async function scoreThread(client: Client, threadId: string, discussionSpecs: DiscussionSpecs, options: Partial<ScoreThreadOptions>): Promise<ScorePeriod[]> {
+    
+    const postSpecs = discussionSpecs.postSpecs;
+    const commentSpecs = discussionSpecs.commentSpecs;
+    const periods = [...discussionSpecs.scorePeriods]; // unpack the periods to make a deep copy so we dont overwrite the real ones in a shallow copy
+
+    periods.forEach((period) => wipeStudentScores(period));
+
+    return periods
+}
+
+function wipeStudentScores(period: ScorePeriod) {
+    period.studentScores = new Map<string, StudentScoreData>();
+}
+
+// debatable whether this should have a separate options interface since in the future score thread may have different options
+export async function getThreadMessages(client: Client, threadId: string, options?: Partial<ScoreThreadOptions>) {
+    
+    // LIMIT / (DELAY / 1000) = MESSAGES PER SECOND
+    // we have to create some limit so that getting messages from a thread doesn't eat up all of the rate limit
+    // Im not sure if it's possible but if we could make this depend on message count of a thread it might be faster to do many threads at once?
+    // perhaps also a number that is passed in that keeps track of the number of requests made so that smaller threads dont eat up a whole thread delay for 3 messages?
+    const MESSAGE_FETCH_LIMIT = 10; // this is the limit enforced by discord
+    const MESSAGE_FETCH_DELAY = 1000 
+
+    const ERROR_RETURN: never[] = []
+
+    const guild = client.guilds.cache.get(GUILDS.MAIN);
+
+    if(!guild) {
+        return ERROR_RETURN;
+    }
+
+    const thread = await guild.channels.fetch(threadId)
+
+    if(thread === null) {
+        return ERROR_RETURN;
+    }
+
+    const threadChannel = await (await thread.fetch()).fetch()
+
+    if(!threadChannel.isTextBased())
+        return ERROR_RETURN;
+
+
+    let messages: Message[] = [];
+    
+    const fetchedMessages = [...(await threadChannel.messages.fetch({limit: MESSAGE_FETCH_LIMIT})).values()];
+    messages.push(...fetchedMessages);
+    let lastFetchedMessage = fetchedMessages.length !== 0 ? fetchedMessages[fetchedMessages.length - 1] : undefined;
+
+    while (lastFetchedMessage) {
+        
+        await wait(MESSAGE_FETCH_DELAY)
+        
+        const fetchedMessages = [...(await threadChannel.messages.fetch({limit: MESSAGE_FETCH_LIMIT, before: lastFetchedMessage.id})).values()];
+        messages.push(...fetchedMessages);
+
+        if(options && lastFetchedMessage && options.after && lastFetchedMessage.createdAt.valueOf() < options.after.valueOf() ) {
+            removeMessagesAfterDate(messages, options.after);
+            break;
+        }
+        
+        lastFetchedMessage = fetchedMessages.length !== 0 ? fetchedMessages[fetchedMessages.length - 1] : undefined;
+    }
+
+    if(options && options.before) {
+        removeMessagesBeforeDate(messages, options.before);
+    }
+
+    console.log(messages.map((message) => { return message.content }));
+}
+
+function removeMessagesAfterDate(messages: Message[], date: Date) {
+    
+    while(messages.length && messages[messages.length - 1].createdAt.valueOf() < date.valueOf()) {
+        messages.pop()
+    }
+
+}
+
+function removeMessagesBeforeDate(messages: Message[], date: Date) {
+    while(messages.length && messages[0].createdAt.valueOf() > date.valueOf()) {
+        messages.shift()
+    }
+}
 
 /**
- * @interface collection of what requirements were met for a comment or post
+ * @interface scoring information about a post or comment
+ * @property {number} score - the amount of points awarded to the student for the post or comment
  * @property {boolean} passedLength - whether the post or comment met the length requirement specified in the course it belongs to
  * @property {boolean} passedParagraph - whether the post or comment met the paragraph requirement specified in the course it belongs to
  * @property {boolean} passedLinks = whether the post or comment met the link requirement specified in the course it belongs to
  */
-export interface ScoreChecks {
+export interface ScoreData { 
+    score: number,
     passedLength: boolean,
     passedParagraph: boolean,
     passedLinks: boolean
 }
 
-/**
- * @function calculates the entire score of a comment
- * @param {Message} comment - the discord message of the comment being scored
- * @param {CommentSpecs} commentSpecs - the specification used to score this comment (should be based on the course this comment was made for)
- * @param {string} staffId - the id that can give staff awards (should be based on the course this comment was made for)
- * @returns {object} scoreInfo - object containing information about the scoring of the comment
- * @property {number} scoreInfo.score - the number of points that the comment earned based on the scoring specification
- * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment met (useful for giving feedback to students whose comments did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
- */
-export async function scoreWholeComment(comment: Message, commentSpecs: CommentSpecs, staffId: string): Promise<{ score: number; scoreChecks: ScoreChecks; }> {
+export async function scoreDiscussionItem(comment: Message, itemSpecs: CommentSpecs | PostSpecs, staffId: string): Promise<ScoreData> {
     
-    // score the content of the comment
-    const scoreInfo = scoreDiscussionContent(comment.content, commentSpecs)
+    const scoreData = scoreDiscussionContent(comment.content, itemSpecs)
 
-    // add score for the awards of the comment
     const reactions = [...comment.reactions.cache.values()];
-    const awards = commentSpecs.awards;
-    scoreInfo.score += await scoreAllAwards(reactions, awards, staffId);
+    const awards = itemSpecs.awards;
+    scoreData.score += await scoreAllAwards(reactions, awards, staffId);
 
-    return scoreInfo;
-}
-
-/**
- * @function calculates the entire score of a post
- * @param {Message} post - the discord message of the post being scored
- * @param {postSpecs} postSpecs - the specification used to score this post (should be based on the course this post was made for)
- * @param {string} staffId - the id that can give staff awards (should be based on the course this post was made for)
- * @returns {object} scoreInfo - object containing information about the scoring of the post
- * @property {number} scoreInfo.score - the number of points that the post earned based on the scoring specification
- * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the post met (useful for giving feedback to students whose posts did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
- */
-export async function scoreWholePost(post: Message, postSpecs: PostSpecs, staffId: string): Promise<{ score: number; scoreChecks: ScoreChecks; }> {
-    // score the content of the post
-    const scoreInfo = scoreDiscussionContent(post.content, postSpecs)
-
-
-    // add score for the awards of the post
-    const reactions = [...post.reactions.cache.values()];
-    const awards = postSpecs.awards;
-    scoreInfo.score = scoreInfo.score + await scoreAllAwards(reactions, awards, staffId);
-
-    // add score for the comments that the post spawned
-    const postChannel = await post.client.channels.fetch(post.id);
-    if(postChannel && (postChannel.type === ChannelType.PublicThread || postChannel.type === ChannelType.PrivateThread) && (postChannel.messageCount)) {
-        scoreInfo.score = scoreInfo.score + (postChannel.messageCount * postSpecs.commentPoints);
-    }
-
-    return scoreInfo;
+    return scoreData;
 }
 
 /**
@@ -72,33 +131,27 @@ export async function scoreWholePost(post: Message, postSpecs: PostSpecs, staffI
  * @property {number} scoreInfo.score - the number of points that the content of the comment or post earned based on the scoring specification
  * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment or post met (useful for giving feedback to students whose comments or posts did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
  */
-export function scoreDiscussionContent(content: string, specs: CommentSpecs | PostSpecs): {score: number, scoreChecks: ScoreChecks} {
+export function scoreDiscussionContent(content: string, specs: CommentSpecs | PostSpecs): ScoreData {
     // remove multiple new lines in a row and newlines and spaces at the end
     const contentTrimmed = (content.replace(/[\r\n]+/g, '\n')).trim();
     // remove all empty spaces
     const contentNoEmpty = contentTrimmed.replace(/[\s]+/g, '');
 
     let score = 0;
-    const scoreChecks = {
-        passedLength: contentNoEmpty.length >= specs.minLength,
-        passedParagraph: countParagraphs(contentTrimmed) >= specs.minParagraphs,
-        passedLinks: countLinks(contentTrimmed) >= specs.minLinks
-    }
+
+    const passedLength = contentNoEmpty.length >= specs.minLength;
+    const passedParagraph = countParagraphs(contentTrimmed) >= specs.minParagraphs;
+    const passedLinks = countLinks(contentTrimmed) >= specs.minLinks;
 
     // if all the checks are met, award the points
-    if(scoreChecks.passedLength && scoreChecks.passedParagraph && scoreChecks.passedLinks) {
+    if(passedLength && passedParagraph && passedLinks) {
         score = specs.points;    
     }
 
-    return {score: score, scoreChecks: scoreChecks}
+    return {score, passedLength, passedParagraph, passedLinks}
 
 }
 
-/**
- * @function counts the number of paragraphs in a string
- * @param {string} content - the string to count the paragraphs of
- * @returns {number} - the number of paragraphs in the string
- */
 function countParagraphs(content: string):number {
     const countArr =  content.match(/\n+/g || [])
     
@@ -109,11 +162,6 @@ function countParagraphs(content: string):number {
     return countArr.length + 1;
 }
 
-/**
- * @function counts the number of links in a string
- * @param {string} content - the string to count the links of
- * @returns {number} - the number of links in the string
- */
 function countLinks(content: string):number {
     const countArr =  content.match(/http+/g || [])
     
@@ -124,13 +172,6 @@ function countLinks(content: string):number {
     return countArr.length;
 }
 
-/**
- * @function calculates the score for the awards of a given post or comment
- * @param {MessageReaction[]} reactions - all of the reactions that exist on the post or comment whose awards are being calculated for
- * @param {Map<string, AwardSpecs>} awards - the map of awards to check for and score based on
- * @param {string} staffId - the id of the role that can give staff only awards
- * @returns {number} - the amount of points earned for all awards on a post
- */
 async function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, AwardSpecs>, staffId: string): Promise<number> {
     
     let totalAwardScore = 0;
