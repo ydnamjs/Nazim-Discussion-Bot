@@ -1,4 +1,4 @@
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions, StringSelectMenuBuilder, User } from "discord.js";
 
 /**  
  * @interface interface of filter and action function
@@ -69,7 +69,7 @@ export class BaseMenu {
      */
     async send(client: Client, interaction: BaseInteraction): Promise<Message<false>> {
         const sentMenuMessage = await interaction.user.send(this.menuMessageData);
-        this.collectMenuInteraction(interaction, sentMenuMessage)
+        this.collectMenuInteraction(interaction.user, sentMenuMessage)
         return sentMenuMessage;
     }
 
@@ -83,17 +83,18 @@ export class BaseMenu {
     /** @member list of all the behaviors for the menu components */
     private componentBehaviors: ComponentBehavior[];
 
+    // TODO: Update js doc it is currently wrong
     /** 
      * @function handles the collection of interactions on the menu when it is sent
      * @param {Client} client - the client that the bot is logged in as
      * @param {BaseInteraction} interaction - the interaction that the menu belongs to
      * @param {Message} message - the message from which the component interactions are being collected
      */
-    async collectMenuInteraction(interaction: BaseInteraction, message: Message ): Promise<void> {
+    async collectMenuInteraction(user: User, message: Message ): Promise<void> {
         try {
 
             // Filter that checks if id of the component user matches the id of the menu reciever (should always be that way since DM but just in case)
-            const collectorFilter = (i: BaseInteraction) => i.user.id === interaction.user.id;
+            const collectorFilter = (i: BaseInteraction) => i.user.id === user.id;
 
             // Get the component that was pressed if one was pressed before menu expires
             const componentUsed = await message.awaitMessageComponent( {filter: collectorFilter, time: BaseMenu.MENU_EXPIRATION_TIME } );
@@ -111,7 +112,7 @@ export class BaseMenu {
             // TODO: I feel like theres a better way to do this but it will work for now
             if(error.toString().includes("Collector received no interactions before ending with reason: time")) {
                 message.delete()
-                interaction.user.send(BaseMenu.MENU_EXPIRTATION_MESSAGE);
+                user.send(BaseMenu.MENU_EXPIRTATION_MESSAGE);
             }
         }
     }
