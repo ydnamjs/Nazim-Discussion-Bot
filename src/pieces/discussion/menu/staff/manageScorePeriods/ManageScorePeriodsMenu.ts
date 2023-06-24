@@ -1,4 +1,4 @@
-import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
+import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { ComponentBehavior } from "../../BaseMenu";
@@ -8,7 +8,14 @@ import { openAddScorePeriodModal } from "./AddScorePeriodModal";
 import { openDeleteScorePeriodModal } from "./DeleteScorePeriodModal";
 import { openEditScorePeriodModal } from "./EditScorePeriodModal";
 
-// BUTTON CONSTANTS
+const MENU_TITLE_SUFFIX = " Manage Score Periods";
+const MENU_DESCRIPTION = "replace me";
+const FIELD_TITLE_PREFIX = "Score Period #";
+const FIELD_START_PREFIX = "Start: ";
+const FIELD_END_PREFIX = "\nEnd: "
+const FIELD_GOAL_POINTS_PREFIX = "\nGoal Points: "
+const FIELD_MAX_POINTS_PREFIX = "\nMax Points: "
+
 const BACK_BUTTON_ID = "discussion_manage_score_periods_menu_back_button";
 const BACK_BUTTON_LABEL = "Back To Course";
 const BACK_BUTTON_DISABLED = false;
@@ -29,7 +36,6 @@ const DELETE_PERIOD_BUTTON_LABEL = "Delete Score Period";
 const DELETE_PERIOD_BUTTON_DISABLED = false;
 const DELETE_PERIOD_BUTTON_STYLE = ButtonStyle.Primary
 
-// NAVIGATION ROW
 const customNavOptions: CustomNavOptions = {
     prevButtonOptions: {exists: true},
     nextButtonOptions: {exists: true},
@@ -40,8 +46,6 @@ const customNavOptions: CustomNavOptions = {
         style: BACK_BUTTON_STYLE
     }
 };
-
-// SCORE PERIOD ROW
 
 const ADD_PERIOD_BUTTON_DATA = {
     custom_id: ADD_PERIOD_BUTTON_ID,
@@ -81,6 +85,11 @@ export async function updateToManagePeriodsMenu(courseName: string, componentInt
     manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }
 
+/**
+ * @function refreshes the manage periods menu on the interaction provided's message
+ * @param courseName - the name of the course that the menu is for
+ * @param interaction - the interaction that the menu belongs to
+ */
 export async function refreshManagePeriodsMenu(courseName: string, interaction: MessageComponentInteraction) {
 
     const scorePeriodData = await getScorePeriodData(courseName)
@@ -127,26 +136,23 @@ async function getScorePeriodData (courseName: string) {
     return scorePeriodData;
 }
 
-export class ManagePeriodsMenu extends NavigatedMenu {
+class ManagePeriodsMenu extends NavigatedMenu {
     constructor(courseTitle: string, scorePeriodsData: ScorePeriodData[]) {
         
-        // generate the fields of basic info for each course and the select menu options
-        let fields: { name: string, value: string }[] = [];
+        let fields: APIEmbedField[] = [];
 
         for(let index = 0; index < scorePeriodsData.length; index++) {
             fields.push({
-                name: "Score Period #" + (index + 1),
+                name: FIELD_TITLE_PREFIX + (index + 1),
                 value: 
-                    "Start: " + scorePeriodsData[index].start.toDateString() + " " + scorePeriodsData[index].start.toLocaleTimeString() + 
-                    "\nEnd: " + scorePeriodsData[index].end.toDateString() + " " + scorePeriodsData[index].end.toLocaleTimeString() + 
-                    "\nGoal Points: " + scorePeriodsData[index].goalPoints + 
-                    "\nMax Points: " + scorePeriodsData[index].maxPoints
+                    FIELD_START_PREFIX + scorePeriodsData[index].start.toDateString() + " " + scorePeriodsData[index].start.toLocaleTimeString() + 
+                    FIELD_END_PREFIX + scorePeriodsData[index].end.toDateString() + " " + scorePeriodsData[index].end.toLocaleTimeString() + 
+                    FIELD_GOAL_POINTS_PREFIX + scorePeriodsData[index].goalPoints + 
+                    FIELD_MAX_POINTS_PREFIX + scorePeriodsData[index].maxPoints
             })
         };
 
-        // button behaviors
         const MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
-            // BACK BUTTON
             {
                 filter: (customId) => {
                     return customId === BACK_BUTTON_ID;
@@ -155,8 +161,6 @@ export class ManagePeriodsMenu extends NavigatedMenu {
                     updateToManageCourseMenu(courseTitle, message, componentInteraction);
                 }
             },
-
-            // ADD SCORE PERIOD BUTTON
             {
                 filter: (customId) => {
                     return customId === ADD_PERIOD_BUTTON_ID;
@@ -166,8 +170,6 @@ export class ManagePeriodsMenu extends NavigatedMenu {
                     openAddScorePeriodModal(courseTitle, componentInteraction);
                 }
             },
-
-            // EDIT SCORE PERIOD BUTTON
             {
                 filter: (customId) => {
                     return customId === EDIT_PERIOD_BUTTON_ID;
@@ -177,8 +179,6 @@ export class ManagePeriodsMenu extends NavigatedMenu {
                     openEditScorePeriodModal(courseTitle, componentInteraction);
                 }
             },
-
-            // DELETE SCORE PERIOD BUTTON
             {
                 filter: (customId) => {
                     return customId === DELETE_PERIOD_BUTTON_ID;
@@ -190,10 +190,9 @@ export class ManagePeriodsMenu extends NavigatedMenu {
             }
         ]
 
-        // data to be fed into super class navigated menu
         const menuData: NavigatedMenuData = {
-            title: courseTitle.toUpperCase() + "Manage Score Periods",
-            description: "replace me",
+            title: courseTitle.toUpperCase() + MENU_TITLE_SUFFIX,
+            description: MENU_DESCRIPTION,
             fields: fields,
             additionalComponents: [MANAGE_PERIODS_BUTTON_ROW],
             additionalComponentBehaviors: MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS,
