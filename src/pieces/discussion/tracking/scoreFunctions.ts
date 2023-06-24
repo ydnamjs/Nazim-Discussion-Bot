@@ -1,10 +1,14 @@
-import { ChannelType, Client, Message, MessageReaction } from "discord.js";
+import { ChannelType, Client, Message, MessageReaction, User } from "discord.js";
 import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, StudentScoreData as StudentScoreData } from "../../../generalModels/DiscussionScoring";
 import { userHasRoleWithId } from "../../../generalUtilities/GetRolesOfUserInGuild";
 import { GUILDS } from "../../../secret";
 import { wait } from "../../../generalUtilities/wait";
 
-//TODO: JSDOC
+/**
+ * @interface - options for scoring a thread
+ * @property {Date} before - the date which the post / all comments have to be made before to be counted in scoring
+ * @property {Date} after - the date which the post / all comments have to be made after to be counted in scoring
+ */
 export interface ScoreThreadOptions {
     before: Date,
     after: Date
@@ -115,9 +119,11 @@ function removeMessagesBeforeDate(messages: Message[], date: Date) {
  * @property {number} score - the amount of points awarded to the student for the post or comment
  * @property {boolean} passedLength - whether the post or comment met the length requirement specified in the course it belongs to
  * @property {boolean} passedParagraph - whether the post or comment met the paragraph requirement specified in the course it belongs to
- * @property {boolean} passedLinks = whether the post or comment met the link requirement specified in the course it belongs to
+ * @property {boolean} passedLinks - whether the post or comment met the link requirement specified in the course it belongs to
+ * @property {number} numAwards - the number of awards the post recieved
+ * @property {number} numPenalties - the number of penalties the post recieved
  */
-export interface ScoreData { 
+export interface MessageScoreData { 
     score: number,
     passedLength: boolean,
     passedParagraph: boolean,
@@ -138,7 +144,7 @@ async function scoreComments(messages: Message[], periods: ScorePeriod[], commen
 async function scoreComment(message: Message, periods: ScorePeriod[], commentSpecs: CommentSpecs, staffId: string) {
 
     const author = message.author
-    const scoreData = await scoreDiscussionItem(message, commentSpecs, staffId);
+    const scoreData = await scoreDiscussionMessage(message, commentSpecs, staffId);
     const createdAt = message.createdAt
 
     const properPeriod = periods.find((period) => {
@@ -150,26 +156,33 @@ async function scoreComment(message: Message, periods: ScorePeriod[], commentSpe
     }
 }
 
-export async function scoreDiscussionItem(comment: Message, itemSpecs: CommentSpecs | PostSpecs, staffId: string): Promise<ScoreData> {
+/**
+ * @function scores a post or comment based on the specs provided (DOES NOT SCORE POST COMMENT POINTS)
+ * @param message - the post or comment to be scored
+ * @param messageSpecs - the specifications to use when scoring
+ * @param staffId - the role id of course staff members
+ * @returns {MessageScoreData} messageScoreData - information about the scoring of the post or comment
+ */
+export async function scoreDiscussionMessage(message: Message, messageSpecs: CommentSpecs | PostSpecs, staffId: string): Promise<MessageScoreData> {
     
-    const scoreData = scoreDiscussionContent(comment.content, itemSpecs)
+    const messageScoreData = scoreDiscussionContent(message.content, messageSpecs)
 
-    const reactions = [...comment.reactions.cache.values()];
-    const awards = itemSpecs.awards;
+    const reactions = [...message.reactions.cache.values()];
+    const awards = messageSpecs.awards;
     
-    const awardScoreData = await scoreAllAwards(reactions, awards, staffId);
+    const awardScoreData = await scoreMessageAwards(reactions, awards, staffId);
 
-    scoreData.score += awardScoreData.score;
-    scoreData.numAwards += awardScoreData.numAwards;
-    scoreData.numPenalties += awardScoreData.numPenalties;
+    messageScoreData.score += awardScoreData.score;
+    messageScoreData.numAwards += awardScoreData.numAwards;
+    messageScoreData.numPenalties += awardScoreData.numPenalties;
 
-    if(scoreData.score > 0)
-        console.log(scoreData)
+    if(messageScoreData.score > 0)
+        console.log(messageScoreData)
 
-    return scoreData;
+    return messageScoreData;
 }
 
-function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, commentScoreData: ScoreData) {
+function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, commentScoreData: MessageScoreData) {
     
     let studentScoreData = period.studentScores.get(studentId)
     
@@ -181,24 +194,23 @@ function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, 
             studentScoreData.numIncomComment += 1;
         studentScoreData.awardsRecieved += commentScoreData.numAwards;
         studentScoreData.penaltiesRecieved += commentScoreData.numPenalties;
+        return
     }
-    else {
-        
-        period.studentScores.set(studentId,
-            {
-                score: commentScoreData.score,
-                numComments: 1,
-                numIncomComment: isIncomplete(commentScoreData) ? 1 : 0,
-                numPosts: 0,
-                numIncomPost: 0,
-                awardsRecieved: commentScoreData.numAwards,
-                penaltiesRecieved: commentScoreData.numPenalties
-            }
-        )
-    }
+    
+    period.studentScores.set(studentId,
+        {
+            score: commentScoreData.score,
+            numComments: 1,
+            numIncomComment: isIncomplete(commentScoreData) ? 1 : 0,
+            numPosts: 0,
+            numIncomPost: 0,
+            awardsRecieved: commentScoreData.numAwards,
+            penaltiesRecieved: commentScoreData.numPenalties
+        }
+    )
 }
 
-function isIncomplete(scoreData: ScoreData): boolean {
+function isIncomplete(scoreData: MessageScoreData): boolean {
     return (!scoreData.passedLength || !scoreData.passedLinks || !scoreData.passedParagraph)
 }
 
@@ -210,10 +222,9 @@ function isIncomplete(scoreData: ScoreData): boolean {
  * @property {number} scoreInfo.score - the number of points that the content of the comment or post earned based on the scoring specification
  * @property {ScoreChecks} scoreInfo.scoreChecks - object containing information about which requirements the comment or post met (useful for giving feedback to students whose comments or posts did not meet the requirements) [see Scorechecks interface in scoreFunction.ts]
  */
-export function scoreDiscussionContent(content: string, specs: CommentSpecs | PostSpecs): ScoreData {
-    // remove multiple new lines in a row and newlines and spaces at the end
+export function scoreDiscussionContent(content: string, specs: CommentSpecs | PostSpecs): MessageScoreData {
+
     const contentTrimmed = (content.replace(/[\r\n]+/g, '\n')).trim();
-    // remove all empty spaces
     const contentNoEmpty = contentTrimmed.replace(/[\s]+/g, '');
 
     let score = 0;
@@ -222,7 +233,6 @@ export function scoreDiscussionContent(content: string, specs: CommentSpecs | Po
     const passedParagraph = countParagraphs(contentTrimmed) >= specs.minParagraphs;
     const passedLinks = countLinks(contentTrimmed) >= specs.minLinks;
 
-    // if all the checks are met, award the points
     if(passedLength && passedParagraph && passedLinks) {
         score = specs.points;    
     }
@@ -257,47 +267,64 @@ interface AwardScoreData {
     numPenalties: number
 }
 
-//TODO: CLEAN THIS MESS UP
-async function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, AwardSpecs>, staffId: string): Promise<AwardScoreData> {
+async function scoreMessageAwards(reactions: MessageReaction[], awards: Map<string, AwardSpecs>, staffId: string): Promise<AwardScoreData> {
     
     let totalAwardScore = 0;
-    let numAwards = 0;
-    let numPenalties = 0;
+    let totalAwards = 0;
+    let totalPenalties = 0;
 
-     for (const reaction of reactions) {
+    for (const reaction of reactions) {
+        const awardScoreData = await processPotentialAward(reaction, awards, staffId)
+        totalAwardScore += awardScoreData.score;
+        totalAwards += awardScoreData.numAwards;
+        totalPenalties += awardScoreData.numPenalties;
+    }
 
-        // get the award specs for the given award
-        const awardSpecs = awards.get(reaction.emoji.toString())
+    return {score: totalAwardScore, numAwards: totalAwards, numPenalties: totalPenalties};
+}
 
-        // if the award specs exist, then the reaction is a real award
-        if(awardSpecs) {
-            
-            // if students can give the award, then every person who reacted counts
-            if(awardSpecs.trackStudents){
-                const numGivers = [...(await reaction.users.fetch())].length;
-                totalAwardScore += awardSpecs.points * numGivers;
-                if(awardSpecs.points > 0)
-                    numAwards += numGivers;
-                if(awardSpecs.points < 0)
-                    numPenalties += numGivers
-            }
+async function processPotentialAward(reaction: MessageReaction, awards: Map<string, AwardSpecs>, staffId: string ): Promise<AwardScoreData> {
+    
+    const awardSpecs = awards.get(reaction.emoji.toString())
 
-            // award points only for staff members that reacted
-            else {
-                const reactors = [...(await reaction.users.fetch()).values()];
-                
-                for (const reactor of reactors) {
-                    if( await userHasRoleWithId(reactor, staffId)) {
-                        totalAwardScore += awardSpecs.points;
-                        if(awardSpecs.points > 0)
-                            numAwards += 1;
-                        if(awardSpecs.points < 0)
-                            numPenalties += 1
-                    }
-                }
-            }
+    if(awardSpecs && awardSpecs.trackStudents) {
+        return await handleStudentAward(reaction, awardSpecs)
+    }
+
+    if(awardSpecs) {
+        
+        const reactors = [...(await reaction.users.fetch()).values()];
+        
+        return await handleStaffAward(awardSpecs, reactors, staffId)
+    }
+    
+    return {score: 0, numAwards: 0, numPenalties: 0};
+}
+
+async function handleStudentAward(reaction: MessageReaction, awardSpecs: AwardSpecs) {
+ 
+    const numGivers = [...(await reaction.users.fetch())].length;
+    
+    return {
+        score: awardSpecs.points * numGivers, 
+        numAwards: awardSpecs.points > 0 ? numGivers : 0, 
+        numPenalties: awardSpecs.points < 0 ? numGivers : 0
+    };
+}
+
+async function handleStaffAward(awardSpecs: AwardSpecs, reactors: User[], staffId: string) {
+    
+    let numStaffGivers = 0;
+
+    for (const reactor of reactors) {
+        if( await userHasRoleWithId(reactor, staffId)) {
+            numStaffGivers++;
         }
     }
 
-    return {score: totalAwardScore, numAwards: numAwards, numPenalties: numPenalties};
+    return {
+        score: awardSpecs.points * numStaffGivers, 
+        numAwards: awardSpecs.points > 0 ? numStaffGivers : 0, 
+        numPenalties: awardSpecs.points < 0 ? numStaffGivers : 0
+    };
 }
