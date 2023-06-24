@@ -56,15 +56,17 @@ export interface ScorePeriod {
     end: Date,
     goalPoints: number,
     maxPoints: number,
-    studentScores: Map<string, {
-        score: number,
-        numPosts: number,
-        numIncomPost: number,
-        numComments: number,
-        numIncomComment: number,
-        awardsRecieved: number,
-        awardsGiven: number
-    }>
+    studentScores: Map<string, StudentScoreData>
+}
+
+export interface StudentScoreData {
+    score: number,
+    numPosts: number,
+    numIncomPost: number,
+    numComments: number,
+    numIncomComment: number,
+    awardsRecieved: number,
+    awardsGiven: number
 }
 
 /**
