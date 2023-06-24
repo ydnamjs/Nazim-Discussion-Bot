@@ -56,7 +56,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
             return CONFLICTING_DATES_MESSAGE;
         }
 
-        insertOnePeriod(courseName, newScorePeriod, currentScorePeriods, submittedModal, SUCCESS_MESSAGE)
+        insertOnePeriod(courseName, newScorePeriod, currentScorePeriods)
     }
     return SUCCESS_MESSAGE;
 }

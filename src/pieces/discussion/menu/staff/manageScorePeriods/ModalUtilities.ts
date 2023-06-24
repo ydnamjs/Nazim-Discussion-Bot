@@ -40,7 +40,7 @@ export async function createManagePeriodModal(idPrefix: string, titlePrefix: str
 
     if (submittedModal !== undefined) {
         const replyText = await modalInputHandler(courseName, submittedModal);
-        refreshManagePeriodsMenu(courseName, triggerInteraction);
+        refreshManagePeriodsMenu(courseName, triggerInteraction); console.log("menu refreshed");
         sendDismissableInteractionReply(submittedModal, replyText);
     }
 }
@@ -166,7 +166,7 @@ export async function checkAgainstCurrentPeriods(newScorePeriodData: NewPeriodDa
  * @param {string} courseName - the name of the course that the score period is being added to
  * @param {string} successMessage - the message to be used in the reply on successful database insert
  */
-export async function insertOnePeriod( courseName: string, newScorePeriodData: NewPeriodData, scorePeriods: ScorePeriod[], submittedModal: ModalSubmitInteraction, successMessage: string ): Promise<string> {
+export async function insertOnePeriod( courseName: string, newScorePeriodData: NewPeriodData, scorePeriods: ScorePeriod[]): Promise<string> {
 
     scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
     scorePeriods = scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
