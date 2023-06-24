@@ -9,18 +9,30 @@ import { channel } from "diagnostics_channel";
 
 export async function scoreAllThreadsInCourse(client: Client, courseName: string, options?: ScoreThreadOptions) {
 
-    const threads = await getAllThreadsOfForum(client, courseName);
+    const threads = await getAllDiscussionThreads(client, courseName);
 
     if(!threads)
         return
 
-    threads.forEach(thread => {
-        console.log(thread.name);
-    });
+    const course = await getCourseByName(courseName);
+
+    if(!course || !course.discussionSpecs) {
+        return undefined;
+    }
+
+    for(const thread of threads) {
+        console.log("\n" + thread.name);
+        const threadScores = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, options)
+
+        threadScores.forEach(element => {
+            console.log(element.studentScores)
+        });
+
+    }
 
 }
 
-async function getAllThreadsOfForum(client: Client, courseName: string) {
+async function getAllDiscussionThreads(client: Client, courseName: string) {
     
     const course = await getCourseByName(courseName);
 
@@ -72,7 +84,7 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
 
     const messages = await getThreadMessages(client, threadId, options)
 
-    console.log(messages.length);
+    //console.log(messages.length);
 
     const commentScoredPeriods = await scoreComments(messages, periods, commentSpecs, staffId)
 
