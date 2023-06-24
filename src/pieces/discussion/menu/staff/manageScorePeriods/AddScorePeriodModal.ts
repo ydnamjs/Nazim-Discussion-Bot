@@ -52,7 +52,11 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
             return CONFLICTING_DATES_MESSAGE;
         }
 
-        insertOnePeriod(courseName, newScorePeriod, currentScorePeriods)
+        const insertErrors = await insertOnePeriod(courseName, newScorePeriod, currentScorePeriods)
+
+        if(insertErrors !== "")
+            return insertErrors
     }
+
     return SUCCESS_MESSAGE;
 }
