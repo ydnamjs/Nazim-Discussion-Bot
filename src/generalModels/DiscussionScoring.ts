@@ -67,7 +67,7 @@ export interface StudentScoreData {
     numComments: number,
     numIncomComment: number,
     awardsRecieved: number,
-    awardsGiven: number
+    penaltiesRecieved: number
 }
 
 /**

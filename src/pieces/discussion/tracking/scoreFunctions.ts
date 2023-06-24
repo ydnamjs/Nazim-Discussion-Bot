@@ -11,7 +11,7 @@ export interface ScoreThreadOptions {
 }
 
 //TODO: JSDOC
-export async function scoreThread(client: Client, threadId: string, discussionSpecs: DiscussionSpecs, options: Partial<ScoreThreadOptions>): Promise<ScorePeriod[]> {
+export async function scoreThread(client: Client, threadId: string, discussionSpecs: DiscussionSpecs, staffId: string, options: Partial<ScoreThreadOptions>): Promise<ScorePeriod[]> {
     
     const postSpecs = discussionSpecs.postSpecs;
     const commentSpecs = discussionSpecs.commentSpecs;
@@ -23,7 +23,7 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
 
     console.log(messages.length);
 
-    const commentScores = scoreComments(messages, periods, commentSpecs)
+    const commentScores = await scoreComments(messages, periods, commentSpecs, staffId)
 
     console.log(commentScores[0].studentScores);
 
@@ -36,7 +36,7 @@ function wipeStudentScores(period: ScorePeriod) {
 }
 
 // debatable whether this should have a separate options interface since in the future score thread may have different options
-export async function getThreadMessages(client: Client, threadId: string, options?: Partial<ScoreThreadOptions>) {
+async function getThreadMessages(client: Client, threadId: string, options?: Partial<ScoreThreadOptions>) {
     
     // LIMIT / (DELAY / 1000) = MESSAGES PER SECOND
     // we have to create some limit so that getting messages from a thread doesn't eat up all of the rate limit
@@ -121,26 +121,33 @@ export interface ScoreData {
     score: number,
     passedLength: boolean,
     passedParagraph: boolean,
-    passedLinks: boolean
+    passedLinks: boolean,
+    numAwards: number,
+    numPenalties: number
 }
 
-function scoreComments(messages: Message[], periods: ScorePeriod[], commentSpecs: CommentSpecs): ScorePeriod[] {
+async function scoreComments(messages: Message[], periods: ScorePeriod[], commentSpecs: CommentSpecs, staffId: string): Promise<ScorePeriod[]> {
     
-    messages.forEach((message) => {
-        const author = message.author
-        const scoreData = scoreDiscussionContent(message.content, commentSpecs);
-        const createdAt = message.createdAt
-
-        const properPeriod = periods.find((period) => {
-            return createdAt.valueOf() > period.start.valueOf() && createdAt.valueOf() < period.end.valueOf()
-        })
-
-        if(properPeriod) {
-            handlePeriodCommentScoreUpdate(properPeriod, author.id, scoreData)
-        }
-    })
+    for (let message of messages) {
+        await scoreComment(message, periods, commentSpecs, staffId)
+    }
 
     return periods;
+}
+
+async function scoreComment(message: Message, periods: ScorePeriod[], commentSpecs: CommentSpecs, staffId: string) {
+
+    const author = message.author
+    const scoreData = await scoreDiscussionItem(message, commentSpecs, staffId);
+    const createdAt = message.createdAt
+
+    const properPeriod = periods.find((period) => {
+        return createdAt.valueOf() > period.start.valueOf() && createdAt.valueOf() < period.end.valueOf()
+    })
+
+    if(properPeriod) {
+        handlePeriodCommentScoreUpdate(properPeriod, author.id, scoreData)
+    }
 }
 
 export async function scoreDiscussionItem(comment: Message, itemSpecs: CommentSpecs | PostSpecs, staffId: string): Promise<ScoreData> {
@@ -149,7 +156,15 @@ export async function scoreDiscussionItem(comment: Message, itemSpecs: CommentSp
 
     const reactions = [...comment.reactions.cache.values()];
     const awards = itemSpecs.awards;
-    scoreData.score += await scoreAllAwards(reactions, awards, staffId);
+    
+    const awardScoreData = await scoreAllAwards(reactions, awards, staffId);
+
+    scoreData.score += awardScoreData.score;
+    scoreData.numAwards += awardScoreData.numAwards;
+    scoreData.numPenalties += awardScoreData.numPenalties;
+
+    if(scoreData.score > 0)
+        console.log(scoreData)
 
     return scoreData;
 }
@@ -159,14 +174,16 @@ function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, 
     let studentScoreData = period.studentScores.get(studentId)
     
     if(studentScoreData) {
+
         studentScoreData.score += commentScoreData.score;
         studentScoreData.numComments += 1;
         if(isIncomplete(commentScoreData)) 
-            studentScoreData.numIncomComment += 1
-        //TODO: add number of awards and penalties incrementing when that's done
+            studentScoreData.numIncomComment += 1;
+        studentScoreData.awardsRecieved += commentScoreData.numAwards;
+        studentScoreData.penaltiesRecieved += commentScoreData.numPenalties;
     }
     else {
-        console.log("adding")
+        
         period.studentScores.set(studentId,
             {
                 score: commentScoreData.score,
@@ -174,10 +191,8 @@ function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, 
                 numIncomComment: isIncomplete(commentScoreData) ? 1 : 0,
                 numPosts: 0,
                 numIncomPost: 0,
-                // TODO: Implement actual award counting once that is done in score discussion item
-                awardsRecieved: 0,
-                // TODO: Replace awards given with penalties recieved and implement that once that is done in score discussion item
-                awardsGiven: 0
+                awardsRecieved: commentScoreData.numAwards,
+                penaltiesRecieved: commentScoreData.numPenalties
             }
         )
     }
@@ -212,7 +227,7 @@ export function scoreDiscussionContent(content: string, specs: CommentSpecs | Po
         score = specs.points;    
     }
 
-    return {score, passedLength, passedParagraph, passedLinks}
+    return {score, passedLength, passedParagraph, passedLinks, numAwards: 0, numPenalties: 0}
 
 }
 
@@ -236,10 +251,19 @@ function countLinks(content: string):number {
     return countArr.length;
 }
 
-async function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, AwardSpecs>, staffId: string): Promise<number> {
+interface AwardScoreData {
+    score: number,
+    numAwards: number,
+    numPenalties: number
+}
+
+//TODO: CLEAN THIS MESS UP
+async function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, AwardSpecs>, staffId: string): Promise<AwardScoreData> {
     
     let totalAwardScore = 0;
-    
+    let numAwards = 0;
+    let numPenalties = 0;
+
      for (const reaction of reactions) {
 
         // get the award specs for the given award
@@ -250,7 +274,12 @@ async function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, 
             
             // if students can give the award, then every person who reacted counts
             if(awardSpecs.trackStudents){
-                totalAwardScore += awardSpecs.points * [...(await reaction.users.fetch())].length;
+                const numGivers = [...(await reaction.users.fetch())].length;
+                totalAwardScore += awardSpecs.points * numGivers;
+                if(awardSpecs.points > 0)
+                    numAwards += numGivers;
+                if(awardSpecs.points < 0)
+                    numPenalties += numGivers
             }
 
             // award points only for staff members that reacted
@@ -260,11 +289,15 @@ async function scoreAllAwards(reactions: MessageReaction[], awards: Map<string, 
                 for (const reactor of reactors) {
                     if( await userHasRoleWithId(reactor, staffId)) {
                         totalAwardScore += awardSpecs.points;
+                        if(awardSpecs.points > 0)
+                            numAwards += 1;
+                        if(awardSpecs.points < 0)
+                            numPenalties += 1
                     }
                 }
             }
         }
     }
 
-    return totalAwardScore;
+    return {score: totalAwardScore, numAwards: numAwards, numPenalties: numPenalties};
 }

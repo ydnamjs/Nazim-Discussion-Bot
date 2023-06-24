@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChannelType, Client, CommandInteraction, ForumChannel, Message, ThreadChannel } from "discord.js";
 import { Command } from "../../../command/Command";
 import { Course, courseModel } from "../../../generalModels/Course";
-import { getThreadMessages, scoreDiscussionItem, scoreThread } from "./scoreFunctions";
+import { scoreDiscussionItem, scoreThread } from "./scoreFunctions";
 import { CommentSpecs, DiscussionSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
 import { DEFAULT_DISCUSSION_SPECS } from "../../../pieces/courseManagement/DiscussionRulesDefaults";
 import { getCourseByName } from "../../../generalUtilities/getCourseByName";
@@ -51,7 +51,7 @@ export const testScore: Command = {
     
         const course = await getCourseByName("test") as Course
 
-        scoreThread(client, "1122138243979284490", course.discussionSpecs as DiscussionSpecs, {})
+        scoreThread(client, "1122138243979284490", course.discussionSpecs as DiscussionSpecs, course.roles.staff,{})
         interaction.followUp("check console");
         //interaction.followUp(str.score.toString());
     }
