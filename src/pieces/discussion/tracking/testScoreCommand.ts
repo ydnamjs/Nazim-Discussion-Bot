@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChannelType, Client, CommandInteraction, ForumChannel, Message, ThreadChannel } from "discord.js";
 import { Command } from "../../../command/Command";
 import { Course, courseModel } from "../../../generalModels/Course";
-import { scoreDiscussionMessage, scoreThread } from "./scoreFunctions";
+import { scoreAllThreadsInCourse, scoreDiscussionMessage, scoreThread } from "./scoreFunctions";
 import { CommentSpecs, DiscussionSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
 import { DEFAULT_DISCUSSION_SPECS } from "../../../pieces/courseManagement/DiscussionRulesDefaults";
 import { getCourseByName } from "../../../generalUtilities/getCourseByName";
@@ -48,14 +48,20 @@ export const testScore: Command = {
 
         */
         //getThreadMessages(client, interaction.options.get('message')?.value as string, {before: new Date("2023-06-24T09:25:00"), after: new Date("2023-06-24T08:24:00")})
-    
+    /*
         const course = await getCourseByName("test") as Course
 
         const periods = await scoreThread(client, "1122138243979284490", course.discussionSpecs as DiscussionSpecs, course.roles.staff,{})
         
+        scoreAllThreadsInCourse(client, "test")
+
         periods.forEach(element => {
             console.log(element.studentScores)
         });
+    */
+   
+        scoreAllThreadsInCourse(client, "test")
+
         interaction.followUp("check console");
     }
 }

@@ -1,4 +1,4 @@
-import { ButtonInteraction, ModalSubmitInteraction } from "discord.js";
+import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
 import { courseModel } from "../../../../../generalModels/Course";
 import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, periodNumActionRow } from "./ModalComponents";
 import { createManagePeriodModal, handleIndexValidation, overwritePeriods } from "./ModalUtilities";
@@ -22,7 +22,7 @@ export async function openDeletePeriodModal(courseName: string, triggerInteracti
     await createManagePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 
-async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
+async function handleModalInput(_client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
 
     const toDeleteIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
 

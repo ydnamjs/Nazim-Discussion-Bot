@@ -1,15 +1,16 @@
-import { ActionRowBuilder, ButtonInteraction, ModalBuilder, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, Client, ModalBuilder, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
 import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
 import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
 import { refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
+import { scoreAllThreadsInCourse } from "../../../../../pieces/discussion/tracking/scoreFunctions";
 
 /**
  * @type function that will handle a modals input data and return the interaction response message as a string
  */
-export type ModalInputHandler = (courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
+export type ModalInputHandler = (client: Client, courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
 
 export async function createManagePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
@@ -39,7 +40,7 @@ export async function createManagePeriodModal(idPrefix: string, titlePrefix: str
     catch {}
 
     if (submittedModal !== undefined) {
-        const replyText = await modalInputHandler(courseName, submittedModal);
+        const replyText = await modalInputHandler(triggerInteraction.client, courseName, submittedModal);
         refreshManagePeriodsMenu(courseName, triggerInteraction);
         sendDismissableInteractionReply(submittedModal, replyText);
     }
@@ -171,12 +172,16 @@ export async function checkAgainstCurrentPeriods(newScorePeriodData: NewPeriodDa
  * @param {string} courseName - the name of the course that the score period is being added to
  * @param {string} successMessage - the message to be used in the reply on successful database insert
  */
-export async function insertOnePeriod( courseName: string, newScorePeriodData: NewPeriodData, scorePeriods: ScorePeriod[]): Promise<string> {
+export async function insertOnePeriod(client: Client, courseName: string, newScorePeriodData: NewPeriodData, scorePeriods: ScorePeriod[]): Promise<string> {
 
     scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
     scorePeriods = scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
     
     const insertErrors = await overwritePeriods(courseName, scorePeriods)
+
+    if(insertErrors === "") {
+        scoreAllThreadsInCourse(client, courseName)
+    }
 
     return insertErrors;
 }

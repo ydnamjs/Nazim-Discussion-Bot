@@ -1,4 +1,4 @@
-import { ButtonInteraction, ModalSubmitInteraction } from "discord.js";
+import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
 import { NewPeriodData, checkAgainstCurrentPeriods, createManagePeriodModal, handlePeriodValidation, insertOnePeriod, validatePeriodInput } from "./ModalUtilities";
@@ -24,7 +24,7 @@ export async function openAddPeriodModal(courseName: string, triggerInteraction:
     await createManagePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 
-async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
+async function handleModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
 
     const periodValidationData = validatePeriodInput(submittedModal);
 
@@ -52,7 +52,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
             return CONFLICTING_DATES_MESSAGE;
         }
 
-        const insertErrors = await insertOnePeriod(courseName, newScorePeriod, currentScorePeriods)
+        const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, currentScorePeriods)
 
         if(insertErrors !== "")
             return insertErrors

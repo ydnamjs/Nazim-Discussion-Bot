@@ -1,10 +1,45 @@
-import { Client, Message, MessageReaction, User } from "discord.js";
+import { ChannelType, Client, ForumChannel, Message, MessageReaction, User } from "discord.js";
 import loadDash from "lodash";
 import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, StudentScoreData } from "../../../generalModels/DiscussionScoring";
 import { userHasRoleWithId } from "../../../generalUtilities/GetRolesOfUserInGuild";
 import { getChannelInMainGuild } from "../../../generalUtilities/getChannelInMain";
 import { wait } from "../../../generalUtilities/wait";
+import { getCourseByName } from "../../../generalUtilities/getCourseByName";
+import { channel } from "diagnostics_channel";
 
+export async function scoreAllThreadsInCourse(client: Client, courseName: string, options?: ScoreThreadOptions) {
+
+    const threads = await getAllThreadsOfForum(client, courseName);
+
+    if(!threads)
+        return
+
+    threads.forEach(thread => {
+        console.log(thread.name);
+    });
+
+}
+
+async function getAllThreadsOfForum(client: Client, courseName: string) {
+    
+    const course = await getCourseByName(courseName);
+
+    if(!course || !course.channels.discussion) {
+        return undefined;
+    }
+
+    const forumChannelId = course.channels.discussion;
+
+    const forumChannel = await getChannelInMainGuild(client, forumChannelId);
+
+    if(!forumChannel || !(forumChannel instanceof ForumChannel)) {
+        return undefined;
+    }
+    
+    const forumThreads = [...forumChannel.threads.cache.values()];
+
+    return forumThreads;
+}
 
 /**
  * @interface - options for scoring a thread
