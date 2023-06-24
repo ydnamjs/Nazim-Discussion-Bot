@@ -182,10 +182,10 @@ export async function insertOnePeriod( courseName: string, newScorePeriodData: N
  * @param {ScorePeriod[]} scorePeriods - the new score periods that will overwrite the ones in the course
  * @returns {string} reasonsForFailure - the reasons that the overwrite failed if any
  */
-async function overwritePeriods(courseName: string, scorePeriods: ScorePeriod[]): Promise<string> {
-    let newCourse: Course | null = null;
+export async function overwritePeriods(courseName: string, scorePeriods: ScorePeriod[]): Promise<string> {
+
     try {
-        newCourse = await courseModel.findOneAndUpdate( 
+        await courseModel.findOneAndUpdate( 
             {name: courseName}, 
             {"discussionSpecs.scorePeriods": scorePeriods}
         )

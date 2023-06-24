@@ -58,6 +58,5 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
 
         insertOnePeriod(courseName, newScorePeriod, currentScorePeriods, submittedModal, SUCCESS_MESSAGE)
     }
-    
     return SUCCESS_MESSAGE;
 }

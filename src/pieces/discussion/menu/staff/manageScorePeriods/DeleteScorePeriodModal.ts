@@ -1,7 +1,7 @@
 import { ButtonInteraction, ModalSubmitInteraction } from "discord.js";
 import { courseModel } from "../../../../../generalModels/Course";
 import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, periodNumActionRow } from "./ModalComponents";
-import { createManagePeriodModal, handleIndexValidation } from "./ModalUtilities";
+import { createManagePeriodModal, handleIndexValidation, overwritePeriods } from "./ModalUtilities";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 
 const MODAL_ID_PREFIX = "delete_score_period_modal"
@@ -40,14 +40,10 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
 
         scorePeriods.splice(toDeleteIndex - 1, 1);
         
-        let newCourse: Document | null = null;
-        try {
-            newCourse = await courseModel.findOneAndUpdate( {name: courseName}, {"discussionSpecs.scorePeriods": scorePeriods})
-        }
-        catch(error: any) {
-            console.error(error);
-            return DATABASE_ERROR_MESSAGE;
-        }
+        const deleteErrors = await overwritePeriods(courseName, scorePeriods);
+
+        if(deleteErrors !== "")
+            return deleteErrors
     }
     return SUCCESS_MESSAGE;
 }
