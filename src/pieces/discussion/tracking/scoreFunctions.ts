@@ -1,9 +1,9 @@
-import { ChannelType, Client, Message, MessageReaction, User } from "discord.js";
-import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, StudentScoreData as StudentScoreData } from "../../../generalModels/DiscussionScoring";
+import { Client, Message, MessageReaction, User } from "discord.js";
+import loadDash from "lodash";
+import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, StudentScoreData } from "../../../generalModels/DiscussionScoring";
 import { userHasRoleWithId } from "../../../generalUtilities/GetRolesOfUserInGuild";
-import { GUILDS } from "../../../secret";
+import { getChannelInMainGuild } from "../../../generalUtilities/getChannelInMain";
 import { wait } from "../../../generalUtilities/wait";
-import loadDash from "lodash"
 
 
 /**
@@ -31,16 +31,18 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
 
     const commentScoredPeriods = await scoreComments(messages, periods, commentSpecs, staffId)
 
-    //TODO: THIS IS NOT A SAFE WAY OF GETTING THE POST IM JUST LAZY
-    const originalPost = messages[messages.length - 1]
+    const originalPost = await getPostMessage(client, threadId, options);
 
-    const postPeriod = commentScoredPeriods.find((period) => {
-        return originalPost.createdAt.valueOf() > period.start.valueOf() && originalPost.createdAt.valueOf() < period.end.valueOf()
-    })
+    if(originalPost) {
 
-    if(postPeriod){
-        const postScoreData = await scorePost(originalPost, messages, postSpecs, staffId)
-        handlePeriodPostScoreUpdate(postPeriod, originalPost.author.id, postScoreData)
+        const postPeriod = commentScoredPeriods.find((period) => {
+            return originalPost.createdAt.valueOf() > period.start.valueOf() && originalPost.createdAt.valueOf() < period.end.valueOf()
+        })
+
+        if(postPeriod){
+            const postScoreData = await scorePost(originalPost, messages, postSpecs, staffId)
+            handlePeriodPostScoreUpdate(postPeriod, originalPost.author.id, postScoreData)
+        }
     }
 
     return periods;
@@ -60,25 +62,12 @@ async function getThreadMessages(client: Client, threadId: string, options?: Par
     const MESSAGE_FETCH_LIMIT = 100; // this is the limit enforced by discord
     const MESSAGE_FETCH_DELAY = 1 // TODO: Make this not 0 when done testing 
 
-    const ERROR_RETURN: never[] = []
+    const ERROR_RETURN: never[] = [];
 
-    const guild = client.guilds.cache.get(GUILDS.MAIN);
+    const threadChannel = await getChannelInMainGuild(client, threadId)
 
-    if(!guild) {
+    if(!threadChannel || !threadChannel.isTextBased())
         return ERROR_RETURN;
-    }
-
-    const thread = await guild.channels.fetch(threadId)
-
-    if(thread === null) {
-        return ERROR_RETURN;
-    }
-
-    const threadChannel = await (await thread.fetch()).fetch()
-
-    if(!threadChannel.isTextBased())
-        return ERROR_RETURN;
-
 
     let messages: Message[] = [];
     
@@ -123,6 +112,26 @@ function removeMessagesBeforeDate(messages: Message[], date: Date) {
     while(messages.length && messages[0].createdAt.valueOf() > date.valueOf()) {
         messages.shift()
     }
+}
+
+async function getPostMessage(client: Client, threadId: string, options?: Partial<ScoreThreadOptions>) {
+    
+    const ERROR_RETURN = undefined;
+
+    const threadChannel = await getChannelInMainGuild(client, threadId)
+
+    if(!threadChannel || !threadChannel.isTextBased())
+        return ERROR_RETURN;
+
+    const post = await threadChannel.messages.fetch(threadId); // this works because the first message in a thread shares it's id with the thread
+
+    if(post && options && options.before && post.createdAt.valueOf() > options.before.valueOf())
+        return undefined
+
+    if(post && options && options.after && post.createdAt.valueOf() < options.after.valueOf())
+        return undefined
+
+    return post;
 }
 
 /**
