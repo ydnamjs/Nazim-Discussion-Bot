@@ -1,6 +1,6 @@
 import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
-import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
+import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { ComponentBehavior } from "../../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
@@ -98,14 +98,7 @@ export async function refreshManagePeriodsMenu(courseName: string, interaction: 
     interaction.message.edit({embeds: manageScorePeriodsMenu.menuMessageData.embeds});
 }
 
-/** 
- * @interface basic information about a score period - intended to be used in the ManageScorePeriodsMenu
- * @property {Date} start - the exact date and time the score period starts
- * @property {Date} end - the exact date and time the score period ends
- * @property {number} goalPoints - the goal for the number of points a student can recieve in the score period
- * @property {number} maxPoints - the maximum number of points a student can recieve in the score period
-*/
-export interface ScorePeriodData {
+interface ScorePeriodDisplayData {
     start: Date,
     end: Date,
     goalPoints: number,
@@ -120,9 +113,9 @@ async function getScorePeriodData (courseName: string) {
         return [];
     }
     
-    let scorePeriodData: ScorePeriodData[] = [];
+    let scorePeriodData: ScorePeriodDisplayData[] = [];
             
-    scorePeriodData = fetchedCourse.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodData => {
+    scorePeriodData = fetchedCourse.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodDisplayData => {
         return {
             start: scorePeriod.start,
             end: scorePeriod.end,
@@ -137,7 +130,7 @@ async function getScorePeriodData (courseName: string) {
 }
 
 class ManagePeriodsMenu extends NavigatedMenu {
-    constructor(courseTitle: string, scorePeriodsData: ScorePeriodData[]) {
+    constructor(courseTitle: string, scorePeriodsData: ScorePeriodDisplayData[]) {
         
         let fields: APIEmbedField[] = [];
 
