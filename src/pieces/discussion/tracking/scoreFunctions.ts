@@ -43,8 +43,7 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
         handlePeriodPostScoreUpdate(postPeriod, originalPost.author.id, postScoreData)
     }
 
-    //TODO: Implement adding of scores to periods
-    return periods
+    return periods;
 }
 
 function wipeStudentScores(period: ScorePeriod) {
@@ -207,60 +206,44 @@ export async function scoreDiscussionMessage(message: Message, messageSpecs: Com
 
 function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, commentScoreData: MessageScoreData) {
     
-    let studentScoreData = period.studentScores.get(studentId)
-    
-    if(studentScoreData) {
-
-        studentScoreData.score += commentScoreData.score;
-        studentScoreData.numComments += 1;
-        if(isIncomplete(commentScoreData)) 
-            studentScoreData.numIncomComment += 1;
-        studentScoreData.awardsRecieved += commentScoreData.numAwards;
-        studentScoreData.penaltiesRecieved += commentScoreData.numPenalties;
-        return
-    }
-    
-    period.studentScores.set(studentId,
-        {
-            score: commentScoreData.score,
-            numComments: 1,
-            numIncomComment: isIncomplete(commentScoreData) ? 1 : 0,
-            numPosts: 0,
-            numIncomPost: 0,
-            awardsRecieved: commentScoreData.numAwards,
-            penaltiesRecieved: commentScoreData.numPenalties
-        }
-    )
+    handlePeriodScoreUpdate(period, studentId, commentScoreData, true)
 }
 
 function handlePeriodPostScoreUpdate(period: ScorePeriod, studentId: string, postScoreData: MessageScoreData) {
     
-    //TODO: convert this to function since it's almost the same thing as the comment equivilant?
-    let studentScoreData = period.studentScores.get(studentId)
-    
-    if(studentScoreData) {
-
-        studentScoreData.score += postScoreData.score;
-        studentScoreData.numPosts += 1;
-        if(isIncomplete(postScoreData)) 
-            studentScoreData.numIncomPost += 1;
-        studentScoreData.awardsRecieved += postScoreData.numAwards;
-        studentScoreData.penaltiesRecieved += postScoreData.numPenalties;
-        return
-    }
-    
-    period.studentScores.set(studentId,
-        {
-            score: postScoreData.score,
-            numPosts: 1,
-            numIncomPost: isIncomplete(postScoreData) ? 1 : 0,
-            numComments: 0,
-            numIncomComment: 0,
-            awardsRecieved: postScoreData.numAwards,
-            penaltiesRecieved: postScoreData.numPenalties
-        }
-    )
+    handlePeriodScoreUpdate(period, studentId, postScoreData, false)
 }
+
+function handlePeriodScoreUpdate(period: ScorePeriod, studentId: string, updateScoreData: MessageScoreData, isCommentUpdate: boolean) {
+        
+        let studentScoreData = period.studentScores.get(studentId)
+        
+        if(studentScoreData) {
+    
+            studentScoreData.score += updateScoreData.score;
+            studentScoreData.numPosts += isCommentUpdate ? 0 : 1;
+            if(isIncomplete(updateScoreData) && !isCommentUpdate) 
+                studentScoreData.numIncomPost += 1;
+            studentScoreData.numComments += isCommentUpdate ? 1 : 0;
+            if(isIncomplete(updateScoreData) && isCommentUpdate) 
+                studentScoreData.numIncomComment += 1;
+            studentScoreData.awardsRecieved += updateScoreData.numAwards;
+            studentScoreData.penaltiesRecieved += updateScoreData.numPenalties;
+            return
+        }
+        
+        period.studentScores.set(studentId,
+            {
+                score: updateScoreData.score,
+                numPosts: isCommentUpdate ? 0 : 1,
+                numIncomPost: isCommentUpdate ? 0 : isIncomplete(updateScoreData) ? 1 : 0,
+                numComments: isCommentUpdate ? 1 : 0,
+                numIncomComment: isCommentUpdate ? isIncomplete(updateScoreData) ? 1 : 0 : 0,
+                awardsRecieved: updateScoreData.numAwards,
+                penaltiesRecieved: updateScoreData.numPenalties
+            }
+        )
+    }
 
 function isIncomplete(scoreData: MessageScoreData): boolean {
     return (!scoreData.passedLength || !scoreData.passedLinks || !scoreData.passedParagraph)

@@ -51,8 +51,11 @@ export const testScore: Command = {
     
         const course = await getCourseByName("test") as Course
 
-        scoreThread(client, "1122138243979284490", course.discussionSpecs as DiscussionSpecs, course.roles.staff,{})
+        const periods = await scoreThread(client, "1122138243979284490", course.discussionSpecs as DiscussionSpecs, course.roles.staff,{})
+        
+        periods.forEach(element => {
+            console.log(element.studentScores)
+        });
         interaction.followUp("check console");
-        //interaction.followUp(str.score.toString());
     }
 }
