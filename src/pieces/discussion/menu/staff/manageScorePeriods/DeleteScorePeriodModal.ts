@@ -8,11 +8,10 @@ const MODAL_ID_PREFIX = "delete_score_period_modal"
 const MODAL_TITLE_PREFIX = "Delete Score Period From CISC ";
 const SUCCESS_MESSAGE = "Score Period Was Successfully Removed!";
 
-// PRIMARY OPEN MODAL FUNCTION
 /**
  * @function creates a modal for deleting a score period
- * @param {string} courseTitle - the name of the course from which a score period is being deleted
- * @param {ButtonInteraction} interaction - the interaction that prompted the deleting of a score period
+ * @param {string} courseName - the name of the course from which a score period is being deleted
+ * @param {ButtonInteraction} triggerInteraction - the interaction that prompted the deleting of a score period
  */
 export async function openDeletePeriodModal(courseName: string, triggerInteraction: ButtonInteraction) {
     

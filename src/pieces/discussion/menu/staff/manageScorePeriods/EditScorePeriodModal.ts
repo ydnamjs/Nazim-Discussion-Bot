@@ -4,10 +4,9 @@ import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, e
 import { NewPeriodData, checkAgainstCurrentPeriods, createManagePeriodModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, validatePeriodInput } from "./ModalUtilities";
 
 const MODAL_ID_PREFIX = "edit_score_period_modal";
-const MODAL_TITLE_PREFIX = "Add Score Period To ";
-const SUCCESS_MESSAGE = "Score Period Successfully Updated";
+const MODAL_TITLE_PREFIX = "Edit Score Period In CISC ";
+const SUCCESS_MESSAGE = "Score Period Successfully Edited";
 
-// PRIMARY OPEN MODAL FUNCTION
 /**
  * @function opens an add score period modal for the given course as a result of the given interaction
  * @param courseTitle - the title of the corse that the score period is to be added to 
