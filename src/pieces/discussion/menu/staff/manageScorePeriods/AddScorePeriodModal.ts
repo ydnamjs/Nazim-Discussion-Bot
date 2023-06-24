@@ -1,7 +1,7 @@
 import { ButtonInteraction, ModalSubmitInteraction } from "discord.js";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, endDateActionRow, goalPointsActionRow, maxPointsActionRow, startDateActionRow } from "./ModalComponents";
-import { NewScorePeriodData, checkAgainstCurrentPeriods, createScorePeriodModal, handlePeriodValidation, insertOnePeriod, validateScorePeriodInput } from "./ModalUtilities";
+import { NewPeriodData, checkAgainstCurrentPeriods, createManagePeriodModal, handlePeriodValidation, insertOnePeriod, validatePeriodInput } from "./ModalUtilities";
 
 const MODAL_ID_PREFIX = "discussion_add_score_period_modal";
 const MODAL_TITLE_PREFIX = "Add Score Period To CISC ";
@@ -12,7 +12,7 @@ const SUCCESS_MESSAGE = "New Score Period Added!";
  * @param courseName - the name of the corse that the score period is to be added to 
  * @param triggerInteraction - the interaction that triggered the opening of this modal
  */
-export async function openAddScorePeriodModal(courseName: string, triggerInteraction: ButtonInteraction) {
+export async function openAddPeriodModal(courseName: string, triggerInteraction: ButtonInteraction) {
 
     const components = [
         startDateActionRow,
@@ -21,12 +21,12 @@ export async function openAddScorePeriodModal(courseName: string, triggerInterac
         maxPointsActionRow
     ];
     
-    await createScorePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
+    await createManagePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 
 async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
 
-    const periodValidationData = validateScorePeriodInput(submittedModal);
+    const periodValidationData = validatePeriodInput(submittedModal);
 
     const reasonsForFailure = handlePeriodValidation(periodValidationData)
 
@@ -34,7 +34,7 @@ async function handleModalInput(courseName: string, submittedModal: ModalSubmitI
         return INVALID_INPUT_PREFIX + reasonsForFailure;
     }
     
-    const newScorePeriod: NewScorePeriodData = {
+    const newScorePeriod: NewPeriodData = {
         start: periodValidationData.startDate as Date, 
         end: periodValidationData.endDate as Date, 
         goalPoints: periodValidationData.goalPoints, 

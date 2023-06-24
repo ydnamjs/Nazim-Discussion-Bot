@@ -77,7 +77,7 @@ const maxPointsInput = new TextInputBuilder({
 })
 
 // ACTION ROWS
-export const scorePeriodNumActionRow = new ActionRowBuilder<TextInputBuilder>({components: [periodNumInput]});
+export const periodNumActionRow = new ActionRowBuilder<TextInputBuilder>({components: [periodNumInput]});
 export const startDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [startDateInput]});
 export const endDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [endDateInput]});
 export const goalPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [goalPointsInput]});

@@ -215,7 +215,7 @@ export class ManageCourseMenu extends NavigatedMenu {
                     return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
                 },
                 resultingAction: (message, componentInteraction) => {
-                    updateToManagePeriodsMenu(courseTitle, componentInteraction, true, true);
+                    updateToManagePeriodsMenu(courseTitle, componentInteraction, true);
                 }
             },
 

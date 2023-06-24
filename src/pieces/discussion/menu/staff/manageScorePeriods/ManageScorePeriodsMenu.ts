@@ -4,9 +4,9 @@ import { getCourseByName } from "../../../../../generalUtilities/getCourseByName
 import { ComponentBehavior } from "../../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
-import { openAddScorePeriodModal } from "./AddScorePeriodModal";
-import { openDeleteScorePeriodModal } from "./DeleteScorePeriodModal";
-import { openEditScorePeriodModal } from "./EditScorePeriodModal";
+import { openAddPeriodModal as openAddPeriodModal } from "./AddScorePeriodModal";
+import { openDeletePeriodModal as openDeletePeriodModal } from "./DeleteScorePeriodModal";
+import { openEditPeriodModal as openEditPeriodModal } from "./EditScorePeriodModal";
 
 const MENU_TITLE_SUFFIX = " Manage Score Periods";
 const MENU_DESCRIPTION = "replace me";
@@ -78,11 +78,11 @@ const MANAGE_PERIODS_BUTTON_ROW = makeActionRowButton([ADD_PERIOD_BUTTON_DATA, E
  */
 export async function updateToManagePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
 
-    const scorePeriodData = await getScorePeriodData(courseName)
+    const periodData = await getPeriodData(courseName)
 
-    const manageScorePeriodsMenu = new ManagePeriodsMenu(courseName, scorePeriodData);
-    isInteractionUpdate ? componentInteraction.update(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(manageScorePeriodsMenu.menuMessageData as InteractionUpdateOptions);
-    manageScorePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
+    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
+    isInteractionUpdate ? componentInteraction.update(managePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(managePeriodsMenu.menuMessageData as InteractionUpdateOptions);
+    managePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }
 
 /**
@@ -92,20 +92,20 @@ export async function updateToManagePeriodsMenu(courseName: string, componentInt
  */
 export async function refreshManagePeriodsMenu(courseName: string, interaction: MessageComponentInteraction) {
 
-    const scorePeriodData = await getScorePeriodData(courseName)
+    const periodData = await getPeriodData(courseName)
     
-    const manageScorePeriodsMenu = new ManagePeriodsMenu(courseName, scorePeriodData);
-    interaction.message.edit({embeds: manageScorePeriodsMenu.menuMessageData.embeds});
+    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
+    interaction.message.edit({embeds: managePeriodsMenu.menuMessageData.embeds});
 }
 
-interface ScorePeriodDisplayData {
+interface PeriodDisplayData {
     start: Date,
     end: Date,
     goalPoints: number,
     maxPoints: number
 }
 
-async function getScorePeriodData (courseName: string) {
+async function getPeriodData (courseName: string) {
     
     let fetchedCourse = await getCourseByName(courseName)
     
@@ -113,9 +113,9 @@ async function getScorePeriodData (courseName: string) {
         return [];
     }
     
-    let scorePeriodData: ScorePeriodDisplayData[] = [];
+    let periodDisplayData: PeriodDisplayData[] = [];
             
-    scorePeriodData = fetchedCourse.discussionSpecs.scorePeriods.map((scorePeriod):ScorePeriodDisplayData => {
+    periodDisplayData = fetchedCourse.discussionSpecs.scorePeriods.map((scorePeriod):PeriodDisplayData => {
         return {
             start: scorePeriod.start,
             end: scorePeriod.end,
@@ -124,15 +124,15 @@ async function getScorePeriodData (courseName: string) {
         };
     })
 
-    scorePeriodData = scorePeriodData.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
+    periodDisplayData = periodDisplayData.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
 
-    return scorePeriodData;
+    return periodDisplayData;
 }
 
 class ManagePeriodsMenu extends NavigatedMenu {
-    constructor(courseTitle: string, scorePeriodsData: ScorePeriodDisplayData[]) {
+    constructor(courseTitle: string, periodDisplayData: PeriodDisplayData[]) {
         
-        let fields = makeScorePeriodFields(scorePeriodsData)
+        let fields = makePeriodFields(periodDisplayData)
 
         const MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
             {
@@ -149,7 +149,7 @@ class ManagePeriodsMenu extends NavigatedMenu {
                 },
                 resultingAction: (_message, componentInteraction) => {
                     if(componentInteraction instanceof ButtonInteraction)
-                    openAddScorePeriodModal(courseTitle, componentInteraction);
+                    openAddPeriodModal(courseTitle, componentInteraction);
                 }
             },
             {
@@ -158,7 +158,7 @@ class ManagePeriodsMenu extends NavigatedMenu {
                 },
                 resultingAction: (_message, componentInteraction) => {
                     if(componentInteraction instanceof ButtonInteraction)
-                    openEditScorePeriodModal(courseTitle, componentInteraction);
+                    openEditPeriodModal(courseTitle, componentInteraction);
                 }
             },
             {
@@ -167,7 +167,7 @@ class ManagePeriodsMenu extends NavigatedMenu {
                 },
                 resultingAction: (_message, componentInteraction) => {
                     if(componentInteraction instanceof ButtonInteraction)
-                    openDeleteScorePeriodModal(courseTitle, componentInteraction);
+                    openDeletePeriodModal(courseTitle, componentInteraction);
                 }
             }
         ]
@@ -184,7 +184,7 @@ class ManagePeriodsMenu extends NavigatedMenu {
     }
 }
 
-function makeScorePeriodFields(periodDisplayData: ScorePeriodDisplayData[]): APIEmbedField[] {
+function makePeriodFields(periodDisplayData: PeriodDisplayData[]): APIEmbedField[] {
     
     let fields: APIEmbedField[] = [];
     

@@ -11,7 +11,7 @@ import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POI
  */
 export type ModalInputHandler = (courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
 
-export async function createScorePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
+export async function createManagePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
     // the modal id has to be generated based on time 
     // because if it isnt and the user cancels the modal and opens another one
@@ -52,7 +52,7 @@ export async function createScorePeriodModal(idPrefix: string, titlePrefix: stri
  * @property {number} goalPoints - the goal points of a score period if valid (NaN if invalid)
  * @property {number} maxPoints - the maximum points of a score period if valid (NaN if invalid)
  */
-export interface ScorePeriodValidationData {
+export interface PeriodValidationData {
     startDate: Date | undefined, 
     endDate: Date | undefined,  
     goalPoints: number, 
@@ -62,9 +62,9 @@ export interface ScorePeriodValidationData {
 /**
  * @function generates validation data for the given score period
  * @param {ModalSubmitInteraction} submittedModal - the submitted modal interaction whose input is to be validated
- * @returns {ScorePeriodValidationData} scorePeriodInputData - data about the validity of each property of the score period
+ * @returns {PeriodValidationData} scorePeriodInputData - data about the validity of each property of the score period
  */
-export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction): ScorePeriodValidationData {
+export function validatePeriodInput(submittedModal: ModalSubmitInteraction): PeriodValidationData {
     
     const startDateString = submittedModal.fields.getTextInputValue(START_DATE_INPUT_ID);
     const startDateTime = DateTime.fromFormat(startDateString, DATE_STRING_FORMAT)
@@ -96,7 +96,7 @@ export function validateScorePeriodInput(submittedModal: ModalSubmitInteraction)
  * @param {ScorePeriodInputData} modalData - the validation data to handle
  * @returns {string} reasonsForFailure - the reasons why the data was invalid
  */
-export function handlePeriodValidation(modalData: ScorePeriodValidationData): string { 
+export function handlePeriodValidation(modalData: PeriodValidationData): string { 
     
     let reasonsForFailure = "";
     if(!modalData.startDate){
@@ -135,7 +135,7 @@ export function handleIndexValidation(scorePeriodIndex: number, scorePeriodsLeng
  * @property {number} goalPoints: the target number of points that can be earned in the new score period
  * @property {number} maxPoints: the maximum number of points that can be earned in the new score period
  */
-export interface NewScorePeriodData {
+export interface NewPeriodData {
     start: Date, 
     end: Date,  
     goalPoints: number, 
@@ -148,7 +148,7 @@ export interface NewScorePeriodData {
  * @param currentScorePeriods - the old score periods being checked against
  * @returns {boolean} hasConflict - whether or not the new score Period has a conflict with the current ones
  */
-export async function checkAgainstCurrentPeriods(newScorePeriodData: NewScorePeriodData, currentScorePeriods: ScorePeriod[]): Promise<boolean> {
+export async function checkAgainstCurrentPeriods(newScorePeriodData: NewPeriodData, currentScorePeriods: ScorePeriod[]): Promise<boolean> {
 
     let hasConflict = false;
     currentScorePeriods.forEach((scorePeriod) => {
@@ -166,7 +166,7 @@ export async function checkAgainstCurrentPeriods(newScorePeriodData: NewScorePer
  * @param {string} courseName - the name of the course that the score period is being added to
  * @param {string} successMessage - the message to be used in the reply on successful database insert
  */
-export async function insertOnePeriod( courseName: string, newScorePeriodData: NewScorePeriodData, scorePeriods: ScorePeriod[], submittedModal: ModalSubmitInteraction, successMessage: string ): Promise<string> {
+export async function insertOnePeriod( courseName: string, newScorePeriodData: NewPeriodData, scorePeriods: ScorePeriod[], submittedModal: ModalSubmitInteraction, successMessage: string ): Promise<string> {
 
     scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
     scorePeriods = scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })

@@ -1,7 +1,7 @@
 import { ButtonInteraction, ModalSubmitInteraction } from "discord.js";
 import { courseModel } from "../../../../../generalModels/Course";
-import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, scorePeriodNumActionRow } from "./ModalComponents";
-import { createScorePeriodModal, handleIndexValidation } from "./ModalUtilities";
+import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, periodNumActionRow } from "./ModalComponents";
+import { createManagePeriodModal, handleIndexValidation } from "./ModalUtilities";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 
 const MODAL_ID_PREFIX = "delete_score_period_modal"
@@ -14,13 +14,13 @@ const SUCCESS_MESSAGE = "Score Period Was Successfully Removed!";
  * @param {string} courseTitle - the name of the course from which a score period is being deleted
  * @param {ButtonInteraction} interaction - the interaction that prompted the deleting of a score period
  */
-export async function openDeleteScorePeriodModal(courseName: string, triggerInteraction: ButtonInteraction) {
+export async function openDeletePeriodModal(courseName: string, triggerInteraction: ButtonInteraction) {
     
     const components = [
-        scorePeriodNumActionRow
+        periodNumActionRow
     ];
     
-    await createScorePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
+    await createManagePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 
 async function handleModalInput(courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
