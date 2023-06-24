@@ -2,7 +2,9 @@ import { ApplicationCommandOptionType, ChannelType, Client, CommandInteraction, 
 import { Command } from "../../../command/Command";
 import { Course, courseModel } from "../../../generalModels/Course";
 import { getThreadMessages, scoreDiscussionItem, scoreThread } from "./scoreFunctions";
-import { CommentSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
+import { CommentSpecs, DiscussionSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
+import { DEFAULT_DISCUSSION_SPECS } from "../../../pieces/courseManagement/DiscussionRulesDefaults";
+import { getCourseByName } from "../../../generalUtilities/getCourseByName";
 
 export const testScore: Command = {
     
@@ -45,7 +47,11 @@ export const testScore: Command = {
         const str = await scoreDiscussionItem(message, course?.discussionSpecs?.commentSpecs as CommentSpecs, course?.roles.staff as string)
 
         */
-        getThreadMessages(client, interaction.options.get('message')?.value as string, {before: new Date("2023-06-24T09:25:00"), after: new Date("2023-06-24T08:24:00")})
+        //getThreadMessages(client, interaction.options.get('message')?.value as string, {before: new Date("2023-06-24T09:25:00"), after: new Date("2023-06-24T08:24:00")})
+    
+        const course = await getCourseByName("test") as Course
+
+        scoreThread(client, "1122138243979284490", course.discussionSpecs as DiscussionSpecs, {})
         interaction.followUp("check console");
         //interaction.followUp(str.score.toString());
     }

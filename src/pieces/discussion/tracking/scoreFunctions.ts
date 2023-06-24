@@ -19,6 +19,15 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
 
     periods.forEach((period) => wipeStudentScores(period));
 
+    const messages = await getThreadMessages(client, threadId, options)
+
+    console.log(messages.length);
+
+    const commentScores = scoreComments(messages, periods, commentSpecs)
+
+    console.log(commentScores[0].studentScores);
+
+    //TODO: Implement adding of scores to periods
     return periods
 }
 
@@ -33,8 +42,8 @@ export async function getThreadMessages(client: Client, threadId: string, option
     // we have to create some limit so that getting messages from a thread doesn't eat up all of the rate limit
     // Im not sure if it's possible but if we could make this depend on message count of a thread it might be faster to do many threads at once?
     // perhaps also a number that is passed in that keeps track of the number of requests made so that smaller threads dont eat up a whole thread delay for 3 messages?
-    const MESSAGE_FETCH_LIMIT = 10; // this is the limit enforced by discord
-    const MESSAGE_FETCH_DELAY = 1000 
+    const MESSAGE_FETCH_LIMIT = 100; // this is the limit enforced by discord
+    const MESSAGE_FETCH_DELAY = 1 // TODO: Make this not 0 when done testing 
 
     const ERROR_RETURN: never[] = []
 
@@ -115,6 +124,25 @@ export interface ScoreData {
     passedLinks: boolean
 }
 
+function scoreComments(messages: Message[], periods: ScorePeriod[], commentSpecs: CommentSpecs): ScorePeriod[] {
+    
+    messages.forEach((message) => {
+        const author = message.author
+        const scoreData = scoreDiscussionContent(message.content, commentSpecs);
+        const createdAt = message.createdAt
+
+        const properPeriod = periods.find((period) => {
+            return createdAt.valueOf() > period.start.valueOf() && createdAt.valueOf() < period.end.valueOf()
+        })
+
+        if(properPeriod) {
+            handlePeriodCommentScoreUpdate(properPeriod, author.id, scoreData)
+        }
+    })
+
+    return periods;
+}
+
 export async function scoreDiscussionItem(comment: Message, itemSpecs: CommentSpecs | PostSpecs, staffId: string): Promise<ScoreData> {
     
     const scoreData = scoreDiscussionContent(comment.content, itemSpecs)
@@ -124,6 +152,39 @@ export async function scoreDiscussionItem(comment: Message, itemSpecs: CommentSp
     scoreData.score += await scoreAllAwards(reactions, awards, staffId);
 
     return scoreData;
+}
+
+function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, commentScoreData: ScoreData) {
+    
+    let studentScoreData = period.studentScores.get(studentId)
+    
+    if(studentScoreData) {
+        studentScoreData.score += commentScoreData.score;
+        studentScoreData.numComments += 1;
+        if(isIncomplete(commentScoreData)) 
+            studentScoreData.numIncomComment += 1
+        //TODO: add number of awards and penalties incrementing when that's done
+    }
+    else {
+        console.log("adding")
+        period.studentScores.set(studentId,
+            {
+                score: commentScoreData.score,
+                numComments: 1,
+                numIncomComment: isIncomplete(commentScoreData) ? 1 : 0,
+                numPosts: 0,
+                numIncomPost: 0,
+                // TODO: Implement actual award counting once that is done in score discussion item
+                awardsRecieved: 0,
+                // TODO: Replace awards given with penalties recieved and implement that once that is done in score discussion item
+                awardsGiven: 0
+            }
+        )
+    }
+}
+
+function isIncomplete(scoreData: ScoreData): boolean {
+    return (!scoreData.passedLength || !scoreData.passedLinks || !scoreData.passedParagraph)
 }
 
 /**
