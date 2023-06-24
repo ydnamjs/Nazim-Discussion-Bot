@@ -69,6 +69,9 @@ export async function getThreadMessages(client: Client, threadId: string, option
         const fetchedMessages = [...(await threadChannel.messages.fetch({limit: MESSAGE_FETCH_LIMIT, before: lastFetchedMessage.id})).values()];
         messages.push(...fetchedMessages);
 
+        // we catch the after here and stop early to prevent wasting fetches on messages that would be removed
+        // we do have to remove messages between the end of the wave and start in case some of those are also after
+        // TODO: we might be able to remove the need for this by fetching messages one at and breaking on the one that is in violation of the after
         if(options && lastFetchedMessage && options.after && lastFetchedMessage.createdAt.valueOf() < options.after.valueOf() ) {
             removeMessagesAfterDate(messages, options.after);
             break;
@@ -81,7 +84,7 @@ export async function getThreadMessages(client: Client, threadId: string, option
         removeMessagesBeforeDate(messages, options.before);
     }
 
-    console.log(messages.map((message) => { return message.content }));
+    return messages;
 }
 
 function removeMessagesAfterDate(messages: Message[], date: Date) {
