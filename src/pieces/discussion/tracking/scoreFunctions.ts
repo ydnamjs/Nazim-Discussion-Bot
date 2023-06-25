@@ -20,16 +20,26 @@ export async function scoreAllThreadsInCourse(client: Client, courseName: string
         return undefined;
     }
 
+    let totalScorePeriods: ScorePeriod[] = loadDash.cloneDeep(course.discussionSpecs.scorePeriods);
+    totalScorePeriods.forEach((scorePeriod) => {
+        wipeStudentScores(scorePeriod);
+    })
+
     for(const thread of threads) {
         console.log("\n" + thread.name);
-        const threadScores = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, options)
+        const threadScoresPeriods = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, options)
 
-        threadScores.forEach(element => {
+        threadScoresPeriods.forEach(element => {
             console.log(element.studentScores)
+            totalScorePeriods = addScorePeriodArrays(totalScorePeriods, threadScoresPeriods)
         });
-
     }
 
+    console.log("total: ");
+    totalScorePeriods.forEach((scorePeriod)=> {
+        console.log(scorePeriod.studentScores)
+    })
+    return totalScorePeriods;
 }
 
 async function getAllDiscussionThreads(client: Client, courseName: string) {
@@ -51,6 +61,77 @@ async function getAllDiscussionThreads(client: Client, courseName: string) {
     const forumThreads = [...forumChannel.threads.cache.values()];
 
     return forumThreads;
+}
+
+function addScorePeriodArrays(scorePeriodsA: ScorePeriod[], scorePeriodsB: ScorePeriod[]) {
+    if(scorePeriodsA.length !== scorePeriodsB.length) {
+        throw new Error("ERROR CANNOT ADD TWO SCORE PERIOD ARRAYS OF DIFFERENT LENGTH");
+    }
+
+    const combinedScorePeriods = scorePeriodsA.map((_scorePeriod, index) => {
+        return addScorePeriods(scorePeriodsA[index], scorePeriodsB[index])
+    })
+
+    return combinedScorePeriods;
+}
+
+function addScorePeriods(scorePeriodA: ScorePeriod, scorePeriodB: ScorePeriod) {
+    
+    const EMPTY_SCORE_VALUE: StudentScoreData = {
+        score: 0,
+        numPosts: 0,
+        numIncomPost: 0,
+        numComments: 0,
+        numIncomComment: 0,
+        awardsRecieved: 0,
+        penaltiesRecieved: 0
+    }
+
+    let combinedScorePeriod = loadDash.cloneDeep(scorePeriodA);
+    combinedScorePeriod.studentScores = new Map<string, StudentScoreData>();
+
+    const periodAKeys = [...scorePeriodA.studentScores.keys()]
+    const periodBKeys = [...scorePeriodB.studentScores.keys()]
+
+    periodAKeys.forEach(key => {
+        combinedScorePeriod.studentScores.set(key, EMPTY_SCORE_VALUE)
+    });
+
+    periodBKeys.forEach(key => {
+        combinedScorePeriod.studentScores.set(key, EMPTY_SCORE_VALUE)
+    });
+
+    const unionedKeys = [...combinedScorePeriod.studentScores.keys()]
+
+    unionedKeys.forEach((key) => {
+        let studentsScore = combinedScorePeriod.studentScores.get(key) as StudentScoreData // the as is here because we know with certainty that the key will be there
+
+        const aScoreData = scorePeriodA.studentScores.get(key)
+        const bScoreData = scorePeriodB.studentScores.get(key)
+
+        if(aScoreData) {
+            studentsScore = addStudentScores(studentsScore, aScoreData)
+        }
+        if(bScoreData) {
+            studentsScore = addStudentScores(studentsScore, bScoreData)
+        }
+    })
+
+    console.log("add period result")
+    console.log(combinedScorePeriod.studentScores)
+    return combinedScorePeriod;
+}
+
+function addStudentScores(studentScoreA: StudentScoreData, studentScoreB: StudentScoreData): StudentScoreData {
+    return {
+        score: studentScoreA.score + studentScoreB.score,
+        numPosts: studentScoreA.numPosts + studentScoreB.numPosts,
+        numIncomPost: studentScoreA.numIncomPost + studentScoreB.numIncomPost,
+        numComments: studentScoreA.numComments + studentScoreB.numComments,
+        numIncomComment: studentScoreA.numIncomComment + studentScoreB.numIncomComment,
+        awardsRecieved: studentScoreA.awardsRecieved + studentScoreB.awardsRecieved,
+        penaltiesRecieved: studentScoreA.penaltiesRecieved + studentScoreB.penaltiesRecieved,
+    }
 }
 
 /**
