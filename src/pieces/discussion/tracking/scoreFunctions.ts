@@ -6,7 +6,7 @@ import { getChannelInMainGuild } from "../../../generalUtilities/getChannelInMai
 import { getCourseByName } from "../../../generalUtilities/getCourseByName";
 import { wait } from "../../../generalUtilities/wait";
 
-export async function scoreAllThreadsInCourse(client: Client, courseName: string, options?: ScoreThreadOptions) {
+export async function scoreAllThreadsInCourse(client: Client, courseName: string, options?: Partial<ScoreThreadOptions>) {
 
     const threads = await getAllDiscussionThreads(client, courseName);
 
@@ -30,6 +30,10 @@ export async function scoreAllThreadsInCourse(client: Client, courseName: string
         totalScorePeriods = addScorePeriodArrays(totalScorePeriods, threadScoresPeriods);
     }
 
+    console.log("total: ");
+    totalScorePeriods.forEach((scorePeriod)=> {
+        console.log(scorePeriod.studentScores)
+    })
     return totalScorePeriods;
 }
 
@@ -100,20 +104,20 @@ function addScorePeriods(scorePeriodA: ScorePeriod, scorePeriodB: ScorePeriod) {
         const bScoreData = scorePeriodB.studentScores.get(key)
 
         if(aScoreData) {
-            combinedScorePeriod.studentScores.set(key, addStudentScores(combinedScorePeriod.studentScores.get(key) as StudentScoreData, aScoreData))
+            combinedScorePeriod.studentScores.set(key, addStudentScores(combinedScorePeriod.studentScores.get(key) as StudentScoreData, aScoreData, combinedScorePeriod.maxPoints))
         }
         if(bScoreData) {
-            combinedScorePeriod.studentScores.set(key, addStudentScores(combinedScorePeriod.studentScores.get(key) as StudentScoreData, bScoreData))
+            combinedScorePeriod.studentScores.set(key, addStudentScores(combinedScorePeriod.studentScores.get(key) as StudentScoreData, bScoreData, combinedScorePeriod.maxPoints))
         }
     })
 
     return combinedScorePeriod;
 }
 
-function addStudentScores(studentScoreA: StudentScoreData, studentScoreB: StudentScoreData): StudentScoreData {
+function addStudentScores(studentScoreA: StudentScoreData, studentScoreB: StudentScoreData, periodMax: number): StudentScoreData {
 
     return {
-        score: studentScoreA.score + studentScoreB.score,
+        score: Math.min(studentScoreA.score + studentScoreB.score, periodMax),
         numPosts: studentScoreA.numPosts + studentScoreB.numPosts,
         numIncomPost: studentScoreA.numIncomPost + studentScoreB.numIncomPost,
         numComments: studentScoreA.numComments + studentScoreB.numComments,
@@ -152,9 +156,12 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
 
     periods.forEach((period) => wipeStudentScores(period));
 
+    // FIXME: Currently this leads to some werid behavior with giving points for comments made in later score periods due to the options feature
+    // still waiting to here back from nazim about how those points should be factored in (points go to post's score period or comment made's score period)
+    // might just do a boolean value and let the user switch between as they please (if this fixme is fixed delete the one that is also on line 318-320)
     const messages = await getThreadMessages(client, threadId, options)
 
-    //console.log(messages.length);
+    console.log(messages.length);
 
     const commentScoredPeriods = await scoreComments(messages, periods, commentSpecs, staffId)
 
@@ -311,6 +318,9 @@ async function scorePost(message: Message, comments: Message[], postSpecs: PostS
     // we wouldnt want posters to recieve extra points for comments they leave
     const commentsFiltered = comments.filter(comment => comment.author.id !== postAuthor.id)
 
+    // FIXME: Currently this leads to some werid behavior with giving points for comments made in later score periods due to the options feature
+    // still waiting to here back from nazim about how those points should be factored in (points go to post's score period or comment made's score period)
+    // might just do a boolean value and let the user switch between as they please (if this fixme is fixed delete the one that is also on lines 159 - 161)
     scoreData.score += commentsFiltered.length * postSpecs.commentPoints;
 
     return scoreData;
@@ -345,7 +355,7 @@ function handlePeriodScoreUpdate(period: ScorePeriod, studentId: string, updateS
         
     if(studentScoreData) {
     
-        studentScoreData.score += updateScoreData.score;
+        studentScoreData.score = Math.min(studentScoreData.score + updateScoreData.score, period.maxPoints);
         studentScoreData.numPosts += isCommentUpdate ? 0 : 1;
         if(isIncomplete(updateScoreData) && !isCommentUpdate) 
             studentScoreData.numIncomPost += 1;

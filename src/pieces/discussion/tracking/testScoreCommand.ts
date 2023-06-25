@@ -28,39 +28,13 @@ export const testScore: Command = {
 
 	run: async (client: Client, interaction: CommandInteraction) => {
         
-        /*
-        
-        let course: Course | null = null;
-        try {
-            course = await courseModel.findOne({name: interaction.options.get('course')?.value});
-        }
-        catch(error: any) {
-            console.error(error);
-        }
+        //const BEFORE = new Date("2023-06-25 02:02:00 PM");
 
-        const forum = await client.channels.fetch(course?.channels.discussion as string) as ForumChannel
-
-        const messageId = interaction.options.get('message')?.value as string
-
-        const message = await forum.threads.cache.get("1120907827947520102")?.messages.fetch(messageId) as Message
-
-        const str = await scoreDiscussionItem(message, course?.discussionSpecs?.commentSpecs as CommentSpecs, course?.roles.staff as string)
-
-        */
-        //getThreadMessages(client, interaction.options.get('message')?.value as string, {before: new Date("2023-06-24T09:25:00"), after: new Date("2023-06-24T08:24:00")})
-    /*
-        const course = await getCourseByName("test") as Course
-
-        const periods = await scoreThread(client, "1122138243979284490", course.discussionSpecs as DiscussionSpecs, course.roles.staff,{})
-        
-        scoreAllThreadsInCourse(client, "test")
-
-        periods.forEach(element => {
-            console.log(element.studentScores)
-        });
-    */
+        //console.log("scoring all threads before " + BEFORE.toDateString())
    
-        scoreAllThreadsInCourse(client, "test")
+        //{before: BEFORE}
+
+        scoreAllThreadsInCourse(client, "test", )
 
         interaction.followUp("check console");
     }
