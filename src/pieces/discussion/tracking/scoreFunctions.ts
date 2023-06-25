@@ -26,19 +26,11 @@ export async function scoreAllThreadsInCourse(client: Client, courseName: string
     })
 
     for(const thread of threads) {
-        console.log("\n" + thread.name);
-        const threadScoresPeriods = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, options)
 
-        threadScoresPeriods.forEach(element => {
-            console.log(element.studentScores)
-            totalScorePeriods = addScorePeriodArrays(totalScorePeriods, threadScoresPeriods)
-        });
+        const threadScoresPeriods = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, options);
+        totalScorePeriods = addScorePeriodArrays(totalScorePeriods, threadScoresPeriods);
     }
 
-    console.log("total: ");
-    totalScorePeriods.forEach((scorePeriod)=> {
-        console.log(scorePeriod.studentScores)
-    })
     return totalScorePeriods;
 }
 
@@ -104,25 +96,23 @@ function addScorePeriods(scorePeriodA: ScorePeriod, scorePeriodB: ScorePeriod) {
     const unionedKeys = [...combinedScorePeriod.studentScores.keys()]
 
     unionedKeys.forEach((key) => {
-        let studentsScore = combinedScorePeriod.studentScores.get(key) as StudentScoreData // the as is here because we know with certainty that the key will be there
 
         const aScoreData = scorePeriodA.studentScores.get(key)
         const bScoreData = scorePeriodB.studentScores.get(key)
 
         if(aScoreData) {
-            studentsScore = addStudentScores(studentsScore, aScoreData)
+            combinedScorePeriod.studentScores.set(key, addStudentScores(combinedScorePeriod.studentScores.get(key) as StudentScoreData, aScoreData))
         }
         if(bScoreData) {
-            studentsScore = addStudentScores(studentsScore, bScoreData)
+            combinedScorePeriod.studentScores.set(key, addStudentScores(combinedScorePeriod.studentScores.get(key) as StudentScoreData, bScoreData))
         }
     })
 
-    console.log("add period result")
-    console.log(combinedScorePeriod.studentScores)
     return combinedScorePeriod;
 }
 
 function addStudentScores(studentScoreA: StudentScoreData, studentScoreB: StudentScoreData): StudentScoreData {
+
     return {
         score: studentScoreA.score + studentScoreB.score,
         numPosts: studentScoreA.numPosts + studentScoreB.numPosts,
@@ -325,7 +315,6 @@ async function scorePost(message: Message, comments: Message[], postSpecs: PostS
     scoreData.score += commentsFiltered.length * postSpecs.commentPoints;
 
     return scoreData;
-
 }
 
 /**
@@ -363,36 +352,37 @@ function handlePeriodPostScoreUpdate(period: ScorePeriod, studentId: string, pos
 
 function handlePeriodScoreUpdate(period: ScorePeriod, studentId: string, updateScoreData: MessageScoreData, isCommentUpdate: boolean) {
         
-        let studentScoreData = period.studentScores.get(studentId)
+    let studentScoreData = period.studentScores.get(studentId)
         
-        if(studentScoreData) {
+    if(studentScoreData) {
     
-            studentScoreData.score += updateScoreData.score;
-            studentScoreData.numPosts += isCommentUpdate ? 0 : 1;
-            if(isIncomplete(updateScoreData) && !isCommentUpdate) 
-                studentScoreData.numIncomPost += 1;
-            studentScoreData.numComments += isCommentUpdate ? 1 : 0;
-            if(isIncomplete(updateScoreData) && isCommentUpdate) 
-                studentScoreData.numIncomComment += 1;
-            studentScoreData.awardsRecieved += updateScoreData.numAwards;
-            studentScoreData.penaltiesRecieved += updateScoreData.numPenalties;
-            return
-        }
-        
-        period.studentScores.set(studentId,
-            {
-                score: updateScoreData.score,
-                numPosts: isCommentUpdate ? 0 : 1,
-                numIncomPost: isCommentUpdate ? 0 : isIncomplete(updateScoreData) ? 1 : 0,
-                numComments: isCommentUpdate ? 1 : 0,
-                numIncomComment: isCommentUpdate ? isIncomplete(updateScoreData) ? 1 : 0 : 0,
-                awardsRecieved: updateScoreData.numAwards,
-                penaltiesRecieved: updateScoreData.numPenalties
-            }
-        )
+        studentScoreData.score += updateScoreData.score;
+        studentScoreData.numPosts += isCommentUpdate ? 0 : 1;
+        if(isIncomplete(updateScoreData) && !isCommentUpdate) 
+            studentScoreData.numIncomPost += 1;
+        studentScoreData.numComments += isCommentUpdate ? 1 : 0;
+        if(isIncomplete(updateScoreData) && isCommentUpdate) 
+            studentScoreData.numIncomComment += 1;
+        studentScoreData.awardsRecieved += updateScoreData.numAwards;
+        studentScoreData.penaltiesRecieved += updateScoreData.numPenalties;
+        return
     }
+        
+    period.studentScores.set(studentId,
+        {
+            score: updateScoreData.score,
+            numPosts: isCommentUpdate ? 0 : 1,
+            numIncomPost: isCommentUpdate ? 0 : isIncomplete(updateScoreData) ? 1 : 0,
+            numComments: isCommentUpdate ? 1 : 0,
+            numIncomComment: isCommentUpdate ? isIncomplete(updateScoreData) ? 1 : 0 : 0,
+            awardsRecieved: updateScoreData.numAwards,
+            penaltiesRecieved: updateScoreData.numPenalties
+        }
+    )
+}
 
 function isIncomplete(scoreData: MessageScoreData): boolean {
+    
     return (!scoreData.passedLength || !scoreData.passedLinks || !scoreData.passedParagraph)
 }
 
@@ -418,11 +408,11 @@ export function scoreDiscussionContent(content: string, specs: CommentSpecs | Po
         score = specs.points;    
     }
 
-    return {score, passedLength, passedParagraph, passedLinks, numAwards: 0, numPenalties: 0}
-
+    return {score, passedLength, passedParagraph, passedLinks, numAwards: 0, numPenalties: 0};
 }
 
 function countParagraphs(content: string):number {
+    
     const countArr =  content.match(/\n+/g || [])
     
     if(!countArr) {
@@ -433,6 +423,7 @@ function countParagraphs(content: string):number {
 }
 
 function countLinks(content: string):number {
+    
     const countArr =  content.match(/http+/g || [])
     
     if(!countArr) {
