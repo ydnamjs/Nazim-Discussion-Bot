@@ -1,11 +1,10 @@
-import { ChannelType, Client, ForumChannel, Message, MessageReaction, User } from "discord.js";
+import { Client, ForumChannel, Message, MessageReaction, User } from "discord.js";
 import loadDash from "lodash";
 import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, StudentScoreData } from "../../../generalModels/DiscussionScoring";
 import { userHasRoleWithId } from "../../../generalUtilities/GetRolesOfUserInGuild";
 import { getChannelInMainGuild } from "../../../generalUtilities/getChannelInMain";
-import { wait } from "../../../generalUtilities/wait";
 import { getCourseByName } from "../../../generalUtilities/getCourseByName";
-import { channel } from "diagnostics_channel";
+import { wait } from "../../../generalUtilities/wait";
 
 export async function scoreAllThreadsInCourse(client: Client, courseName: string, options?: ScoreThreadOptions) {
 
@@ -169,7 +168,7 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
 
         if(postPeriod){
             const postScoreData = await scorePost(originalPost, messages, postSpecs, staffId)
-            handlePeriodPostScoreUpdate(postPeriod, originalPost.author.id, postScoreData)
+            handlePeriodScoreUpdate(postPeriod, originalPost.author.id, postScoreData, false)
         }
     }
 
@@ -300,7 +299,7 @@ async function scoreComment(message: Message, periods: ScorePeriod[], commentSpe
     })
 
     if(properPeriod) {
-        handlePeriodCommentScoreUpdate(properPeriod, author.id, scoreData)
+        handlePeriodScoreUpdate(properPeriod, author.id, scoreData, true)
     }
 }
 
@@ -338,16 +337,6 @@ export async function scoreDiscussionMessage(message: Message, messageSpecs: Com
     messageScoreData.numPenalties += awardScoreData.numPenalties;
 
     return messageScoreData;
-}
-
-function handlePeriodCommentScoreUpdate(period: ScorePeriod, studentId: string, commentScoreData: MessageScoreData) {
-    
-    handlePeriodScoreUpdate(period, studentId, commentScoreData, true)
-}
-
-function handlePeriodPostScoreUpdate(period: ScorePeriod, studentId: string, postScoreData: MessageScoreData) {
-    
-    handlePeriodScoreUpdate(period, studentId, postScoreData, false)
 }
 
 function handlePeriodScoreUpdate(period: ScorePeriod, studentId: string, updateScoreData: MessageScoreData, isCommentUpdate: boolean) {
