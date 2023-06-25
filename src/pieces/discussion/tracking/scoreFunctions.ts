@@ -30,10 +30,6 @@ export async function scoreAllThreadsInCourse(client: Client, courseName: string
         totalScorePeriods = addScorePeriodArrays(totalScorePeriods, threadScoresPeriods);
     }
 
-    console.log("total: ");
-    totalScorePeriods.forEach((scorePeriod)=> {
-        console.log(scorePeriod.studentScores)
-    })
     return totalScorePeriods;
 }
 
@@ -161,7 +157,7 @@ export async function scoreThread(client: Client, threadId: string, discussionSp
     // might just do a boolean value and let the user switch between as they please (if this fixme is fixed delete the one that is also on line 318-320)
     const messages = await getThreadMessages(client, threadId, options)
 
-    console.log(messages.length);
+    //console.log(messages.length);
 
     const commentScoredPeriods = await scoreComments(messages, periods, commentSpecs, staffId)
 
@@ -193,8 +189,8 @@ async function getThreadMessages(client: Client, threadId: string, options?: Par
     // we have to create some limit so that getting messages from a thread doesn't eat up all of the rate limit
     // Im not sure if it's possible but if we could make this depend on message count of a thread it might be faster to do many threads at once?
     // perhaps also a number that is passed in that keeps track of the number of requests made so that smaller threads dont eat up a whole thread delay for 3 messages?
-    const MESSAGE_FETCH_LIMIT = 100; // this is the limit enforced by discord
-    const MESSAGE_FETCH_DELAY = 1 // TODO: Make this not 0 when done testing 
+    const MESSAGE_FETCH_LIMIT = 10; // this is the limit enforced by discord
+    const MESSAGE_FETCH_DELAY = 1000 // TODO: Make this not 0 when done testing 
 
     const ERROR_RETURN: never[] = [];
 

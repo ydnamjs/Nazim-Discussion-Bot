@@ -42,17 +42,17 @@ export async function sendDismissableReply(message: Message, text: string) {
  * @param {string} text - the content of the message
  * @throws {Error} unrepliableInteractionError - thrown when interaction is not repliable
  */
-export async function sendDismissableInteractionReply(interaction: BaseInteraction, text: string) {
+export async function sendDismissableFollowUp(interaction: BaseInteraction, text: string) {
 
     if(interaction.isRepliable()) {
-        const replyMessage = await interaction.reply({
+        const followUp = await interaction.followUp({
             content: text,
             components: [dismissRow]
         });
         try {
-            await replyMessage.awaitMessageComponent( {filter: (i: BaseInteraction) => i.user.id === interaction.user.id, time: DISMISSABLE_MESSAGE_DURATION } );
+            await followUp.awaitMessageComponent( {filter: (i: BaseInteraction) => i.user.id === interaction.user.id, time: DISMISSABLE_MESSAGE_DURATION } );
         } catch {}
-        replyMessage.delete()
+        followUp.delete()
     } 
 
     else {

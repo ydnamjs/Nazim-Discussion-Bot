@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonInteraction, Client, ModalBuilder, ModalSubmitI
 import { DateTime } from "luxon";
 import { Course, courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
-import { sendDismissableInteractionReply } from "../../../../../generalUtilities/DismissableMessage";
+import { sendDismissableFollowUp } from "../../../../../generalUtilities/DismissableMessage";
 import { refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
 import { scoreAllThreadsInCourse } from "../../../../../pieces/discussion/tracking/scoreFunctions";
@@ -40,9 +40,10 @@ export async function createManagePeriodModal(idPrefix: string, titlePrefix: str
     catch {}
 
     if (submittedModal !== undefined) {
+        submittedModal.deferReply()
         const replyText = await modalInputHandler(triggerInteraction.client, courseName, submittedModal);
         refreshManagePeriodsMenu(courseName, triggerInteraction);
-        sendDismissableInteractionReply(submittedModal, replyText);
+        sendDismissableFollowUp(submittedModal, replyText);
     }
 }
 
@@ -180,7 +181,8 @@ export async function insertOnePeriod(client: Client, courseName: string, newSco
     const insertErrors = await overwritePeriods(courseName, scorePeriods)
 
     if(insertErrors === "") {
-        scoreAllThreadsInCourse(client, courseName)
+        const newScorePeriods = await scoreAllThreadsInCourse(client, courseName, {before: newScorePeriodData.end, after: newScorePeriodData.start}) as ScorePeriod[];
+        console.log(newScorePeriods[0].studentScores);
     }
 
     return insertErrors;
