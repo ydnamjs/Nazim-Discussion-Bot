@@ -6,27 +6,24 @@ import { getChannelInMainGuild } from "../../../generalUtilities/getChannelInMai
 import { getCourseByName } from "../../../generalUtilities/getCourseByName";
 import { wait } from "../../../generalUtilities/wait";
 
-export async function scoreAllThreadsInCourse(client: Client, courseName: string, options?: Partial<ScoreThreadOptions>) {
+export async function scoreAllThreadsInCourse(client: Client, courseName: string, customPeriods?: ScorePeriod[], options?: Partial<ScoreThreadOptions>) {
 
     const threads = await getAllDiscussionThreads(client, courseName);
 
-    if(!threads)
-        return
-
     const course = await getCourseByName(courseName);
 
-    if(!course || !course.discussionSpecs) {
+    if(!threads || !course || !course.discussionSpecs) {
         return undefined;
     }
 
-    let totalScorePeriods: ScorePeriod[] = loadDash.cloneDeep(course.discussionSpecs.scorePeriods);
+    let totalScorePeriods: ScorePeriod[] = loadDash.cloneDeep( customPeriods? customPeriods : course.discussionSpecs.scorePeriods);
     totalScorePeriods.forEach((scorePeriod) => {
         wipeStudentScores(scorePeriod);
     })
 
     for(const thread of threads) {
 
-        const threadScoresPeriods = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, options);
+        const threadScoresPeriods = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, customPeriods, options);
         totalScorePeriods = addScorePeriodArrays(totalScorePeriods, threadScoresPeriods);
     }
 
@@ -144,11 +141,11 @@ export interface ScoreThreadOptions {
  * @param {Date} options.after **optional** the date which the post / all comments have to be made after to be counted in scoring
  * @returns {Promise<ScorePeriod[]>}
  */
-export async function scoreThread(client: Client, threadId: string, discussionSpecs: DiscussionSpecs, staffId: string, options?: Partial<ScoreThreadOptions>): Promise<ScorePeriod[]> {
+export async function scoreThread(client: Client, threadId: string, discussionSpecs: DiscussionSpecs, staffId: string, customPeriods?: ScorePeriod[], options?: Partial<ScoreThreadOptions>): Promise<ScorePeriod[]> {
     
     const postSpecs = discussionSpecs.postSpecs;
     const commentSpecs = discussionSpecs.commentSpecs;
-    const periods = loadDash.cloneDeep(discussionSpecs.scorePeriods) // Make a deep copy so we dont overwrite when scoring multiple threads
+    const periods = loadDash.cloneDeep(customPeriods ? customPeriods : discussionSpecs.scorePeriods) // Make a deep copy so we dont overwrite when scoring multiple threads
 
     periods.forEach((period) => wipeStudentScores(period));
 

@@ -175,16 +175,14 @@ export async function checkAgainstCurrentPeriods(newScorePeriodData: NewPeriodDa
  */
 export async function insertOnePeriod(client: Client, courseName: string, newScorePeriodData: NewPeriodData, scorePeriods: ScorePeriod[]): Promise<string> {
 
-    scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
     scorePeriods = scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
+    const newScorePeriods = await scoreAllThreadsInCourse(client, courseName, [{ ...newScorePeriodData, studentScores: new Map() }])
     
-    const insertErrors = await overwritePeriods(courseName, scorePeriods)
+    if(!newScorePeriods || newScorePeriods.length !== 1)
+        return "scoring error ocurred";
 
-    if(insertErrors === "") {
-        const newScorePeriods = await scoreAllThreadsInCourse(client, courseName, {before: newScorePeriodData.end, after: newScorePeriodData.start}) as ScorePeriod[];
-        console.log(newScorePeriods[0].studentScores);
-    }
-
+    scorePeriods.push(newScorePeriods[0])
+    let insertErrors = await overwritePeriods(courseName, scorePeriods)
     return insertErrors;
 }
 
