@@ -21,10 +21,22 @@ export async function scoreAllThreadsInCourse(client: Client, courseName: string
         wipeStudentScores(scorePeriod);
     })
 
+
+    let lockedThreads = [];
+    for(let thread of threads) {
+
+        lockedThreads.push(await thread.setLocked(true));
+    }
+
     for(const thread of threads) {
 
         const threadScoresPeriods = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, customPeriods, options);
         totalScorePeriods = addScorePeriodArrays(totalScorePeriods, threadScoresPeriods);
+    }
+
+    for(const lockedThread of lockedThreads) {
+
+        await lockedThread.setLocked(false);
     }
 
     return totalScorePeriods;
