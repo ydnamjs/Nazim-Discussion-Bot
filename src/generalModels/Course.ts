@@ -63,7 +63,16 @@ export const course_schema: Schema = new mongoose.Schema({
             start: Date,
             end: Date,
             goalPoints: number,
-            maxPoints: number
+            maxPoints: number,
+            studentScores: Map<string, {
+                score: number,
+                numPosts: number,
+                numIncomPost: number,
+                numComments: number,
+                numIncomComment: number,
+                awardsRecieved: number,
+                awardsGiven: number
+            }>
         }>
     }
 },

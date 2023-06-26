@@ -50,7 +50,7 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     // replace the old menu with the staff menu
     const staffMenu = new StaffMenu(courseInfo);
     componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
-    staffMenu.collectMenuInteraction(componentInteraction, message);
+    staffMenu.collectMenuInteraction(componentInteraction.user, message);
 }
 
 /** 

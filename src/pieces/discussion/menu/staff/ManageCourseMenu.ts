@@ -4,6 +4,7 @@ import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow"
 import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { ComponentBehavior } from "../BaseMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
+import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
@@ -28,7 +29,7 @@ const MANAGE_COMMENT_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
 
 const MANAGE_SCORE_PERIODS_BUTTON_ID = "discussion-manage-score-periods";
 const MANAGE_SCORE_PERIODS_BUTTON_LABEL = "Score Periods";
-const MANAGE_SCORE_PERIODS_BUTTON_DISABLED = true;
+const MANAGE_SCORE_PERIODS_BUTTON_DISABLED = false;
 const MANAGE_SCORE_PERIODS_BUTTON_STYLE = ButtonStyle.Secondary
 
 const VIEW_STUDENTS_BUTTON_ID = "discussion-view-students";
@@ -110,7 +111,7 @@ export async function updateToManageCourseMenu(name: string, message: Message, c
     // replace the old menu with the manage course menu
     const manageCourseMenu = new ManageCourseMenu(name);
     componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
-    manageCourseMenu.collectMenuInteraction(componentInteraction, message);
+    manageCourseMenu.collectMenuInteraction(componentInteraction.user, message);
 }
 
 // MENU TEXT CONSTANTS
@@ -214,7 +215,7 @@ export class ManageCourseMenu extends NavigatedMenu {
                     return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
                 },
                 resultingAction: (message, componentInteraction) => {
-                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                    updateToManagePeriodsMenu(courseTitle, componentInteraction, true);
                 }
             },
 

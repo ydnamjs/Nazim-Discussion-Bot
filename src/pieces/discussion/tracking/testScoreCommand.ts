@@ -1,8 +1,10 @@
 import { ApplicationCommandOptionType, ChannelType, Client, CommandInteraction, ForumChannel, Message, ThreadChannel } from "discord.js";
 import { Command } from "../../../command/Command";
 import { Course, courseModel } from "../../../generalModels/Course";
-import { scoreWholeComment, scoreWholePost } from "./scoreFunctions";
-import { CommentSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
+import { scoreAllThreadsInCourse, scoreDiscussionMessage, scoreThread } from "./scoreFunctions";
+import { CommentSpecs, DiscussionSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
+import { DEFAULT_DISCUSSION_SPECS } from "../../../pieces/courseManagement/DiscussionRulesDefaults";
+import { getCourseByName } from "../../../generalUtilities/getCourseByName";
 
 export const testScore: Command = {
     
@@ -25,22 +27,15 @@ export const testScore: Command = {
     ],
 
 	run: async (client: Client, interaction: CommandInteraction) => {
-        let course: Course | null = null;
-        try {
-            course = await courseModel.findOne({name: interaction.options.get('course')?.value});
-        }
-        catch(error: any) {
-            console.error(error);
-        }
+        
+        //const BEFORE = new Date("2023-06-25 02:02:00 PM");
 
-        const forum = await client.channels.fetch(course?.channels.discussion as string) as ForumChannel
+        //console.log("scoring all threads before " + BEFORE.toDateString())
+   
+        //{before: BEFORE}
 
-        const messageId = interaction.options.get('message')?.value as string
+        scoreAllThreadsInCourse(client, "test", )
 
-        const message = await forum.threads.cache.get("1120907827947520102")?.messages.fetch(messageId) as Message
-
-        const str = await scoreWholeComment(message, course?.discussionSpecs?.commentSpecs as CommentSpecs, course?.roles.staff as string)
-
-        interaction.followUp(str.score.toString());
+        interaction.followUp("check console");
     }
 }
