@@ -10,7 +10,7 @@ const TITLE_COURSE_PREFIX = "Students of CISC ";
 const MENU_DESCRIPTION = "replace me";
 const STUDENT_USERNAME_PREFIX = "username: ";
 const STUDENT_NICKNAME_PREFIX = " - server nickname: ";
-const STUDENT_NUM_POSTS_PREFIX = "# posts: ";
+const STUDENT_NUM_POSTS_PREFIX = "\n# posts: ";
 const STUDENT_NUM_COMMENTS_PREFIX = "\n# comments: ";
 const STUDENT_INCOMPLETE_PREFIX = " (";
 const STUDENT_INCOMPLETE_SUFFIX = " incomplete)"
@@ -36,11 +36,15 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
         start: new Date(),
         end: new Date(),
         goalPoints: 0,
-        maxPoints: 0,
+        maxPoints: Number.MAX_VALUE,
         studentScores: new Map<string, StudentScoreData>()
     }
 
+    let totalGoalScore = 0;
+    let totalMaxScore = 0;
     course.discussionSpecs.scorePeriods.forEach( (scorePeriod) => {
+        totalGoalScore += scorePeriod.goalPoints;
+        totalMaxScore += scorePeriod.maxPoints;
         totalPeriod = addScorePeriods(totalPeriod, scorePeriod)
     })
 
@@ -72,7 +76,7 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
         })
     }
 
-    const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData);
+    const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData, totalGoalScore, totalMaxScore);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
     viewStudentsMenu.collectMenuInteraction(componentInteraction.user, message);
 }
@@ -94,20 +98,19 @@ export interface DiscussionStudentData {
 }
 
 export class ViewStudentsMenu extends NavigatedMenu {
-    constructor(courseTitle: string, studentData: DiscussionStudentData[]) {
+    constructor(courseTitle: string, studentData: DiscussionStudentData[], goalScore: number, maxScore: number) {
         
-        // generate the fields of basic info for each course and the select menu options
         let fields: { name: string; value: string; }[] = [];
         studentData.forEach(student => {
             fields.push({
                 name: STUDENT_USERNAME_PREFIX + student.username + (student.nickname ? STUDENT_NICKNAME_PREFIX + student.nickname : ""),
-                value: STUDENT_NUM_POSTS_PREFIX + student.numPosts + STUDENT_INCOMPLETE_PREFIX + student.numIncomPosts + STUDENT_INCOMPLETE_SUFFIX
+                value: "total score: " + student.score + " / " + goalScore + " ( max possible: " + maxScore + ")"
+                    + STUDENT_NUM_POSTS_PREFIX + student.numPosts + STUDENT_INCOMPLETE_PREFIX + student.numIncomPosts + STUDENT_INCOMPLETE_SUFFIX
                     + STUDENT_NUM_COMMENTS_PREFIX + student.numComments + STUDENT_INCOMPLETE_PREFIX + student.numIncomComments + STUDENT_INCOMPLETE_SUFFIX
                     + STUDENT_NUM_AWARDS_PREFIX + student.numAwardsRecieved + STUDENT_NUM_PENALTIES_PREFIX + student.numPenaltiesRecieved
             })
         });
 
-        // data to be fed into super class navigated menu
         const menuData: NavigatedMenuData = {
             title: TITLE_COURSE_PREFIX + courseTitle.toUpperCase(),
             description: MENU_DESCRIPTION,
