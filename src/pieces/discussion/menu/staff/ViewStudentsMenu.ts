@@ -6,6 +6,11 @@ import { sendDismissableReply } from "../../../../generalUtilities/DismissableMe
 import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
 import { addScorePeriods } from "../../tracking/scoreFunctions";
 
+const TITLE_COURSE_PREFIX = "Students of CISC ";
+const MENU_DESCRIPTION = "replace me";
+const STUDENT_USERNAME_PREFIX = "username: ";
+const STUDENT_NICKNAME_PREFIX = " - server nickname: ";
+
 /**
  * @function updates a menu so that it is now a staff menu
  * @param {string} courseName - the title of the course whose students are to be viewed
@@ -30,7 +35,6 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
     }
 
     course.discussionSpecs.scorePeriods.forEach( (scorePeriod) => {
-        console.log("adding period")
         totalPeriod = addScorePeriods(totalPeriod, scorePeriod)
     })
 
@@ -43,18 +47,14 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
     });
 
     for (const student of students) {
+
+        const nickname = student.nickname !== null ? STUDENT_NICKNAME_PREFIX + student.nickname : "";
+
         studentsData.push({
-            username: "username:" + student.user.username + student.nickname? "- server nickanme: " + student.nickname : ""
+            name: STUDENT_USERNAME_PREFIX + student.user.username + nickname 
         })
     }
 
-    // get userIds of every student in the course
-
-    const studentIds =  guild.members.cache.filter((member) => {
-        return [...member.roles.cache.keys()].includes(course?.roles.student as string)
-    })
-
-    // replace the old menu with the view students menu
     const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
     viewStudentsMenu.collectMenuInteraction(componentInteraction.user, message);
@@ -65,7 +65,7 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
  * @property {string} username - username of the student
 */
 export interface DiscussionStudentData {
-    username: string,
+    name: string,
 }
 
 export class ViewStudentsMenu extends NavigatedMenu {
@@ -75,15 +75,15 @@ export class ViewStudentsMenu extends NavigatedMenu {
         let fields: { name: string; value: string; }[] = [];
         studentData.forEach(student => {
             fields.push({
-                name: student.username,
+                name: student.name,
                 value: "replace me too" //TODO: Add interesting info once more is done for sage user / our own discussion student
             })
         });
 
         // data to be fed into super class navigated menu
         const menuData: NavigatedMenuData = {
-            title: courseTitle.toUpperCase(),
-            description: "replace me",
+            title: TITLE_COURSE_PREFIX + courseTitle.toUpperCase(),
+            description: MENU_DESCRIPTION,
             fields: fields,
             additionalComponents: [],
             additionalComponentBehaviors: [],
