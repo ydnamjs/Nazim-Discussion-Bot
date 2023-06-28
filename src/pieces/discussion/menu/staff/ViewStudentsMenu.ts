@@ -1,11 +1,13 @@
-import { Guild, GuildMember, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
-import { NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { ButtonStyle, Guild, GuildMember, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { GUILDS } from "../../../../secret";
 import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
 import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
 import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
 import { addScorePeriods } from "../../tracking/scoreFunctions";
 import { Course } from "../../../../generalModels/Course";
+import { ComponentBehavior } from "../BaseMenu";
+import { updateToManageCourseMenu } from "./ManageCourseMenu";
 
 const TITLE_COURSE_PREFIX = "Students of CISC ";
 const MENU_DESCRIPTION = "replace me";
@@ -121,6 +123,22 @@ export interface DiscussionStudentData {
     numPenaltiesRecieved: number 
 }
 
+const BACK_BUTTON_ID = "discussion_view_students_back_button";
+const BACK_BUTTON_LABEL = "Back To Course";
+const BACK_BUTTON_DISABLED = false;
+const BACK_BUTTON_STYLE = ButtonStyle.Secondary
+
+const customNavOptions: CustomNavOptions = {
+    prevButtonOptions: {exists: true},
+    nextButtonOptions: {exists: true},
+    specialMenuButton: {
+        customId: BACK_BUTTON_ID, 
+        label: BACK_BUTTON_LABEL,
+        disabled: BACK_BUTTON_DISABLED,
+        style: BACK_BUTTON_STYLE
+    }
+};
+
 export class ViewStudentsMenu extends NavigatedMenu {
     
     constructor(courseTitle: string, studentData: DiscussionStudentData[], goalScore: number, maxScore: number) {
@@ -136,14 +154,25 @@ export class ViewStudentsMenu extends NavigatedMenu {
             })
         });
 
+        const ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
+            {
+                filter: (customId) => {
+                    return customId === BACK_BUTTON_ID;
+                },
+                resultingAction: (message, componentInteraction) => {
+                    updateToManageCourseMenu(courseTitle, message, componentInteraction);
+                }
+            },
+        ]
+        
         const menuData: NavigatedMenuData = {
             title: TITLE_COURSE_PREFIX + courseTitle.toUpperCase(),
             description: MENU_DESCRIPTION,
             fields: fields,
             additionalComponents: [],
-            additionalComponentBehaviors: [],
+            additionalComponentBehaviors: ADDITIONAL_BEHAVIORS,
         }
 
-        super(menuData, 0);
+        super(menuData, 0, customNavOptions);
     }
 }
