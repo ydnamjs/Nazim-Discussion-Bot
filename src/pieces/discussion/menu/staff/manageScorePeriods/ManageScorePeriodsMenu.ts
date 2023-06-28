@@ -134,6 +134,7 @@ class ManagePeriodsMenu extends NavigatedMenu {
         
         let fields = makePeriodFields(periodDisplayData)
 
+        //TODO: Rename this (and possibly functionify it
         const MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
             {
                 filter: (customId) => {
