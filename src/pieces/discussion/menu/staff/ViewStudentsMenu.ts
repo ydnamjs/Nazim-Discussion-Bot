@@ -1,4 +1,4 @@
-import { Guild, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { Guild, GuildMember, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { GUILDS } from "../../../../secret";
 import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
@@ -37,7 +37,8 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
     let course = await getCourseByName(courseName)
 
     if(!course || !course.discussionSpecs) {
-        sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
+        await sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
+        await message.delete()
         return;
     }
 
@@ -65,41 +66,43 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
 
     const studentsData: DiscussionStudentData[] = [];
     for (const student of students) {
-
-        const nickname = student.nickname !== null ? student.nickname : undefined;
-        const scoreData = totalPeriod.studentScores.get(student.id);
-
-        if(!scoreData) {
-            studentsData.push({
-                username: student.user.username,
-                nickname: nickname,
-                score: 0,
-                numPosts: 0,
-                numIncomPosts: 0,
-                numComments: 0,
-                numIncomComments: 0,
-                numAwardsRecieved: 0,
-                numPenaltiesRecieved: 0
-            });
-            continue;
-        }
-
-        studentsData.push({
-            username: student.user.username,
-            nickname: nickname,
-            score: scoreData.score,
-            numPosts: scoreData.numPosts,
-            numIncomPosts: scoreData.numIncomPost,
-            numComments: scoreData.numComments,
-            numIncomComments: scoreData.numIncomComment,
-            numAwardsRecieved: scoreData.awardsRecieved,
-            numPenaltiesRecieved: scoreData.penaltiesRecieved
-        })
+        studentsData.push(getTotalStudentData(student, totalPeriod));
     }
 
     const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData, totalGoalScore, totalMaxScore);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
     viewStudentsMenu.collectMenuInteraction(componentInteraction.user, message);
+}
+
+function getTotalStudentData(student: GuildMember, totalPeriod: ScorePeriod): DiscussionStudentData {
+    const nickname = student.nickname !== null ? student.nickname : undefined;
+    const scoreData = totalPeriod.studentScores.get(student.id);
+
+    if(!scoreData) {
+        return {
+            username: student.user.username,
+            nickname: nickname,
+            score: 0,
+            numPosts: 0,
+            numIncomPosts: 0,
+            numComments: 0,
+            numIncomComments: 0,
+            numAwardsRecieved: 0,
+            numPenaltiesRecieved: 0
+        }
+    }
+
+    return {
+        username: student.user.username,
+        nickname: nickname,
+        score: scoreData.score,
+        numPosts: scoreData.numPosts,
+        numIncomPosts: scoreData.numIncomPost,
+        numComments: scoreData.numComments,
+        numIncomComments: scoreData.numIncomComment,
+        numAwardsRecieved: scoreData.awardsRecieved,
+        numPenaltiesRecieved: scoreData.penaltiesRecieved
+    }
 }
 
 /** 
@@ -119,6 +122,7 @@ export interface DiscussionStudentData {
 }
 
 export class ViewStudentsMenu extends NavigatedMenu {
+    
     constructor(courseTitle: string, studentData: DiscussionStudentData[], goalScore: number, maxScore: number) {
         
         let fields: { name: string; value: string; }[] = [];
