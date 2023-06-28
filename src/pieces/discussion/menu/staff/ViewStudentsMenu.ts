@@ -10,6 +10,12 @@ const TITLE_COURSE_PREFIX = "Students of CISC ";
 const MENU_DESCRIPTION = "replace me";
 const STUDENT_USERNAME_PREFIX = "username: ";
 const STUDENT_NICKNAME_PREFIX = " - server nickname: ";
+const STUDENT_NUM_POSTS_PREFIX = "# posts: ";
+const STUDENT_NUM_COMMENTS_PREFIX = "\n# comments: ";
+const STUDENT_INCOMPLETE_PREFIX = " (";
+const STUDENT_INCOMPLETE_SUFFIX = " incomplete)"
+const STUDENT_NUM_AWARDS_PREFIX = "\n# awards recieved: ";
+const STUDENT_NUM_PENALTIES_PREFIX = "\n# penalties recieved: ";
 
 /**
  * @function updates a menu so that it is now a staff menu
@@ -40,18 +46,29 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
 
     const guild = componentInteraction.client.guilds.cache.get(GUILDS.MAIN) as Guild;
 
-    const studentsData: DiscussionStudentData[] = [];
-
     const students = [...guild.members.cache.values()].filter((member) => {
         return totalPeriod.studentScores.has(member.id)
     });
 
+    const studentsData: DiscussionStudentData[] = [];
     for (const student of students) {
 
-        const nickname = student.nickname !== null ? STUDENT_NICKNAME_PREFIX + student.nickname : "";
+        const nickname = student.nickname !== null ? student.nickname : undefined;
+        const scoreData = totalPeriod.studentScores.get(student.id);
+
+        if(!scoreData)
+            return
 
         studentsData.push({
-            name: STUDENT_USERNAME_PREFIX + student.user.username + nickname 
+            username: student.user.username,
+            nickname: nickname,
+            score: scoreData.score,
+            numPosts: scoreData.numPosts,
+            numIncomPosts: scoreData.numIncomPost,
+            numComments: scoreData.numComments,
+            numIncomComments: scoreData.numIncomComment,
+            numAwardsRecieved: scoreData.awardsRecieved,
+            numPenaltiesRecieved: scoreData.penaltiesRecieved
         })
     }
 
@@ -65,7 +82,15 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
  * @property {string} username - username of the student
 */
 export interface DiscussionStudentData {
-    name: string,
+    username: string,
+    nickname: string | undefined;
+    score: number
+    numPosts: number,
+    numIncomPosts: number,
+    numComments: number,
+    numIncomComments: number,
+    numAwardsRecieved: number,
+    numPenaltiesRecieved: number 
 }
 
 export class ViewStudentsMenu extends NavigatedMenu {
@@ -75,8 +100,10 @@ export class ViewStudentsMenu extends NavigatedMenu {
         let fields: { name: string; value: string; }[] = [];
         studentData.forEach(student => {
             fields.push({
-                name: student.name,
-                value: "replace me too" //TODO: Add interesting info once more is done for sage user / our own discussion student
+                name: STUDENT_USERNAME_PREFIX + student.username + (student.nickname ? STUDENT_NICKNAME_PREFIX + student.nickname : ""),
+                value: STUDENT_NUM_POSTS_PREFIX + student.numPosts + STUDENT_INCOMPLETE_PREFIX + student.numIncomPosts + STUDENT_INCOMPLETE_SUFFIX
+                    + STUDENT_NUM_COMMENTS_PREFIX + student.numComments + STUDENT_INCOMPLETE_PREFIX + student.numIncomComments + STUDENT_INCOMPLETE_SUFFIX
+                    + STUDENT_NUM_AWARDS_PREFIX + student.numAwardsRecieved + STUDENT_NUM_PENALTIES_PREFIX + student.numPenaltiesRecieved
             })
         });
 
