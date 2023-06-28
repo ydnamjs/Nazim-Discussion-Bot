@@ -8,12 +8,20 @@ import { addScorePeriods } from "../../tracking/scoreFunctions";
 
 const TITLE_COURSE_PREFIX = "Students of CISC ";
 const MENU_DESCRIPTION = "replace me";
+
 const STUDENT_USERNAME_PREFIX = "username: ";
 const STUDENT_NICKNAME_PREFIX = " - server nickname: ";
+
+const STUDENT_SCORE_PREFIX = "total score: ";
+const STUDENT_SCORE_DIVIDER = " / ";
+const STUDENT_SCORE_MAX_PREFIX = " ( max possible: ";
+const STUDENT_SCORE_MAX_SUFFIX = ")";
+
 const STUDENT_NUM_POSTS_PREFIX = "\n# posts: ";
 const STUDENT_NUM_COMMENTS_PREFIX = "\n# comments: ";
 const STUDENT_INCOMPLETE_PREFIX = " (";
-const STUDENT_INCOMPLETE_SUFFIX = " incomplete)"
+const STUDENT_INCOMPLETE_SUFFIX = " incomplete)";
+
 const STUDENT_NUM_AWARDS_PREFIX = "\n# awards recieved: ";
 const STUDENT_NUM_PENALTIES_PREFIX = "\n# penalties recieved: ";
 
@@ -104,7 +112,7 @@ export class ViewStudentsMenu extends NavigatedMenu {
         studentData.forEach(student => {
             fields.push({
                 name: STUDENT_USERNAME_PREFIX + student.username + (student.nickname ? STUDENT_NICKNAME_PREFIX + student.nickname : ""),
-                value: "total score: " + student.score + " / " + goalScore + " ( max possible: " + maxScore + ")"
+                value: STUDENT_SCORE_PREFIX + student.score + STUDENT_SCORE_DIVIDER + goalScore + STUDENT_SCORE_MAX_PREFIX + maxScore + STUDENT_SCORE_MAX_SUFFIX
                     + STUDENT_NUM_POSTS_PREFIX + student.numPosts + STUDENT_INCOMPLETE_PREFIX + student.numIncomPosts + STUDENT_INCOMPLETE_SUFFIX
                     + STUDENT_NUM_COMMENTS_PREFIX + student.numComments + STUDENT_INCOMPLETE_PREFIX + student.numIncomComments + STUDENT_INCOMPLETE_SUFFIX
                     + STUDENT_NUM_AWARDS_PREFIX + student.numAwardsRecieved + STUDENT_NUM_PENALTIES_PREFIX + student.numPenaltiesRecieved
