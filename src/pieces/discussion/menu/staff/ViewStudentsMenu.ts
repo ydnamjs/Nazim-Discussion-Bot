@@ -5,6 +5,7 @@ import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
 import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
 import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
 import { addScorePeriods } from "../../tracking/scoreFunctions";
+import { Course } from "../../../../generalModels/Course";
 
 const TITLE_COURSE_PREFIX = "Students of CISC ";
 const MENU_DESCRIPTION = "replace me";
@@ -35,7 +36,7 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
 
     let course = await getCourseByName(courseName)
 
-    if(!course || !course.discussionSpecs || course.discussionSpecs.scorePeriods.length < 1) {
+    if(!course || !course.discussionSpecs) {
         sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
         return;
     }
@@ -59,7 +60,7 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
     const guild = componentInteraction.client.guilds.cache.get(GUILDS.MAIN) as Guild;
 
     const students = [...guild.members.cache.values()].filter((member) => {
-        return totalPeriod.studentScores.has(member.id)
+        return (totalPeriod.studentScores.has(member.id) || member.roles.cache.has((course as Course).roles.student))
     });
 
     const studentsData: DiscussionStudentData[] = [];
@@ -68,8 +69,20 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
         const nickname = student.nickname !== null ? student.nickname : undefined;
         const scoreData = totalPeriod.studentScores.get(student.id);
 
-        if(!scoreData)
-            return
+        if(!scoreData) {
+            studentsData.push({
+                username: student.user.username,
+                nickname: nickname,
+                score: 0,
+                numPosts: 0,
+                numIncomPosts: 0,
+                numComments: 0,
+                numIncomComments: 0,
+                numAwardsRecieved: 0,
+                numPenaltiesRecieved: 0
+            });
+            continue;
+        }
 
         studentsData.push({
             username: student.user.username,
