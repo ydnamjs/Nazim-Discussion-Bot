@@ -1,47 +1,61 @@
 import { Guild, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
-import { Course, courseModel } from "../../../../generalModels/Course";
-import { ROLES_GUILD } from "../../../../secret";
+import { GUILDS } from "../../../../secret";
+import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
+import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
+import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
+import { addScorePeriods } from "../../tracking/scoreFunctions";
 
 /**
  * @function updates a menu so that it is now a staff menu
- * @param {string} courseTitle - the title of the course whose students are to be viewed
+ * @param {string} courseName - the title of the course whose students are to be viewed
  * @param {Message} message - the message to have the menu be replaced on
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  */
-export async function updateToViewStudentsMenu(courseTitle: string, message: Message, componentInteraction: MessageComponentInteraction) {
+export async function updateToViewStudentsMenu(courseName: string, message: Message, componentInteraction: MessageComponentInteraction) {
 
-    // get the ids of all students in the course
-    let course: Course | null = null;
-    try {
-        course = await courseModel.findOne({name: courseTitle});
-    }
-    catch(error: any) {
-        console.error(error);
-    }
+    let course = await getCourseByName(courseName)
 
-    // if the course was not found there was a problem getting it from the database
-    if(!course) {
-        componentInteraction.reply("Database error. Please message admin");
+    if(!course || !course.discussionSpecs || course.discussionSpecs.scorePeriods.length < 1) {
+        sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
         return;
     }
 
+    let totalPeriod: ScorePeriod = {
+        start: new Date(),
+        end: new Date(),
+        goalPoints: 0,
+        maxPoints: 0,
+        studentScores: new Map<string, StudentScoreData>()
+    }
+
+    course.discussionSpecs.scorePeriods.forEach( (scorePeriod) => {
+        console.log("adding period")
+        totalPeriod = addScorePeriods(totalPeriod, scorePeriod)
+    })
+
+    const guild = componentInteraction.client.guilds.cache.get(GUILDS.MAIN) as Guild;
+
+    const studentsData: DiscussionStudentData[] = [];
+
+    const students = [...guild.members.cache.values()].filter((member) => {
+        return totalPeriod.studentScores.has(member.id)
+    });
+
+    for (const student of students) {
+        studentsData.push({
+            username: "username:" + student.user.username + student.nickname? "- server nickanme: " + student.nickname : ""
+        })
+    }
+
     // get userIds of every student in the course
-    const guild = componentInteraction.client.guilds.cache.get(ROLES_GUILD) as Guild;
+
     const studentIds =  guild.members.cache.filter((member) => {
         return [...member.roles.cache.keys()].includes(course?.roles.student as string)
     })
 
-    // generate a list of student data from student Ids
-    const studentData: DiscussionStudentData[] = []
-    studentIds.forEach((student) => {
-        studentData.push({
-            username: student.user.username
-        })
-    })
-
     // replace the old menu with the view students menu
-    const viewStudentsMenu = new ViewStudentsMenu(courseTitle, studentData);
+    const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
     viewStudentsMenu.collectMenuInteraction(componentInteraction.user, message);
 }
