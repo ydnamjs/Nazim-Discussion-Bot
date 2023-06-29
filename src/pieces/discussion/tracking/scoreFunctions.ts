@@ -75,7 +75,7 @@ function addScorePeriodArrays(scorePeriodsA: ScorePeriod[], scorePeriodsB: Score
     return combinedScorePeriods;
 }
 
-function addScorePeriods(scorePeriodA: ScorePeriod, scorePeriodB: ScorePeriod) {
+export function addScorePeriods(scorePeriodA: ScorePeriod, scorePeriodB: ScorePeriod) {
     
     const EMPTY_SCORE_VALUE: StudentScoreData = {
         score: 0,

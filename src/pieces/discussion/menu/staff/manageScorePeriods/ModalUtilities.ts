@@ -40,7 +40,7 @@ export async function createManagePeriodModal(idPrefix: string, titlePrefix: str
     catch {}
 
     if (submittedModal !== undefined) {
-        submittedModal.deferReply()
+        await submittedModal.deferReply()
         const replyText = await modalInputHandler(triggerInteraction.client, courseName, submittedModal);
         refreshManagePeriodsMenu(courseName, triggerInteraction);
         sendDismissableFollowUp(submittedModal, replyText);
