@@ -144,22 +144,26 @@ class ManagePeriodsMenu extends NavigatedMenu {
     }
 }
 
-function makePeriodFields(periodDisplayData: PeriodDisplayData[]): APIEmbedField[] {
+function makePeriodFields(periodDisplaysData: PeriodDisplayData[]): APIEmbedField[] {
     
     let fields: APIEmbedField[] = [];
     
-    for(let index = 0; index < periodDisplayData.length; index++) {
-        fields.push({
-            name: FIELD_TITLE_PREFIX + (index + 1),
-            value: 
-                FIELD_START_PREFIX + periodDisplayData[index].start.toDateString() + " " + periodDisplayData[index].start.toLocaleTimeString() + 
-                FIELD_END_PREFIX + periodDisplayData[index].end.toDateString() + " " + periodDisplayData[index].end.toLocaleTimeString() + 
-                FIELD_GOAL_POINTS_PREFIX + periodDisplayData[index].goalPoints + 
-                FIELD_MAX_POINTS_PREFIX + periodDisplayData[index].maxPoints
-        })
+    for(let index = 0; index < periodDisplaysData.length; index++) {
+        fields.push(makePeriodField( periodDisplaysData[index], index));
     };
 
     return fields;
+}
+
+function makePeriodField(periodDisplayData: PeriodDisplayData, index: number): APIEmbedField {
+   return {
+        name: FIELD_TITLE_PREFIX + (index + 1),
+        value: 
+            FIELD_START_PREFIX + periodDisplayData.start.toDateString() + " " + periodDisplayData.start.toLocaleTimeString() + 
+            FIELD_END_PREFIX + periodDisplayData.end.toDateString() + " " + periodDisplayData.end.toLocaleTimeString() + 
+            FIELD_GOAL_POINTS_PREFIX + periodDisplayData.goalPoints + 
+            FIELD_MAX_POINTS_PREFIX + periodDisplayData.maxPoints
+    }
 }
 
 function generateBehaviors(courseName: string): ComponentBehavior[] {
