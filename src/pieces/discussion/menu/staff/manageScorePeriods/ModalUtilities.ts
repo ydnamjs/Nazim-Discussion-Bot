@@ -198,6 +198,16 @@ export async function insertOnePeriod(client: Client, courseName: string, newSco
 }
 
 /**
+ * @function sorts periods and returns the sorted periods. Not that sorting mutates the original array of periods as it uses the Array.sort function
+ * @param {ScorePeriod[]} periods - the periods to be sorted
+ * @returns {ScorePeriod[]} sorted periods - 
+ */
+export function sortPeriods(periods: ScorePeriod[]) {
+
+    return periods.sort((a, b) => {return a.start.valueOf() - b.start.valueOf()});
+}
+
+/**
  * @function overwrites the score periods of the given course
  * @param {string} courseName - the name of the course to overwrite the score periods of
  * @param {ScorePeriod[]} scorePeriods - the new score periods that will overwrite the ones in the course
