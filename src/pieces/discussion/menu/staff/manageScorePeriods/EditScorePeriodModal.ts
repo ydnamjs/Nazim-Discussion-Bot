@@ -1,7 +1,7 @@
 import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, periodNumActionRow, startDateActionRow } from "./ModalComponents";
-import { NewPeriodData, checkAgainstCurrentPeriods, createManagePeriodModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, validatePeriodInput } from "./ModalUtilities";
+import { NewPeriodData, checkAgainstCurrentPeriods, createManagePeriodModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, sortPeriods, validatePeriodInput } from "./ModalUtilities";
 
 const MODAL_ID_PREFIX = "edit_score_period_modal";
 const MODAL_TITLE_PREFIX = "Edit Score Period In CISC ";
@@ -35,6 +35,7 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
     if(fetchedCourse && fetchedCourse.discussionSpecs !== null) {
 
         const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
+        sortPeriods(currentScorePeriods)
 
         const reasonsForFailure = handleIndexValidation(toEditIndex, currentScorePeriods.length) + handlePeriodValidation(periodValidationData)
 
