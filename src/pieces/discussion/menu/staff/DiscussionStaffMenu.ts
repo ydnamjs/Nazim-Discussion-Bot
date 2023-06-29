@@ -106,6 +106,8 @@ const NUM_STUDENTS_PREFIX = "# of students: ";
 const NUM_POSTS_PREFIX = "\n# of posts: ";
 const NUM_COMMENTS_PREFIX = "\n# of comments: ";
 
+const SELECT_MENU_ERROR_MESSAGE = "An error occurred. Expected a select menu interaction with a selected value"
+
 const DROP_DOWN_ID = "discussion-course-select";
 
 const EXTRA_BEHAVIORS: ComponentBehavior[] = [
@@ -118,7 +120,7 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
                 updateToManageCourseMenu(componentInteraction.values[0], componentInteraction);
             }
             else {
-                await sendDismissableInteractionReply(componentInteraction, "An error occurred. Expected a select menu interaction with a selected value");
+                await sendDismissableInteractionReply(componentInteraction, SELECT_MENU_ERROR_MESSAGE);
             }
         }
     }
@@ -129,6 +131,7 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
  * @param {DiscussionCourseBasicData[]} courseInfo - list of courses to display information about
  */
 export class StaffMenu extends NavigatedMenu {
+    
     constructor(courseInfo: DiscussionCourseBasicData[]) {
         
         let fields: { name: string; value: string; }[] = [];
