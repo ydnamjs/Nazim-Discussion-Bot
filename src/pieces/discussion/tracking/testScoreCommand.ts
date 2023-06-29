@@ -23,12 +23,6 @@ export const testScore: Command = {
     ],
 
 	run: async (client: Client, interaction: CommandInteraction) => {
-        
-        //const BEFORE = new Date("2023-06-25 02:02:00 PM");
-
-        //console.log("scoring all threads before " + BEFORE.toDateString())
-   
-        //{before: BEFORE}
 
         scoreAllThreadsInCourse(client, "test", )
 
