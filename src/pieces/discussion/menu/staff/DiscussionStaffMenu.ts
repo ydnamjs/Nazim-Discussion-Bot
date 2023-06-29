@@ -1,6 +1,6 @@
-import { ActionRowBuilder, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction, StringSelectMenuBuilder, ThreadChannel } from "discord.js";
+import { ActionRowBuilder, ButtonStyle, Client, InteractionUpdateOptions, Message, MessageComponentInteraction, StringSelectMenuBuilder, ThreadChannel, User } from "discord.js";
 import { Course, courseModel } from "../../../../generalModels/Course";
-import { getRolesOfUserInGuild } from "../../../../generalUtilities/GetRolesOfUserInGuild";
+import { getRolesOfUserInGuild as getRolesOfUser } from "../../../../generalUtilities/GetRolesOfUser";
 import { GUILDS } from "../../../../secret";
 import { ComponentBehavior } from "../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
@@ -14,10 +14,8 @@ import { sendDismissableReply } from "../../../../generalUtilities/DismissableMe
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  */
 export async function updateToStaffMenu(message: Message, componentInteraction: MessageComponentInteraction) {
-            
-    const roles = await getRolesOfUserInGuild(componentInteraction);
 
-    const staffsCourses = await getStaffsCourses(roles)
+    const staffsCourses = await getStaffsCourses(componentInteraction.client, componentInteraction.user);
 
     const guild = componentInteraction.client.guilds.cache.get(GUILDS.MAIN)
 
@@ -50,8 +48,10 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     staffMenu.collectMenuInteraction(componentInteraction.user, message);
 }
 
-async function getStaffsCourses(roles: string[]) {
+async function getStaffsCourses(client: Client, user: User) {
     
+    const roles = await getRolesOfUser(client, user);
+
     let staffsCourses: Course[] = [];
     try {
         staffsCourses = await courseModel.find({'roles.staff': {$in: roles}, 'channels.discussion': {$ne: null}});

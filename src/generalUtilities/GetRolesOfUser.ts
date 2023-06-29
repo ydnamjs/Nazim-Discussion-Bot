@@ -1,12 +1,12 @@
-import { BaseInteraction, Guild, User } from "discord.js";
+import { BaseInteraction, Client, Guild, User } from "discord.js";
 import { ROLES_GUILD } from "../secret";
 
-export async function getRolesOfUserInGuild(interaction: BaseInteraction) {
+export async function getRolesOfUserInGuild(client: Client, user: User) {
     
-    const guild = interaction.client.guilds.cache.get(ROLES_GUILD) as Guild;
+    const guild = client.guilds.cache.get(ROLES_GUILD) as Guild;
     
-    if( await guild.members.fetch(interaction.user)) {
-        const roles = ((await guild.members.fetch(interaction.user)).roles.cache).keys();
+    if( await guild.members.fetch(user)) {
+        const roles = ((await guild.members.fetch(user)).roles.cache).keys();
         if (roles) {
             return [...roles];
         }
