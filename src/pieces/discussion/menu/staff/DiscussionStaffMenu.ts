@@ -5,6 +5,8 @@ import { GUILDS } from "../../../../secret";
 import { ComponentBehavior } from "../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
+import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
+import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
 
 /**
  * @function updates a menu so that it is now a staff menu
@@ -13,44 +15,76 @@ import { updateToManageCourseMenu } from "./ManageCourseMenu";
  */
 export async function updateToStaffMenu(message: Message, componentInteraction: MessageComponentInteraction) {
             
-    // get the roles of the user in the guild
     const roles = await getRolesOfUserInGuild(componentInteraction);
 
-    // get the courses from which the user is a staff member of
-    let allCourses: Course[] = [];
+    const staffsCourses = await getStaffsCourses(roles)
+
+    const guild = componentInteraction.client.guilds.cache.get(GUILDS.MAIN)
+
+    if(!guild){
+        await sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
+        await componentInteraction.message.delete();
+        return;
+    }
+
+    let discussionCoursesData: DiscussionCourseBasicData[] = [];
+    for (const course of staffsCourses) {
+        
+        if(!course || course.discussionSpecs === null)
+            continue;
+
+        const studentRole = await guild.roles.fetch(course.roles.student);
+
+        const totals = getTotalPostsComments(course.discussionSpecs.scorePeriods);
+
+        discussionCoursesData.push({
+            name: course.name,
+            numStudents: studentRole ? studentRole.members.size : 0,
+            numPosts: totals.totalPosts,
+            numComments: totals.totalComments
+        });
+    }
+
+    const staffMenu = new StaffMenu(discussionCoursesData);
+    componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
+    staffMenu.collectMenuInteraction(componentInteraction.user, message);
+}
+
+async function getStaffsCourses(roles: string[]) {
+    
+    let staffsCourses: Course[] = [];
     try {
-        allCourses = await courseModel.find({'roles.staff': {$in: roles}, 'channels.discussion': {$ne: null}});
+        staffsCourses = await courseModel.find({'roles.staff': {$in: roles}, 'channels.discussion': {$ne: null}});
     }
     catch(error: any) {
         console.error(error);
     }
 
-    const guild = await componentInteraction.client.guilds.fetch(GUILDS.MAIN)
-    const threads = guild.channels.cache.filter(x => x.isThread());
+    staffsCourses.forEach((course) => {
+        
+        // we do this because mongo db doesn't store maps as maps, it stores them as objects so in order to actually use the scores as a map,
+        // we have to convert it from object to map
+        course?.discussionSpecs?.scorePeriods.forEach((scorePeriod)=> {
+            scorePeriod.studentScores = new Map<string, StudentScoreData>(Object.entries(scorePeriod.studentScores))
+        })
+    })
 
-    // convert the courses into data for the staff menu
-    let courseInfo: DiscussionCourseBasicData[] = [];
-    for(let i = 0; i < allCourses.length; i++) {
-                
-        // TODO: Change this to user sage user class and database
-        const studentRole = await guild.roles.fetch(allCourses[i].roles.student);
+    return staffsCourses
+}
 
-        const posts = [...threads.filter(thread => thread.parentId === allCourses[i].channels.discussion).values()] as ThreadChannel[];
-        let numComments = 0;
-        posts.forEach(post => numComments += post.messageCount as number)
+function getTotalPostsComments(scorePeriods: ScorePeriod[]) {
+    
+    let totalPosts = 0;
+    let totalComments = 0;
 
-        courseInfo.push({
-            name: allCourses[i].name,
-            numStudents: studentRole ? studentRole.members.size : 0,
-            numPosts: posts.length,
-            numComments: numComments
+    scorePeriods.forEach((scorePeriod) => {
+        [...scorePeriod.studentScores.values()].forEach(studentScore => {
+            totalPosts += studentScore.numPosts;
+            totalComments += studentScore.numComments;
         });
-    }
+    })
 
-    // replace the old menu with the staff menu
-    const staffMenu = new StaffMenu(courseInfo);
-    componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
-    staffMenu.collectMenuInteraction(componentInteraction.user, message);
+    return {totalPosts, totalComments}
 }
 
 /** 
