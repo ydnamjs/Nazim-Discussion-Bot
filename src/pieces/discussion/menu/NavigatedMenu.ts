@@ -43,12 +43,6 @@ const CLOSE_MENU_LABEL = "close menu";
 const CLOSE_MENU_DISABLED = false;
 const CLOSE_MENU_STYLE = ButtonStyle.Danger;
 
-/**
- * @interface interface for custom page buttons input
- * @property {String} customId - **optional** the string for the button's id to be used in place of default
- * @property {String} label - **optional** the text to be displayed on the button to be used in place of default
- * @property {boolean} disabled - **optional** the state of if the button is disabled to be used in place of default
- */
 interface customPageButtonData {
     exists: boolean
     customId?: string, 
@@ -68,17 +62,10 @@ export interface CustomNavOptions {
     specialMenuButton?: buttonData
 }
 
-/**
- * @function makes an ActionRowBuilder of the navigation buttons (typically used for a navigated menu)
- * @param {CustomNavOptions} customNavOptions - object containing definitions for overwriting the defailt menu buttons (main menu and close menu are not changable nor is the the style of the page buttons)
- * @returns {ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>} the row containing the navigation buttons specified by the customNavOptions and defaults
- */
 function makeNavigationRow(customNavOptions: CustomNavOptions): ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder> {
     
-    // add the previous and next page buttons
     const navButtonData: buttonData[] = []
         
-    // if the previous page should exist, add it
     if(customNavOptions.prevButtonOptions.exists)
         navButtonData.push({
             customId: customNavOptions.prevButtonOptions.customId !== undefined ? customNavOptions.prevButtonOptions.customId : PREV_PAGE_CUSTOMID,
@@ -87,7 +74,6 @@ function makeNavigationRow(customNavOptions: CustomNavOptions): ActionRowBuilder
             style: PREV_PAGE_STYLE,
         });
 
-    // if the next page should exist, add it
     if(customNavOptions.nextButtonOptions.exists) {
         navButtonData.push({
             customId: customNavOptions.nextButtonOptions.customId !== undefined ? customNavOptions.nextButtonOptions.customId : NEXT_PAGE_CUSTOMID,
@@ -97,7 +83,6 @@ function makeNavigationRow(customNavOptions: CustomNavOptions): ActionRowBuilder
         })
     }
 
-    // if the special button is defined, add it
     if(customNavOptions.specialMenuButton) {
         navButtonData.push({
             customId: customNavOptions.specialMenuButton.customId,
@@ -107,16 +92,13 @@ function makeNavigationRow(customNavOptions: CustomNavOptions): ActionRowBuilder
         });
     }
     
-    // add the main menu and the close menu buttons
     navButtonData.push(            
-    // home/main menu
     {
         customId: MAIN_MENU_CUSTOMID,
         label: MAIN_MENU_LABEL,
         disabled: MAIN_MENU_DISABLED,
         style: MAIN_MENU_STYLE,
     },
-    // close menu
     {
         customId: CLOSE_MENU_CUSTOMID,
         label: CLOSE_MENU_LABEL,
@@ -127,7 +109,6 @@ function makeNavigationRow(customNavOptions: CustomNavOptions): ActionRowBuilder
     return makeActionRowButton(navButtonData);
 }
 
-/** @constant behavior of the main menu button */
 const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     
     filter: (customId: string) => {
@@ -139,7 +120,6 @@ const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     }
 }
 
-/** @constant behavior of the close menu button */
 const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     filter: (customId: string) => {
         return customId === CLOSE_MENU_CUSTOMID;
@@ -161,7 +141,6 @@ export class NavigatedMenu extends BaseMenu{
 
     constructor(menuData: NavigatedMenuData, pageNumber: number, customNavOptions?: CustomNavOptions) {
         
-        // components have a maximum number of rows
         if(menuData.additionalComponents && menuData.additionalComponents.length > MAX_NUMBER_OF_COMPONENT_ROWS - 1) {
             throw new Error(MAX_ADDITIONAL_COMPONENT_ROWS_EXCEEDED_ERROR);
         }
