@@ -15,12 +15,12 @@ import { sendDismissableReply } from "../../../../generalUtilities/DismissableMe
  */
 export async function updateToStaffMenu(message: Message, componentInteraction: MessageComponentInteraction) {
 
-    const staffsCourses = await getStaffsCourses(componentInteraction.client, componentInteraction.user);
+    const staffsCourses = await getStaffsDiscussionCourses(componentInteraction.client, componentInteraction.user);
 
     const guild = componentInteraction.client.guilds.cache.get(GUILDS.MAIN)
 
     if(!guild){
-        await sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
+        await sendDismissableReply(componentInteraction.message, "Error fetching discord server. Please try again or message admin");
         await componentInteraction.message.delete();
         return;
     }
@@ -48,7 +48,7 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
     staffMenu.collectMenuInteraction(componentInteraction.user, message);
 }
 
-async function getStaffsCourses(client: Client, user: User) {
+async function getStaffsDiscussionCourses(client: Client, user: User) {
     
     const roles = await getRolesOfUser(client, user);
 
