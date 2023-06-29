@@ -6,7 +6,7 @@ import { ComponentBehavior } from "../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
 import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
-import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
+import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
 
 /**
  * @function updates a menu so that it is now a staff menu
@@ -103,32 +103,19 @@ export interface DiscussionCourseBasicData {
 const STAFF_MENU_TITLE = "My Courses";
 const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To access a specific course select it from the drop down or click the view course button and input the name of the course";
 
-const EXPAND_COURSE_BUTTON_ID = "discussion_staff_expand_button";
-const EXPAN_COURSE_BUTTON_LABEL = "expand course view";
-
 const DROP_DOWN_ID = "discussion-course-select";
 
 const EXTRA_BEHAVIORS: ComponentBehavior[] = [
     {
-        // expand course button
-        filter: (custom_id: string) => {
-            return custom_id === EXPAND_COURSE_BUTTON_ID;
-        },
-        resultingAction: (componentInteraction: MessageComponentInteraction) => {
-            // TODO: Implement functionality once modal has been created
-        }
-    },
-    {
-        // drop down menu
         filter: (custom_id: string) => {
             return custom_id === DROP_DOWN_ID;
         },
-        resultingAction: (componentInteraction: MessageComponentInteraction) => {
-            if(componentInteraction.isStringSelectMenu()){
+        resultingAction: async (componentInteraction: MessageComponentInteraction) => {
+            if(componentInteraction.isStringSelectMenu() && componentInteraction.values.length > 0){
                 updateToManageCourseMenu(componentInteraction.values[0], componentInteraction);
             }
             else {
-                componentInteraction.reply("An error occurred. Expected a select menu event but recieved something different");
+                await sendDismissableInteractionReply(componentInteraction, "An error occurred. Expected a select menu interaction with a selected value");
             }
         }
     }
@@ -141,7 +128,6 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
 export class StaffMenu extends NavigatedMenu {
     constructor(courseInfo: DiscussionCourseBasicData[]) {
         
-        // generate the fields of basic info for each course and the select menu options
         let fields: { name: string; value: string; }[] = [];
         let selectMenuOptions: {value: string, label: string}[] = []; 
         courseInfo.forEach((course: DiscussionCourseBasicData)=>{
@@ -167,7 +153,6 @@ export class StaffMenu extends NavigatedMenu {
             components: [courseSelect]
         })
 
-        // data to be fed into super class navigated menu
         const menuData: NavigatedMenuData = {
             title: STAFF_MENU_TITLE,
             description: STAFF_MENU_DESCRIPTION,
@@ -179,12 +164,6 @@ export class StaffMenu extends NavigatedMenu {
         const customNavOptions: CustomNavOptions = {
             prevButtonOptions: { exists: true },
             nextButtonOptions: { exists: true },
-            specialMenuButton: { 
-                customId: EXPAND_COURSE_BUTTON_ID,
-                label: EXPAN_COURSE_BUTTON_LABEL,
-                disabled: true,
-                style: ButtonStyle.Primary
-            }
         };
         
         super(menuData, 0, customNavOptions);
