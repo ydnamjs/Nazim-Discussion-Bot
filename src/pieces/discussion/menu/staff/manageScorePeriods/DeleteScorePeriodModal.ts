@@ -1,8 +1,7 @@
 import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
-import { courseModel } from "../../../../../generalModels/Course";
-import { DATABASE_ERROR_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, periodNumActionRow } from "./ModalComponents";
-import { createManagePeriodModal, handleIndexValidation, overwritePeriods } from "./ModalUtilities";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, periodNumActionRow } from "./ModalComponents";
+import { createManagePeriodModal, handleIndexValidation, overwritePeriods } from "./ModalUtilities";
 
 const MODAL_ID_PREFIX = "delete_score_period_modal"
 const MODAL_TITLE_PREFIX = "Delete Score Period From CISC ";

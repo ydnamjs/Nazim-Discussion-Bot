@@ -1,12 +1,12 @@
-import { APIEmbedField, ButtonStyle, CacheType, Guild, GuildMember, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
-import { GUILDS } from "../../../../secret";
-import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
-import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
-import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
-import { addScorePeriods } from "../../tracking/scoreFunctions";
+import { APIEmbedField, ButtonStyle, Guild, GuildMember, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { Course } from "../../../../generalModels/Course";
+import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
+import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
+import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
+import { GUILDS } from "../../../../secret";
+import { addScorePeriods } from "../../tracking/scoreFunctions";
 import { ComponentBehavior } from "../BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
 
 const TITLE_COURSE_PREFIX = "Students of CISC ";

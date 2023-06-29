@@ -1,8 +1,8 @@
-import { ButtonStyle, Component, InteractionUpdateOptions, Message, MessageComponentInteraction, messageLink } from "discord.js";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
-import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { ComponentBehavior } from "../BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
 

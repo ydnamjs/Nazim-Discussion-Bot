@@ -1,10 +1,6 @@
-import { ApplicationCommandOptionType, ChannelType, Client, CommandInteraction, ForumChannel, Message, ThreadChannel } from "discord.js";
+import { ApplicationCommandOptionType, Client, CommandInteraction } from "discord.js";
 import { Command } from "../../../command/Command";
-import { Course, courseModel } from "../../../generalModels/Course";
-import { scoreAllThreadsInCourse, scoreDiscussionMessage, scoreThread } from "./scoreFunctions";
-import { CommentSpecs, DiscussionSpecs, PostSpecs } from "../../../generalModels/DiscussionScoring";
-import { DEFAULT_DISCUSSION_SPECS } from "../../../pieces/courseManagement/DiscussionRulesDefaults";
-import { getCourseByName } from "../../../generalUtilities/getCourseByName";
+import { scoreAllThreadsInCourse } from "./scoreFunctions";
 
 export const testScore: Command = {
     

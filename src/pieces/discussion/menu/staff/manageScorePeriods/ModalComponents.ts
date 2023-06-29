@@ -1,4 +1,4 @@
-import { TextInputStyle, TextInputBuilder, ActionRowBuilder } from "discord.js";
+import { ActionRowBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
 // MODAL BEHAVIOR CONSTANTS
 export const MODAL_EXPIRATION_TIME = 600_000; // 10 minutes

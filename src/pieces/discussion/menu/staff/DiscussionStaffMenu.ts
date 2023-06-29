@@ -1,9 +1,9 @@
-import { Message, MessageComponentInteraction, InteractionUpdateOptions, ButtonStyle, ForumChannel, ThreadChannel, SelectMenuBuilder, StringSelectMenuBuilder, ActionRowBuilder } from "discord.js";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { ActionRowBuilder, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction, StringSelectMenuBuilder, ThreadChannel } from "discord.js";
 import { Course, courseModel } from "../../../../generalModels/Course";
 import { getRolesOfUserInGuild } from "../../../../generalUtilities/GetRolesOfUserInGuild";
 import { GUILDS } from "../../../../secret";
 import { ComponentBehavior } from "../BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
 
 /**
