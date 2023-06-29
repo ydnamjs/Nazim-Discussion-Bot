@@ -218,7 +218,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === VIEW_STUDENTS_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToViewStudentsMenu(courseName, componentInteraction.message, componentInteraction);
+                updateToViewStudentsMenu(courseName, componentInteraction);
             }
         },
         {

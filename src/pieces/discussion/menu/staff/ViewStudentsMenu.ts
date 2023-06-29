@@ -34,13 +34,13 @@ const STUDENT_NUM_PENALTIES_PREFIX = "\n# penalties recieved: ";
  * @param {Message} message - the message to have the menu be replaced on
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  */
-export async function updateToViewStudentsMenu(courseName: string, message: Message, componentInteraction: MessageComponentInteraction) {
+export async function updateToViewStudentsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
 
     let course = await getCourseByName(courseName)
 
     if(!course || !course.discussionSpecs) {
         await sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
-        await message.delete()
+        await componentInteraction.message.delete()
         return;
     }
 
@@ -73,7 +73,7 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
 
     const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData, totalGoalScore, totalMaxScore);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
-    viewStudentsMenu.collectMenuInteraction(componentInteraction.user, message);
+    viewStudentsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }
 
 function getTotalStudentData(student: GuildMember, totalPeriod: ScorePeriod): DiscussionStudentStats {
