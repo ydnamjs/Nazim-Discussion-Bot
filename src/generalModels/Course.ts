@@ -22,7 +22,6 @@ export interface Course {
 // TODO: Currently, the discussionSpecs and its child "documents" take up space in the DB even when not defined. Not as much as a discussion course but 
 // there should be no reason that they have to when they arent being used. possible fix: https://stackoverflow.com/questions/38248365/mongoose-schema-with-nested-optional-object
 
-//schema
 export const course_schema: Schema = new mongoose.Schema({
 	name: String,
 	channels: {
@@ -80,5 +79,4 @@ export const course_schema: Schema = new mongoose.Schema({
     versionKey: false
 });
 
-//model
 export const courseModel = mongoose.model<Course>('COURSE', course_schema);
