@@ -149,7 +149,7 @@ function makePeriodFields(periodDisplaysData: PeriodDisplayData[]): APIEmbedFiel
     let fields: APIEmbedField[] = [];
     
     for(let index = 0; index < periodDisplaysData.length; index++) {
-        fields.push(makePeriodField( periodDisplaysData[index], index));
+        fields.push(makePeriodField(periodDisplaysData[index], index));
     };
 
     return fields;

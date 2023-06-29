@@ -12,6 +12,15 @@ import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POI
  */
 export type ModalInputHandler = (client: Client, courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
 
+/**
+ * @function creates and handles a modal for managing score periods
+ * @param {string} idPrefix - the prefix of the modal's id (full id is prefix + milliseconds time)
+ * @param {string} titlePrefix - the prefix of the modal's title (goes before the course name)
+ * @param {string} courseName - the name of the course that is having its score periods managed
+ * @param {ButtonInteraction} triggerInteraction - the interaction that triggered the opening of the modal
+ * @param {ActionRowBuilder<TextInputBuilder>[]} components - the components that on the modal
+ * @param {ModalInputHandler} modalInputHandler - function that handles the modal input
+ */
 export async function createManagePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
     // the modal id has to be generated based on time 
@@ -32,6 +41,7 @@ export async function createManagePeriodModal(idPrefix: string, titlePrefix: str
 
     let submittedModal: ModalSubmitInteraction | undefined = undefined;
     try {
+
         // we have to filter that it matches the id because if it isnt and the user cancels the modal and opens another one the
         // canceled modal will also be processed and we'll have duplicates and that behavior is VERY undefined
         // (this is unlike message component interactions! and thus weird)
@@ -151,8 +161,8 @@ export interface NewPeriodData {
 
 /**
  * @function determines if the new score period provided has any issues with the current ones
- * @param newScorePeriodData - the new score period to be added
- * @param currentScorePeriods - the old score periods being checked against
+ * @param {NewPeriodData} newScorePeriodData - the new score period to be added
+ * @param {ScorePeriod[]} currentScorePeriods - the old score periods being checked against
  * @returns {boolean} hasConflict - whether or not the new score Period has a conflict with the current ones
  */
 export async function checkAgainstCurrentPeriods(newScorePeriodData: NewPeriodData, currentScorePeriods: ScorePeriod[]): Promise<boolean> {
@@ -166,11 +176,12 @@ export async function checkAgainstCurrentPeriods(newScorePeriodData: NewPeriodDa
     return hasConflict;
 }
 
-//TODO: fix jsdocs
 /**
  * @function inserts a score period to a course in the database
- * @param {Object} newScorePeriodData - data for the score period to be added
+ * @param {Client} client - the client performing operations
  * @param {string} courseName - the name of the course that the score period is being added to
+ * @param {NewPeriodData} newScorePeriodData - data for the score period to be added
+ * @param {ScorePeriod[]} scorePeriods - the score periods that existed prior to the insert
  */
 export async function insertOnePeriod(client: Client, courseName: string, newScorePeriodData: NewPeriodData, scorePeriods: ScorePeriod[]): Promise<string> {
 
