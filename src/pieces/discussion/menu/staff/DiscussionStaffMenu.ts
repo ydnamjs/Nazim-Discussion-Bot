@@ -102,6 +102,9 @@ export interface DiscussionCourseBasicData {
 
 const STAFF_MENU_TITLE = "My Courses";
 const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To manage the score period or scoring rules of a course select it from the drop down";
+const NUM_STUDENTS_PREFIX = "# of students: ";
+const NUM_POSTS_PREFIX = "\n# of posts: ";
+const NUM_COMMENTS_PREFIX = "\n# of comments: ";
 
 const DROP_DOWN_ID = "discussion-course-select";
 
@@ -133,7 +136,7 @@ export class StaffMenu extends NavigatedMenu {
         courseInfo.forEach((course: DiscussionCourseBasicData)=>{
             fields.push({
                 name: course.name,
-                value: "# of students: " + course.numStudents + "\n# of posts: " + course.numPosts + "\n# of comments: " + course.numComments
+                value: NUM_STUDENTS_PREFIX + course.numStudents + NUM_POSTS_PREFIX + course.numPosts + NUM_COMMENTS_PREFIX + course.numComments
             });
             selectMenuOptions.push({
                 value: course.name,
