@@ -109,7 +109,7 @@ const PEOPLE_BUTTON_ROW = makeActionRowButton([VIEW_STUDENTS_BUTTON_DATA, VIEW_S
 export async function updateToManageCourseMenu(name: string, componentInteraction: MessageComponentInteraction) {
 
     const manageCourseMenu = new ManageCourseMenu(name);
-    componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
+    await componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
     manageCourseMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }
 
@@ -154,7 +154,7 @@ const menuFields: APIEmbedField[] = [
 
 const ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
 
-export class ManageCourseMenu extends NavigatedMenu {
+class ManageCourseMenu extends NavigatedMenu {
     
     constructor(courseTitle: string) {
 
