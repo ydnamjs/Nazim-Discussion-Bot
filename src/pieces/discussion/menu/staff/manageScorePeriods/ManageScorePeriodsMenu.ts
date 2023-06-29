@@ -1,4 +1,4 @@
-import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
+import { APIEmbedField, ButtonInteraction, ButtonStyle, CacheType, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { ComponentBehavior } from "../../BaseMenu";
@@ -130,55 +130,14 @@ async function getPeriodData (courseName: string) {
 }
 
 class ManagePeriodsMenu extends NavigatedMenu {
-    constructor(courseTitle: string, periodDisplayData: PeriodDisplayData[]) {
-        
-        let fields = makePeriodFields(periodDisplayData)
-
-        //TODO: Rename this (and possibly functionify it
-        const MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
-            {
-                filter: (customId) => {
-                    return customId === BACK_BUTTON_ID;
-                },
-                resultingAction: (message, componentInteraction) => {
-                    updateToManageCourseMenu(courseTitle, message, componentInteraction);
-                }
-            },
-            {
-                filter: (customId) => {
-                    return customId === ADD_PERIOD_BUTTON_ID;
-                },
-                resultingAction: (_message, componentInteraction) => {
-                    if(componentInteraction instanceof ButtonInteraction)
-                    openAddPeriodModal(courseTitle, componentInteraction);
-                }
-            },
-            {
-                filter: (customId) => {
-                    return customId === EDIT_PERIOD_BUTTON_ID;
-                },
-                resultingAction: (_message, componentInteraction) => {
-                    if(componentInteraction instanceof ButtonInteraction)
-                    openEditPeriodModal(courseTitle, componentInteraction);
-                }
-            },
-            {
-                filter: (customId) => {
-                    return customId === DELETE_PERIOD_BUTTON_ID;
-                },
-                resultingAction: (_message, componentInteraction) => {
-                    if(componentInteraction instanceof ButtonInteraction)
-                    openDeletePeriodModal(courseTitle, componentInteraction);
-                }
-            }
-        ]
+    constructor(courseName: string, periodDisplayData: PeriodDisplayData[]) {
 
         const menuData: NavigatedMenuData = {
-            title: courseTitle.toUpperCase() + MENU_TITLE_SUFFIX,
+            title: courseName.toUpperCase() + MENU_TITLE_SUFFIX,
             description: MENU_DESCRIPTION,
-            fields: fields,
+            fields: makePeriodFields(periodDisplayData),
             additionalComponents: [MANAGE_PERIODS_BUTTON_ROW],
-            additionalComponentBehaviors: MANAGE_SCORE_PERIOD_MENU_ADDITIONAL_BEHAVIORS,
+            additionalComponentBehaviors: generateBehaviors(courseName),
         }
 
         super(menuData, 0, customNavOptions);
@@ -201,4 +160,47 @@ function makePeriodFields(periodDisplayData: PeriodDisplayData[]): APIEmbedField
     };
 
     return fields;
+}
+
+function generateBehaviors(courseName: string): ComponentBehavior[] {
+    
+    const behaviors = [
+        {
+            filter: (customId: string) => {
+                return customId === BACK_BUTTON_ID;
+            },
+            resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
+                updateToManageCourseMenu(courseName, message, componentInteraction);
+            }
+        },
+        {
+            filter: (customId: string) => {
+                return customId === ADD_PERIOD_BUTTON_ID;
+            },
+            resultingAction: (_message: Message, componentInteraction: MessageComponentInteraction) => {
+                if(componentInteraction instanceof ButtonInteraction)
+                openAddPeriodModal(courseName, componentInteraction);
+            }
+        },
+        {
+            filter: (customId: string) => {
+                return customId === EDIT_PERIOD_BUTTON_ID;
+            },
+            resultingAction: (_message: Message, componentInteraction: MessageComponentInteraction) => {
+                if(componentInteraction instanceof ButtonInteraction)
+                openEditPeriodModal(courseName, componentInteraction);
+            }
+        },
+        {
+            filter: (customId: string) => {
+                return customId === DELETE_PERIOD_BUTTON_ID;
+            },
+            resultingAction: (_message: Message, componentInteraction: MessageComponentInteraction) => {
+                if(componentInteraction instanceof ButtonInteraction)
+                openDeletePeriodModal(courseName, componentInteraction);
+            }
+        }
+    ]
+    
+    return behaviors
 }
