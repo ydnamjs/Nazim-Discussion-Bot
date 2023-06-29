@@ -133,9 +133,9 @@ const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     filter: (customId: string) => {
         return customId === MAIN_MENU_CUSTOMID;
     },
-    resultingAction: async ( message, componentInteraction) => {
+    resultingAction: async (componentInteraction) => {
         componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
-        mainMenu.collectMenuInteraction(componentInteraction.user, message);
+        mainMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
     }
 }
 
@@ -144,9 +144,9 @@ const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     filter: (customId: string) => {
         return customId === CLOSE_MENU_CUSTOMID;
     },
-    resultingAction: async ( message, componentInteraction) => {
-        await message.reply("Discussion menu closed");
-        message.delete();
+    resultingAction: async (componentInteraction) => {
+        await componentInteraction.message.reply("Discussion menu closed");
+        componentInteraction.message.delete();
     }
 }
 

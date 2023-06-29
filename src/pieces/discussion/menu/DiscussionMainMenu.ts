@@ -42,7 +42,7 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
         filter: (customId: string) => {
             return customId === MAIN_MENU_STUDENT_BUTTON_ID;
         },
-        resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
+        resultingAction: (componentInteraction: MessageComponentInteraction) => {
             // TODO: Implement opening of student view once student menu is implemented
             componentInteraction.update({
                 content: "Student view not yet implemented",
@@ -55,7 +55,9 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
         filter: (customId: string) => {
             return customId === MAIN_MENU_STAFF_BUTTON_ID;
         },
-        resultingAction: updateToStaffMenu
+        resultingAction: (componentInteraction: MessageComponentInteraction) => {
+            updateToStaffMenu(componentInteraction.message, componentInteraction)
+        }
     },
 ]
 

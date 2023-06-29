@@ -178,8 +178,8 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId: string) => {
                 return customId === BACK_BUTTON_ID;
             },
-            resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
-                updateToManageCourseMenu(courseName, message, componentInteraction);
+            resultingAction: (componentInteraction: MessageComponentInteraction) => {
+                updateToManageCourseMenu(courseName, componentInteraction.message, componentInteraction);
             }
         }
     ]

@@ -9,7 +9,7 @@ import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, Client, 
 */
 export interface ComponentBehavior {
     filter: (customId: string) => boolean;
-    resultingAction: ( message: Message, componentInteraction: MessageComponentInteraction ) => void;
+    resultingAction: ( componentInteraction: MessageComponentInteraction ) => void;
 }
 
 /** 
@@ -102,7 +102,7 @@ export class BaseMenu {
             // For every component behavior, if the check function returns true, execute the resulting action
             this.componentBehaviors.forEach( (behavior: ComponentBehavior) => {
                 if(behavior.filter(componentUsed.customId)) {
-                    behavior.resultingAction(message, componentUsed);
+                    behavior.resultingAction(componentUsed);
                 }
             })
         }

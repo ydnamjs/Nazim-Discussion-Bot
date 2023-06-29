@@ -173,15 +173,15 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId: string) => {
                 return customId === BACK_BUTTON_ID;
             },
-            resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
-                updateToManageCourseMenu(courseName, message, componentInteraction);
+            resultingAction: (componentInteraction: MessageComponentInteraction) => {
+                updateToManageCourseMenu(courseName, componentInteraction.message, componentInteraction);
             }
         },
         {
             filter: (customId: string) => {
                 return customId === ADD_PERIOD_BUTTON_ID;
             },
-            resultingAction: (_message: Message, componentInteraction: MessageComponentInteraction) => {
+            resultingAction: (componentInteraction: MessageComponentInteraction) => {
                 if(componentInteraction instanceof ButtonInteraction)
                 openAddPeriodModal(courseName, componentInteraction);
             }
@@ -190,7 +190,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId: string) => {
                 return customId === EDIT_PERIOD_BUTTON_ID;
             },
-            resultingAction: (_message: Message, componentInteraction: MessageComponentInteraction) => {
+            resultingAction: (componentInteraction: MessageComponentInteraction) => {
                 if(componentInteraction instanceof ButtonInteraction)
                 openEditPeriodModal(courseName, componentInteraction);
             }
@@ -199,7 +199,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId: string) => {
                 return customId === DELETE_PERIOD_BUTTON_ID;
             },
-            resultingAction: (_message: Message, componentInteraction: MessageComponentInteraction) => {
+            resultingAction: (componentInteraction: MessageComponentInteraction) => {
                 if(componentInteraction instanceof ButtonInteraction)
                 openDeletePeriodModal(courseName, componentInteraction);
             }

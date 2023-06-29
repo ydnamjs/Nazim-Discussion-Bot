@@ -80,7 +80,7 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
         filter: (custom_id: string) => {
             return custom_id === EXPAND_COURSE_BUTTON_ID;
         },
-        resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
+        resultingAction: (componentInteraction: MessageComponentInteraction) => {
             // TODO: Implement functionality once modal has been created
         }
     },
@@ -89,9 +89,9 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
         filter: (custom_id: string) => {
             return custom_id === DROP_DOWN_ID;
         },
-        resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
+        resultingAction: (componentInteraction: MessageComponentInteraction) => {
             if(componentInteraction.isStringSelectMenu()){
-                updateToManageCourseMenu(componentInteraction.values[0], message, componentInteraction);
+                updateToManageCourseMenu(componentInteraction.values[0], componentInteraction.message, componentInteraction);
             }
             else {
                 componentInteraction.reply("An error occurred. Expected a select menu event but recieved something different");

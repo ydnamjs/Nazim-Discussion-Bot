@@ -177,15 +177,15 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId) => {
                 return customId === BACK_BUTTON_ID;
             },
-            resultingAction: (message, componentInteraction) => {
-                updateToStaffMenu(message, componentInteraction);
+            resultingAction: (componentInteraction) => {
+                updateToStaffMenu(componentInteraction.message, componentInteraction);
             }
         },
         {
             filter: (customId) => {
                 return customId === GET_SCORES_BUTTON_ID;
             },
-            resultingAction: (message, componentInteraction) => {
+            resultingAction: (componentInteraction) => {
                 // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
             }
         },
@@ -193,7 +193,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId) => {
                 return customId === MANAGE_POST_SCORING_BUTTON_ID;
             },
-            resultingAction: (message, componentInteraction) => {
+            resultingAction: (componentInteraction) => {
                 // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
             }
         },
@@ -201,7 +201,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId) => {
                 return customId === MANAGE_COMMENT_SCORING_BUTTON_ID;
             },
-            resultingAction: (message, componentInteraction) => {
+            resultingAction: (componentInteraction) => {
                 // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
             }
         },
@@ -209,7 +209,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId) => {
                 return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
             },
-            resultingAction: (message, componentInteraction) => {
+            resultingAction: (componentInteraction) => {
                 updateToManagePeriodsMenu(courseName, componentInteraction, true);
             }
         },
@@ -217,15 +217,15 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId) => {
                 return customId === VIEW_STUDENTS_BUTTON_ID;
             },
-            resultingAction: (message, componentInteraction) => {
-                updateToViewStudentsMenu(courseName, message, componentInteraction);
+            resultingAction: (componentInteraction) => {
+                updateToViewStudentsMenu(courseName, componentInteraction.message, componentInteraction);
             }
         },
         {
             filter: (customId) => {
                 return customId === VIEW_STAFF_BUTTON_ID;
             },
-            resultingAction: (message, componentInteraction) => {
+            resultingAction: (componentInteraction) => {
                 // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
             }
         },
