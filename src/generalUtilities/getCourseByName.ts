@@ -1,4 +1,4 @@
-import { StudentScoreData } from "src/generalModels/DiscussionScoring";
+import { StudentScoreData } from "../generalModels/DiscussionScoring";
 import { Course, courseModel } from "../generalModels/Course";
 
 export async function getCourseByName(courseName: string) {

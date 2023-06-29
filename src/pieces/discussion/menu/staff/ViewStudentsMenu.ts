@@ -1,12 +1,12 @@
-import { APIEmbedField, ButtonStyle, CacheType, Guild, GuildMember, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
-import { GUILDS } from "../../../../secret";
-import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
-import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
-import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
-import { addScorePeriods } from "../../tracking/scoreFunctions";
+import { APIEmbedField, ButtonStyle, Guild, GuildMember, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { Course } from "../../../../generalModels/Course";
+import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
+import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
+import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
+import { GUILDS } from "../../../../secret";
+import { addScorePeriods } from "../../tracking/scoreFunctions";
 import { ComponentBehavior } from "../BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
 
 const TITLE_COURSE_PREFIX = "Students of CISC ";
@@ -34,13 +34,13 @@ const STUDENT_NUM_PENALTIES_PREFIX = "\n# penalties recieved: ";
  * @param {Message} message - the message to have the menu be replaced on
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  */
-export async function updateToViewStudentsMenu(courseName: string, message: Message, componentInteraction: MessageComponentInteraction) {
+export async function updateToViewStudentsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
 
     let course = await getCourseByName(courseName)
 
     if(!course || !course.discussionSpecs) {
         await sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
-        await message.delete()
+        await componentInteraction.message.delete()
         return;
     }
 
@@ -73,7 +73,7 @@ export async function updateToViewStudentsMenu(courseName: string, message: Mess
 
     const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData, totalGoalScore, totalMaxScore);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
-    viewStudentsMenu.collectMenuInteraction(componentInteraction.user, message);
+    viewStudentsMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 function getTotalStudentData(student: GuildMember, totalPeriod: ScorePeriod): DiscussionStudentStats {
@@ -178,8 +178,8 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             filter: (customId: string) => {
                 return customId === BACK_BUTTON_ID;
             },
-            resultingAction: (message: Message, componentInteraction: MessageComponentInteraction) => {
-                updateToManageCourseMenu(courseName, message, componentInteraction);
+            resultingAction: (componentInteraction: MessageComponentInteraction) => {
+                updateToManageCourseMenu(courseName, componentInteraction);
             }
         }
     ]

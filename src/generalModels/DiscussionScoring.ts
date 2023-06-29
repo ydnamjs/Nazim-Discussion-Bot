@@ -59,7 +59,16 @@ export interface ScorePeriod {
     studentScores: Map<string, StudentScoreData>
 }
 
-//TODO: JSDOCIFY
+/**
+ * @interface stats about a students performance in a score period
+ * @property {number} score
+ * @property {number} numPosts
+ * @property {number} numIncomPost
+ * @property {number} numComments
+ * @property {number} numIncomComment
+ * @property {number} awardsRecieved
+ * @property {number} penaltiesRecieved
+ */
 export interface StudentScoreData {
     score: number,
     numPosts: number,

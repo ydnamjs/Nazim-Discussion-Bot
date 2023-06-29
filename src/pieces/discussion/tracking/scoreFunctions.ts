@@ -1,7 +1,7 @@
 import { Client, ForumChannel, Message, MessageReaction, User } from "discord.js";
 import loadDash from "lodash";
 import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, StudentScoreData } from "../../../generalModels/DiscussionScoring";
-import { userHasRoleWithId } from "../../../generalUtilities/GetRolesOfUserInGuild";
+import { userHasRoleWithId } from "../../../generalUtilities/RoleUtilities";
 import { getChannelInMainGuild } from "../../../generalUtilities/getChannelInMain";
 import { getCourseByName } from "../../../generalUtilities/getCourseByName";
 import { wait } from "../../../generalUtilities/wait";

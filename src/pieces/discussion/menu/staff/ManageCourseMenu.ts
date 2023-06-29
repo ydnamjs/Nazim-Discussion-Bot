@@ -1,8 +1,8 @@
-import { ButtonStyle, Component, InteractionUpdateOptions, Message, MessageComponentInteraction, messageLink } from "discord.js";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { APIEmbedField, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
-import { updateToStaffMenu } from "./DiscussionStaffMenu";
 import { ComponentBehavior } from "../BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { updateToStaffCoursesMenu } from "./StaffCoursesMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
 
@@ -106,12 +106,11 @@ const VIEW_STAFF_BUTTON_DATA = {
 const PEOPLE_BUTTON_ROW = makeActionRowButton([VIEW_STUDENTS_BUTTON_DATA, VIEW_STAFF_BUTTON_DATA]);
 
 // UPDATE FUNCTION
-export async function updateToManageCourseMenu(name: string, message: Message, componentInteraction: MessageComponentInteraction) {
+export async function updateToManageCourseMenu(name: string, componentInteraction: MessageComponentInteraction) {
 
-    // replace the old menu with the manage course menu
     const manageCourseMenu = new ManageCourseMenu(name);
-    componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
-    manageCourseMenu.collectMenuInteraction(componentInteraction.user, message);
+    await componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
+    manageCourseMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 // MENU TEXT CONSTANTS
@@ -126,129 +125,109 @@ const MANAGE_SCORE_PERIODS_DESCRIPTION = "Click the \"" + MANAGE_SCORE_PERIODS_B
 const VIEW_STUDENTS_DESCRIPTION = "Click the \"" + VIEW_STUDENTS_BUTTON_LABEL + "\" button to open a menu for viewing a list of students with various stats about them";
 const VIEW_STAFF_DESCRIPTION = "Click the \"" + VIEW_STAFF_BUTTON_LABEL + "\" button to open a menu for viewing a list of staff members with various stats about them";
 
+const menuFields: APIEmbedField[] = [
+    {
+        name: GET_SCORES_BUTTON_LABEL,
+        value: GET_SCORES_CSV_DESCRIPTION
+    },
+    {
+        name: MANAGE_POST_SCORING_BUTTON_LABEL,
+        value: MANAGE_POST_SCORING_DESCRIPTION
+    },
+    {
+        name: MANAGE_COMMENT_SCORING_BUTTON_LABEL,
+        value: MANAGE_COMMENT_SCORING_DESCRIPTION
+    },
+    {
+        name: MANAGE_SCORE_PERIODS_BUTTON_LABEL,
+        value: MANAGE_SCORE_PERIODS_DESCRIPTION
+    },
+    {
+        name: VIEW_STUDENTS_BUTTON_LABEL,
+        value: VIEW_STUDENTS_DESCRIPTION
+    },
+    {
+        name: VIEW_STAFF_BUTTON_LABEL,
+        value: VIEW_STAFF_DESCRIPTION
+    }
+]
 
-export class ManageCourseMenu extends NavigatedMenu {
+const ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
+
+class ManageCourseMenu extends NavigatedMenu {
+    
     constructor(courseTitle: string) {
-        
-        // generate the fields of basic info for each course and the select menu options
-        let fields: { name: string; value: string; }[] = [
-            // get scores csv button explanation
-            {
-                name: GET_SCORES_BUTTON_LABEL,
-                value: GET_SCORES_CSV_DESCRIPTION
-            },
-            // manage post scoring button explanation
-            {
-                name: MANAGE_POST_SCORING_BUTTON_LABEL,
-                value: MANAGE_POST_SCORING_DESCRIPTION
-            },
-            // manage comment scoring button explanation
-            {
-                name: MANAGE_COMMENT_SCORING_BUTTON_LABEL,
-                value: MANAGE_COMMENT_SCORING_DESCRIPTION
-            },
-            // manage score periods button explanation
-            {
-                name: MANAGE_SCORE_PERIODS_BUTTON_LABEL,
-                value: MANAGE_SCORE_PERIODS_DESCRIPTION
-            },
-            // view students button explanation
-            {
-                name: VIEW_STUDENTS_BUTTON_LABEL,
-                value: VIEW_STUDENTS_DESCRIPTION
-            },
-            // view staff button explanation
-            {
-                name: VIEW_STAFF_BUTTON_LABEL,
-                value: VIEW_STAFF_DESCRIPTION
-            }
-        ];
 
-        // list of additional components
-        const COURSE_MENU_ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
-        
-        // list of component behaviors
-        const COURSE_MENU_ADDITIONAL_BEHAVIORS: ComponentBehavior[] = [
-            // BACK TO MY COURSES BUTTON BEHAVIOR
-            {
-                filter: (customId) => {
-                    return customId === BACK_BUTTON_ID;
-                },
-                resultingAction: (message, componentInteraction) => {
-                    updateToStaffMenu(message, componentInteraction);
-                }
-            },
-
-            // GET SCORES CSV BUTTON BEHAVIOR
-            {
-                filter: (customId) => {
-                    return customId === GET_SCORES_BUTTON_ID;
-                },
-                resultingAction: (message, componentInteraction) => {
-                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
-                }
-            },
-
-            // MANAGE POST SCORING BUTTON BEHAVIOR
-            {
-                filter: (customId) => {
-                    return customId === MANAGE_POST_SCORING_BUTTON_ID;
-                },
-                resultingAction: (message, componentInteraction) => {
-                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
-                }
-            },
-
-            // MANAGE COMMENT SCORING BUTTON BEHAVIOR
-            {
-                filter: (customId) => {
-                    return customId === MANAGE_COMMENT_SCORING_BUTTON_ID;
-                },
-                resultingAction: (message, componentInteraction) => {
-                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
-                }
-            },
-
-            // MANAGE SCORE PERIODS BUTTON BEHAVIOR
-            {
-                filter: (customId) => {
-                    return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
-                },
-                resultingAction: (message, componentInteraction) => {
-                    updateToManagePeriodsMenu(courseTitle, componentInteraction, true);
-                }
-            },
-
-            // VIEW STUDENTS BUTTON BEHAVIOR
-            {
-                filter: (customId) => {
-                    return customId === VIEW_STUDENTS_BUTTON_ID;
-                },
-                resultingAction: (message, componentInteraction) => {
-                    updateToViewStudentsMenu(courseTitle, message, componentInteraction);
-                }
-            },
-
-            // VIEW STAFF BUTTON BEHAVIOR
-            {
-                filter: (customId) => {
-                    return customId === VIEW_STAFF_BUTTON_ID;
-                },
-                resultingAction: (message, componentInteraction) => {
-                    // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
-                }
-            },
-        ]
-
-        // data to be fed into super class navigated menu
         const menuData: NavigatedMenuData = {
             title: COURSE_NAME_PREFIX + courseTitle.toUpperCase() + COURSE_NAME_SUFFIX,
             description: MENU_DESCRIPTION,
-            fields: fields,
-            additionalComponents: COURSE_MENU_ADDITIONAL_COMPONENTS,
-            additionalComponentBehaviors: COURSE_MENU_ADDITIONAL_BEHAVIORS
+            fields: menuFields,
+            additionalComponents: ADDITIONAL_COMPONENTS,
+            additionalComponentBehaviors: generateBehaviors(courseTitle)
         }
 
         super(menuData, 0, customNavOptions);
     }
+}
+
+function generateBehaviors(courseName: string): ComponentBehavior[] {
+    
+    return [
+        {
+            filter: (customId) => {
+                return customId === BACK_BUTTON_ID;
+            },
+            resultingAction: (componentInteraction) => {
+                updateToStaffCoursesMenu(componentInteraction);
+            }
+        },
+        {
+            filter: (customId) => {
+                return customId === GET_SCORES_BUTTON_ID;
+            },
+            resultingAction: (componentInteraction) => {
+                // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+            }
+        },
+        {
+            filter: (customId) => {
+                return customId === MANAGE_POST_SCORING_BUTTON_ID;
+            },
+            resultingAction: (componentInteraction) => {
+                // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+            }
+        },
+        {
+            filter: (customId) => {
+                return customId === MANAGE_COMMENT_SCORING_BUTTON_ID;
+            },
+            resultingAction: (componentInteraction) => {
+                // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+            }
+        },
+        {
+            filter: (customId) => {
+                return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
+            },
+            resultingAction: (componentInteraction) => {
+                updateToManagePeriodsMenu(courseName, componentInteraction, true);
+            }
+        },
+        {
+            filter: (customId) => {
+                return customId === VIEW_STUDENTS_BUTTON_ID;
+            },
+            resultingAction: (componentInteraction) => {
+                updateToViewStudentsMenu(courseName, componentInteraction);
+            }
+        },
+        {
+            filter: (customId) => {
+                return customId === VIEW_STAFF_BUTTON_ID;
+            },
+            resultingAction: (componentInteraction) => {
+                // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+            }
+        },
+    ]
 }

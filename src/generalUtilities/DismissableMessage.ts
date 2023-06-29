@@ -18,9 +18,8 @@ const dismissRow = makeActionRowButton([{
 
 /**
  * @function replies to a message with a dismissable message. useful for creating notifications that can be dismissed
- * @param {Message} message - the interaction that is being replied to
+ * @param {Message} message - the message that is being replied to
  * @param {string} text - the content of the message
- * @throws {Error} unrepliableInteractionError - thrown when interaction is not repliable
  */
 export async function sendDismissableReply(message: Message, text: string) {
 
@@ -37,8 +36,32 @@ export async function sendDismissableReply(message: Message, text: string) {
 }
 
 /**
- * @function replies to an interaction with a dismissable message. useful for creating notifications that can be dismissed
+ * @function sends a reply to an interaction that can be dismissed with an attached button
  * @param {BaseInteraction} interaction - the interaction that is being replied to 
+ * @param {string} text - the content of the message
+ * @throws {Error} unrepliableInteractionError - thrown when interaction is not repliable
+ */
+export async function sendDismissableInteractionReply(interaction: BaseInteraction, text: string) {
+
+    if(interaction.isRepliable()) {
+        const reply = await interaction.reply({
+            content: text,
+            components: [dismissRow]
+        });
+        try {
+            await reply.awaitMessageComponent( {filter: (i: BaseInteraction) => i.user.id === interaction.user.id, time: DISMISSABLE_MESSAGE_DURATION } );
+        } catch {}
+        reply.delete()
+    } 
+
+    else {
+        throw new Error("Interaction in sendDismissableInteractionReply must be repliable");
+    }
+}
+
+/**
+ * @function sends a follow up to an interaction that can be dismissed with an attached button
+ * @param {BaseInteraction} interaction - the interaction that is having a follow up sent
  * @param {string} text - the content of the message
  * @throws {Error} unrepliableInteractionError - thrown when interaction is not repliable
  */
