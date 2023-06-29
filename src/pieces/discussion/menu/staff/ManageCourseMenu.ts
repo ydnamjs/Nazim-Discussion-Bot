@@ -1,4 +1,4 @@
-import { ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { APIEmbedField, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
 import { ComponentBehavior } from "../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
@@ -125,46 +125,44 @@ const MANAGE_SCORE_PERIODS_DESCRIPTION = "Click the \"" + MANAGE_SCORE_PERIODS_B
 const VIEW_STUDENTS_DESCRIPTION = "Click the \"" + VIEW_STUDENTS_BUTTON_LABEL + "\" button to open a menu for viewing a list of students with various stats about them";
 const VIEW_STAFF_DESCRIPTION = "Click the \"" + VIEW_STAFF_BUTTON_LABEL + "\" button to open a menu for viewing a list of staff members with various stats about them";
 
+const menuFields: APIEmbedField[] = [
+    {
+        name: GET_SCORES_BUTTON_LABEL,
+        value: GET_SCORES_CSV_DESCRIPTION
+    },
+    {
+        name: MANAGE_POST_SCORING_BUTTON_LABEL,
+        value: MANAGE_POST_SCORING_DESCRIPTION
+    },
+    {
+        name: MANAGE_COMMENT_SCORING_BUTTON_LABEL,
+        value: MANAGE_COMMENT_SCORING_DESCRIPTION
+    },
+    {
+        name: MANAGE_SCORE_PERIODS_BUTTON_LABEL,
+        value: MANAGE_SCORE_PERIODS_DESCRIPTION
+    },
+    {
+        name: VIEW_STUDENTS_BUTTON_LABEL,
+        value: VIEW_STUDENTS_DESCRIPTION
+    },
+    {
+        name: VIEW_STAFF_BUTTON_LABEL,
+        value: VIEW_STAFF_DESCRIPTION
+    }
+]
+
+const ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
 
 export class ManageCourseMenu extends NavigatedMenu {
     
     constructor(courseTitle: string) {
-        
-        let fields: { name: string; value: string; }[] = [
-            {
-                name: GET_SCORES_BUTTON_LABEL,
-                value: GET_SCORES_CSV_DESCRIPTION
-            },
-            {
-                name: MANAGE_POST_SCORING_BUTTON_LABEL,
-                value: MANAGE_POST_SCORING_DESCRIPTION
-            },
-            {
-                name: MANAGE_COMMENT_SCORING_BUTTON_LABEL,
-                value: MANAGE_COMMENT_SCORING_DESCRIPTION
-            },
-            {
-                name: MANAGE_SCORE_PERIODS_BUTTON_LABEL,
-                value: MANAGE_SCORE_PERIODS_DESCRIPTION
-            },
-            {
-                name: VIEW_STUDENTS_BUTTON_LABEL,
-                value: VIEW_STUDENTS_DESCRIPTION
-            },
-            {
-                name: VIEW_STAFF_BUTTON_LABEL,
-                value: VIEW_STAFF_DESCRIPTION
-            }
-        ];
 
-        const COURSE_MENU_ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
-
-        // data to be fed into super class navigated menu
         const menuData: NavigatedMenuData = {
             title: COURSE_NAME_PREFIX + courseTitle.toUpperCase() + COURSE_NAME_SUFFIX,
             description: MENU_DESCRIPTION,
-            fields: fields,
-            additionalComponents: COURSE_MENU_ADDITIONAL_COMPONENTS,
+            fields: menuFields,
+            additionalComponents: ADDITIONAL_COMPONENTS,
             additionalComponentBehaviors: generateBehaviors(courseTitle)
         }
 
