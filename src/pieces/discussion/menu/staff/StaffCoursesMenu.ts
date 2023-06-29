@@ -43,7 +43,7 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
         });
     }
 
-    const staffMenu = new StaffMenu(discussionCoursesData);
+    const staffMenu = new StaffCoursesMenu(discussionCoursesData);
     componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
     staffMenu.collectMenuInteraction(componentInteraction.user, message);
 }
@@ -130,7 +130,7 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
  * @class menu that displays basic info about a user's courses
  * @param {DiscussionCourseBasicData[]} courseInfo - list of courses to display information about
  */
-export class StaffMenu extends NavigatedMenu {
+export class StaffCoursesMenu extends NavigatedMenu {
     
     constructor(courseInfo: DiscussionCourseBasicData[]) {
         

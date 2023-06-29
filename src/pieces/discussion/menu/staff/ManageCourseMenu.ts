@@ -2,7 +2,7 @@ import { APIEmbedField, ButtonStyle, InteractionUpdateOptions, Message, MessageC
 import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
 import { ComponentBehavior } from "../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
-import { updateToStaffMenu } from "./DiscussionStaffMenu";
+import { updateToStaffMenu } from "./StaffCoursesMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
 
