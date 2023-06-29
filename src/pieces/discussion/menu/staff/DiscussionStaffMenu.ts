@@ -91,7 +91,7 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
         },
         resultingAction: (componentInteraction: MessageComponentInteraction) => {
             if(componentInteraction.isStringSelectMenu()){
-                updateToManageCourseMenu(componentInteraction.values[0], componentInteraction.message, componentInteraction);
+                updateToManageCourseMenu(componentInteraction.values[0], componentInteraction);
             }
             else {
                 componentInteraction.reply("An error occurred. Expected a select menu event but recieved something different");

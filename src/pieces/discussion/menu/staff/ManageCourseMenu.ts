@@ -106,11 +106,11 @@ const VIEW_STAFF_BUTTON_DATA = {
 const PEOPLE_BUTTON_ROW = makeActionRowButton([VIEW_STUDENTS_BUTTON_DATA, VIEW_STAFF_BUTTON_DATA]);
 
 // UPDATE FUNCTION
-export async function updateToManageCourseMenu(name: string, message: Message, componentInteraction: MessageComponentInteraction) {
+export async function updateToManageCourseMenu(name: string, componentInteraction: MessageComponentInteraction) {
 
     const manageCourseMenu = new ManageCourseMenu(name);
     componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
-    manageCourseMenu.collectMenuInteraction(componentInteraction.user, message);
+    manageCourseMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }
 
 // MENU TEXT CONSTANTS
