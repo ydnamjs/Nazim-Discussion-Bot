@@ -13,7 +13,7 @@ import { sendDismissableInteractionReply, sendDismissableReply } from "../../../
  * @param {Message} message - the message to have the menu be replaced on
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  */
-export async function updateToStaffMenu(message: Message, componentInteraction: MessageComponentInteraction) {
+export async function updateToStaffCoursesMenu(componentInteraction: MessageComponentInteraction) {
 
     const staffsCourses = await getStaffsDiscussionCourses(componentInteraction.client, componentInteraction.user);
 
@@ -45,7 +45,7 @@ export async function updateToStaffMenu(message: Message, componentInteraction: 
 
     const staffMenu = new StaffCoursesMenu(discussionCoursesData);
     componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
-    staffMenu.collectMenuInteraction(componentInteraction.user, message);
+    staffMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
 }
 
 async function getStaffsDiscussionCourses(client: Client, user: User) {

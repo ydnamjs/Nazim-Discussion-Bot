@@ -2,7 +2,7 @@ import { APIEmbedField, ButtonStyle, InteractionUpdateOptions, Message, MessageC
 import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
 import { ComponentBehavior } from "../BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
-import { updateToStaffMenu } from "./StaffCoursesMenu";
+import { updateToStaffCoursesMenu } from "./StaffCoursesMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
 
@@ -178,7 +178,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === BACK_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToStaffMenu(componentInteraction.message, componentInteraction);
+                updateToStaffCoursesMenu(componentInteraction.message, componentInteraction);
             }
         },
         {

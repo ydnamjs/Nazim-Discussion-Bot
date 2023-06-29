@@ -1,7 +1,7 @@
 import { ButtonComponentData, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { BaseMenu, ComponentBehavior } from "./BaseMenu";
 import { makeActionRowButton } from "../../../generalUtilities/MakeActionRow";
-import { updateToStaffMenu } from "./staff/StaffCoursesMenu";
+import { updateToStaffCoursesMenu } from "./staff/StaffCoursesMenu";
 
 const MAIN_MENU_TITLE = "Discussion Menu";
 const MAIN_MENU_DESCRIPTION = "Welcom to the discussion menu! Click the button below that corresponds to your role to open a menu for that role";
@@ -56,12 +56,11 @@ const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
             return customId === MAIN_MENU_STAFF_BUTTON_ID;
         },
         resultingAction: (componentInteraction: MessageComponentInteraction) => {
-            updateToStaffMenu(componentInteraction.message, componentInteraction)
+            updateToStaffCoursesMenu(componentInteraction)
         }
     },
 ]
 
-/** @constant the main menu object that is sent for the discussion menu command - used to acess all other menus */
 export const mainMenu = new BaseMenu({
     title: MAIN_MENU_TITLE,
     description: MAIN_MENU_DESCRIPTION,
