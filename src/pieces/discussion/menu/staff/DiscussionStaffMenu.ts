@@ -101,7 +101,7 @@ export interface DiscussionCourseBasicData {
 }
 
 const STAFF_MENU_TITLE = "My Courses";
-const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To access a specific course select it from the drop down or click the view course button and input the name of the course";
+const STAFF_MENU_DESCRIPTION = "Below this you will find a list of all your courses and some basic info about them and their discussions. To manage the score period or scoring rules of a course select it from the drop down";
 
 const DROP_DOWN_ID = "discussion-course-select";
 
