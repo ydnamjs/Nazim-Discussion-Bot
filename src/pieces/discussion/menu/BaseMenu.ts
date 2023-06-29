@@ -1,4 +1,5 @@
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions, StringSelectMenuBuilder, User } from "discord.js";
+import { sendDismissableReply } from "../../../generalUtilities/DismissableMessage";
 
 /**  
  * @interface interface of filter and action function
@@ -44,9 +45,6 @@ export interface buttonData {
     style: ButtonStyle
 };
 
-/**
- *  @constant The maximum number of components discord allows in a message
-*/
 export const MAX_NUMBER_OF_COMPONENT_ROWS = 5; 
 const MAX_COMPONENT_ROWS_EXCEEDED_ERROR = "ERROR: TRIED TO CREATE A MENU WITH MORE COMPONENT ROWS THAN ALLOWED";
 
@@ -56,50 +54,22 @@ const MAX_COMPONENT_ROWS_EXCEEDED_ERROR = "ERROR: TRIED TO CREATE A MENU WITH MO
  */
 export class BaseMenu {
 
-// MENU MESSAGING
-
-    /** @member {MessageCreateOptions} object that is used to construct a message containing the embed and components */
     menuMessageData: MessageCreateOptions;
 
-    /** 
-     * @function sends the menu as a message to the interaction user as a direct message
-     * @param {Client} client - the client that the bot is logged in as
-     * @param {BaseInteraction} interaction - the interaction that spawned this menu
-     * @returns {Promise<Message<false>>} - the message that was sent
-     */
-    async send(client: Client, interaction: BaseInteraction): Promise<Message<false>> {
-        const sentMenuMessage = await interaction.user.send(this.menuMessageData);
-        this.collectMenuInteraction(interaction.user, sentMenuMessage)
-        return sentMenuMessage;
-    }
-
-// COMPONENT BEHAVIOR
-
-    /** @constant The message sent to the user when the menu expires due to inactivity */
     private static MENU_EXPIRTATION_MESSAGE = "Your discussion menu expired due to inactivity";
-    /** @constant the amount of time in miliseconds before the menu expires (gets deleted) */
     private static MENU_EXPIRATION_TIME = 600_000;
 
-    /** @member list of all the behaviors for the menu components */
     private componentBehaviors: ComponentBehavior[];
 
-    // TODO: Update js doc it is currently wrong
     /** 
      * @function handles the collection of interactions on the menu when it is sent
-     * @param {Client} client - the client that the bot is logged in as
-     * @param {BaseInteraction} interaction - the interaction that the menu belongs to
      * @param {Message} message - the message from which the component interactions are being collected
      */
-    async collectMenuInteraction(user: User, message: Message ): Promise<void> {
+    async collectMenuInteraction(message: Message ): Promise<void> {
         try {
 
-            // Filter that checks if id of the component user matches the id of the menu reciever (should always be that way since DM but just in case)
-            const collectorFilter = (i: BaseInteraction) => i.user.id === user.id;
+            const componentUsed = await message.awaitMessageComponent({time: BaseMenu.MENU_EXPIRATION_TIME});
 
-            // Get the component that was pressed if one was pressed before menu expires
-            const componentUsed = await message.awaitMessageComponent( {filter: collectorFilter, time: BaseMenu.MENU_EXPIRATION_TIME } );
-
-            // For every component behavior, if the check function returns true, execute the resulting action
             this.componentBehaviors.forEach( (behavior: ComponentBehavior) => {
                 if(behavior.filter(componentUsed.customId)) {
                     behavior.resultingAction(componentUsed);
@@ -108,36 +78,31 @@ export class BaseMenu {
         }
         catch (error: any) {
 
-            // if the collector expired, delete the menu and notify the user that it expired
             // TODO: I feel like theres a better way to do this but it will work for now
             if(error.toString().includes("Collector received no interactions before ending with reason: time")) {
+                sendDismissableReply(message, BaseMenu.MENU_EXPIRTATION_MESSAGE)
                 message.delete()
-                user.send(BaseMenu.MENU_EXPIRTATION_MESSAGE);
             }
         }
     }
 
     constructor(menuData: MenuData) {
 
-        // components have a maximum number of rows
         if(menuData.components && menuData.components.length > MAX_NUMBER_OF_COMPONENT_ROWS) {
             throw new Error(MAX_COMPONENT_ROWS_EXCEEDED_ERROR);
         }
 
-        // build an embed as the menu's display
         const menuEmbed = new EmbedBuilder({
             title: menuData.title,
             description: menuData.description,
             fields: menuData.fields
         });
 
-        // construct the menu Message Data for the message to be sent to the user
         this.menuMessageData = { 
             embeds: [menuEmbed],
             components: menuData.components
         }
 
-        // define the behaviors for the menu's components
         this.componentBehaviors = [];
         if(menuData.componentBehaviors) {
             this.componentBehaviors = menuData.componentBehaviors;

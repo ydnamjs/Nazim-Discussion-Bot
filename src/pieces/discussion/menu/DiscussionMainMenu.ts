@@ -1,4 +1,4 @@
-import { ButtonComponentData, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { BaseInteraction, ButtonComponentData, ButtonStyle, Client, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { BaseMenu, ComponentBehavior } from "./BaseMenu";
 import { makeActionRowButton } from "../../../generalUtilities/MakeActionRow";
 import { updateToStaffCoursesMenu } from "./staff/StaffCoursesMenu";
@@ -17,7 +17,6 @@ const MAIN_MENU_STAFF_BUTTON_LABEL = "staff view";
 const MAIN_MENU_STAFF_BUTTON_STYLE = ButtonStyle.Primary;
 const MAIN_MENU_STAFF_BUTTON_DISABLED = false;
 
-/** @constant list of button data used to construct the visual parts of the buttons for the main menu */
 const MAIN_MENU_BUTTON_DATA: Partial<ButtonComponentData>[] = [
     {
         customId: MAIN_MENU_STUDENT_BUTTON_ID,
@@ -33,10 +32,8 @@ const MAIN_MENU_BUTTON_DATA: Partial<ButtonComponentData>[] = [
     }
 ];
 
-/** @constant the components of the main menu (see MAIN_MENU_BUTTON_DATA for how editing how they look and MAIN_MENU_BUTTON_BEHAVIORS for how they act) */
 const MAIN_MENU_COMPONENTS = [makeActionRowButton(MAIN_MENU_BUTTON_DATA)];
 
-/**@constant behavior data of main menu buttons (see component behavior interface in class.BaseMenu.ts) */
 const MAIN_MENU_BUTTON_BEHAVIORS: ComponentBehavior[] = [
     {
         filter: (customId: string) => {
@@ -68,3 +65,9 @@ export const mainMenu = new BaseMenu({
     components: MAIN_MENU_COMPONENTS,
     componentBehaviors: MAIN_MENU_BUTTON_BEHAVIORS
 });
+
+export async function sendDiscussionMainMenu(interaction: BaseInteraction): Promise<Message<false>> {
+    const sentMenuMessage = await interaction.user.send(mainMenu.menuMessageData);
+    mainMenu.collectMenuInteraction(sentMenuMessage)
+    return sentMenuMessage;
+}

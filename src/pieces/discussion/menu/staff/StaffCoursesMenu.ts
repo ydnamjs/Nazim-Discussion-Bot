@@ -45,7 +45,7 @@ export async function updateToStaffCoursesMenu(componentInteraction: MessageComp
 
     const staffMenu = new StaffCoursesMenu(discussionCoursesData);
     componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
-    staffMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
+    staffMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 async function getStaffsDiscussionCourses(client: Client, user: User) {

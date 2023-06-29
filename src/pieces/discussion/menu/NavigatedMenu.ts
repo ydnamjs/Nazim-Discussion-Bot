@@ -116,7 +116,7 @@ const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     },
     resultingAction: async (componentInteraction) => {
         componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
-        mainMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
+        mainMenu.collectMenuInteraction(componentInteraction.message);
     }
 }
 

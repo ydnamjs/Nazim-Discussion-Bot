@@ -110,7 +110,7 @@ export async function updateToManageCourseMenu(name: string, componentInteractio
 
     const manageCourseMenu = new ManageCourseMenu(name);
     await componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
-    manageCourseMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
+    manageCourseMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 // MENU TEXT CONSTANTS
@@ -178,7 +178,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === BACK_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToStaffCoursesMenu(componentInteraction.message, componentInteraction);
+                updateToStaffCoursesMenu(componentInteraction);
             }
         },
         {

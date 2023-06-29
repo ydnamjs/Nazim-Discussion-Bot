@@ -73,7 +73,7 @@ export async function updateToViewStudentsMenu(courseName: string, componentInte
 
     const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData, totalGoalScore, totalMaxScore);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
-    viewStudentsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
+    viewStudentsMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 function getTotalStudentData(student: GuildMember, totalPeriod: ScorePeriod): DiscussionStudentStats {

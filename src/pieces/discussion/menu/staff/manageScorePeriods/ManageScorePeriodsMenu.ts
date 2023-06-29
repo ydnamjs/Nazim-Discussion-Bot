@@ -82,7 +82,7 @@ export async function updateToManagePeriodsMenu(courseName: string, componentInt
 
     const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
     isInteractionUpdate ? componentInteraction.update(managePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(managePeriodsMenu.menuMessageData as InteractionUpdateOptions);
-    managePeriodsMenu.collectMenuInteraction(componentInteraction.user, componentInteraction.message);
+    managePeriodsMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 /**
