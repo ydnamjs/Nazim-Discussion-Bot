@@ -21,7 +21,7 @@
         "baseUrl": "./"
     },
     "files": [
-        "src/_Bot.ts"
+        "src/_Bot.ts", "./src/pieces/discussion/menu/staff/manageScorePeriods/ModalInputHandler.ts"
     ],
     "include": [
         "./**/*.ts"

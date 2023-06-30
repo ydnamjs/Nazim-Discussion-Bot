@@ -1,16 +1,11 @@
-import { ActionRowBuilder, ButtonInteraction, Client, ModalBuilder, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
 import { DateTime } from "luxon";
 import { courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
-import { sendDismissableFollowUp } from "../../../../../generalUtilities/DismissableMessage";
-import { scoreAllThreadsInCourse } from "../../../../../pieces/discussion/tracking/scoreFunctions";
+import { scoreAllThreadsInCourse } from "../../../tracking/scoreFunctions";
+import { ModalInputHandler, createDiscussionModal } from "../../ModalUtilities";
 import { refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, MODAL_EXPIRATION_TIME, START_DATE_INPUT_ID } from "./ModalComponents";
-
-/**
- * @type function that will handle a modals input data and return the interaction response message as a string
- */
-export type ModalInputHandler = (client: Client, courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
+import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, START_DATE_INPUT_ID } from "./ModalComponents";
 
 /**
  * @function creates and handles a modal for managing score periods
@@ -21,41 +16,14 @@ export type ModalInputHandler = (client: Client, courseName: string, submittedMo
  * @param {ActionRowBuilder<TextInputBuilder>[]} components - the components that on the modal
  * @param {ModalInputHandler} modalInputHandler - function that handles the modal input
  */
-export async function createManagePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
+export async function createHandleModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
-    // the modal id has to be generated based on time 
-    // because if it isnt and the user cancels the modal and opens another one
-    // we have to filter that it matches the id otherwise the canceled modal will also be processed
-    // and we'll have duplicates and that behavior is VERY undefined
-    const modalId = idPrefix + new Date().getMilliseconds()
-
     updateToManagePeriodsMenu(courseName, triggerInteraction, false);
 
-    const addScorePeriodModal = new ModalBuilder({
-        customId: modalId,
-        title: titlePrefix + courseName,
-        components: components
-    })
-    
-    triggerInteraction.showModal(addScorePeriodModal);
-
-    let submittedModal: ModalSubmitInteraction | undefined = undefined;
-    try {
-
-        // we have to filter that it matches the id because if it isnt and the user cancels the modal and opens another one the
-        // canceled modal will also be processed and we'll have duplicates and that behavior is VERY undefined
-        // (this is unlike message component interactions! and thus weird)
-        submittedModal = await triggerInteraction.awaitModalSubmit({filter: (modal)=> {return modal.customId === modalId}, time: MODAL_EXPIRATION_TIME});
-    }
-    catch {}
-
-    if (submittedModal !== undefined) {
-        await submittedModal.deferReply()
-        const replyText = await modalInputHandler(triggerInteraction.client, courseName, submittedModal);
-        refreshManagePeriodsMenu(courseName, triggerInteraction);
-        sendDismissableFollowUp(submittedModal, replyText);
-    }
+    createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePeriodsMenu(courseName, triggerInteraction)})
 }
+
+//        refreshManagePeriodsMenu(courseName, triggerInteraction);
 
 /**
  * @interface information about the validity of a score period

@@ -1,7 +1,7 @@
 import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, periodNumActionRow, startDateActionRow } from "./ModalComponents";
-import { NewPeriodData, checkAgainstCurrentPeriods, createManagePeriodModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, sortPeriods, validatePeriodInput } from "./ModalUtilities";
+import { NewPeriodData, checkAgainstCurrentPeriods, createHandleModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, sortPeriods, validatePeriodInput } from "./PeriodModalUtilities";
 
 const MODAL_ID_PREFIX = "edit_score_period_modal";
 const MODAL_TITLE_PREFIX = "Edit Score Period In CISC ";
@@ -22,7 +22,7 @@ export async function openEditPeriodModal(courseName: string, triggerInteraction
         maxPointsActionRow
     ];
     
-    await createManagePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
+    await createHandleModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 
 async function handleModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
