@@ -2,10 +2,11 @@ import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, Te
 import { DateTime } from "luxon";
 import { courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
-import { scoreAllThreadsInCourse } from "../../../tracking/scoreFunctions";
+import { scoreAllThreads } from "../../../tracking/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../ModalUtilities";
 import { refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, START_DATE_INPUT_ID } from "./ModalComponents";
+import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 
 /**
  * @function creates and handles a modal for managing score periods
@@ -153,7 +154,15 @@ export async function insertOnePeriod(client: Client, courseName: string, newSco
 
     // TODO: After on the fly scoring is done, add listeners to undo and pause it while scoring is being done
     scorePeriods = scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
-    const newScorePeriods = await scoreAllThreadsInCourse(client, courseName, [{ ...newScorePeriodData, studentScores: new Map() }])
+
+    const course = await getCourseByName(courseName);
+
+    if(!course || !course.discussionSpecs || !course.channels.discussion)
+        return "database error"
+
+    course.discussionSpecs.scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
+
+    const newScorePeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
     
     if(!newScorePeriods || newScorePeriods.length !== 1)
         return "scoring error ocurred";
