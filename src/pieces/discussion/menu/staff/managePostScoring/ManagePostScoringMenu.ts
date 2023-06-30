@@ -54,7 +54,8 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
 }
 
 function generateFields(postSpecs: PostSpecs): APIEmbedField[] {
-    return [
+    
+    const fields = [
         {
             name: "Post Points: " + postSpecs.points,
             value: SCORE_DESCRIPTION
@@ -79,5 +80,22 @@ function generateFields(postSpecs: PostSpecs): APIEmbedField[] {
             name: "Awards & Penalties",
             value: AWARD_DESCRIPTION
         }
-    ]
+    ];
+    
+    fields.push(...makeAwardFields(postSpecs))
+
+    return fields;
+}
+
+function makeAwardFields(postSpecs: PostSpecs) {
+    const awards = [...postSpecs.awards];
+
+    const awardFields: APIEmbedField[] = awards.map((award)=> {
+        return {
+            name: award[0],
+            value: "points: " + award[1].points + "\ngivers: " + (award[1].trackStudents ? "Everyone" : "Staff Only")
+        }
+    })
+
+    return awardFields;
 }
