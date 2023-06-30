@@ -1,10 +1,11 @@
-import { APIEmbedField, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
+import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
 import { NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { ComponentBehavior } from "../../BaseMenu";
 import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
+import { openEditPostModal } from "./EditPostScoringModal";
 
 const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
 const MENU_DESCRIPTION = "replace me";
@@ -34,7 +35,7 @@ const AWARD_NOT_STAFFONLY_TEXT = "Everyone"
 
 const EDIT_SCORING_BUTTON_ID = "discussion-edit-post-scoring-button";
 const EDIT_SCORING_BUTTON_LABEL = "Edit Post Scoring";
-const EDIT_SCORING_BUTTON_DISABLED = true;
+const EDIT_SCORING_BUTTON_DISABLED = false;
 const EDIT_SCORING_BUTTON_STYLE = ButtonStyle.Primary
 
 const ADD_AWARD_BUTTON_ID = "discussion-add-post-award-button";
@@ -82,7 +83,7 @@ const DELETE_AWARD_BUTTON_DATA = {
 
 const SCORE_BUTTON_ROW = makeActionRowButton([EDIT_SCORING_BUTTON_DATA, ADD_AWARD_BUTTON_DATA, EDIT_AWARD_BUTTON_DATA, DELETE_AWARD_BUTTON_DATA])
 
-export async function updateToManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function updateToManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
     
     let course = await getCourseByName(courseName)
 
@@ -93,8 +94,21 @@ export async function updateToManagePostScoringMenu(courseName: string, componen
     }
 
     const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
-    componentInteraction.update(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
+    isInteractionUpdate ? componentInteraction.update(managePostScoringMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
     managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
+}
+
+export async function refreshManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+    let course = await getCourseByName(courseName)
+
+    if(!course || !course.discussionSpecs) {
+        await sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
+        await componentInteraction.message.delete()
+        return;
+    }
+
+    const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
+    componentInteraction.message.edit(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
 }
 
 export class ManagePostScoringMenu extends NavigatedMenu {
@@ -115,7 +129,12 @@ export class ManagePostScoringMenu extends NavigatedMenu {
 
 function generateBehaviors(courseName: string): ComponentBehavior[] {
     
-    const behaviors: ComponentBehavior[] = []
+    const behaviors: ComponentBehavior[] = [
+        {
+            filter: (customId) => {return customId === EDIT_SCORING_BUTTON_ID},
+            resultingAction: (triggerInteraction) => { openEditPostModal(courseName, triggerInteraction as ButtonInteraction) }
+        }
+    ];
     
     return behaviors
 }

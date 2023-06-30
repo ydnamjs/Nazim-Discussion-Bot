@@ -1,7 +1,7 @@
 import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, periodNumActionRow } from "./ModalComponents";
-import { createHandleModal, handleIndexValidation, overwritePeriods } from "./PeriodModalUtilities";
+import { createHandlePeriodModal, handleIndexValidation, overwritePeriods } from "./PeriodModalUtilities";
 
 const MODAL_ID_PREFIX = "delete_score_period_modal"
 const MODAL_TITLE_PREFIX = "Delete Score Period From CISC ";
@@ -18,7 +18,7 @@ export async function openDeletePeriodModal(courseName: string, triggerInteracti
         periodNumActionRow
     ];
     
-    await createHandleModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
+    await createHandlePeriodModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput);
 }
 
 async function handleModalInput(_client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {

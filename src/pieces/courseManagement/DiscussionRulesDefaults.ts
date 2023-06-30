@@ -7,7 +7,7 @@ let DEFAULT_AWARDS = new Map<string, AwardSpecs>([
     ["👍", {points: 10, trackStudents: true }]
 ]);
 
-const DEFAULT_POST_SPECS: PostSpecs = {
+export const DEFAULT_POST_SPECS: PostSpecs = {
     points: 270,
     commentPoints: 60,
     minLength: 50,
@@ -16,7 +16,7 @@ const DEFAULT_POST_SPECS: PostSpecs = {
     awards: DEFAULT_AWARDS
 }
 
-const DEFAULT_COMMENT_SPECS: CommentSpecs = {
+export const DEFAULT_COMMENT_SPECS: CommentSpecs = {
     points: 210,
     minLength: 25,
     minParagraphs: 0,

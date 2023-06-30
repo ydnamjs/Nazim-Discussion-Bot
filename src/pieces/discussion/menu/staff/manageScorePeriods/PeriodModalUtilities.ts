@@ -16,14 +16,12 @@ import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POI
  * @param {ActionRowBuilder<TextInputBuilder>[]} components - the components that on the modal
  * @param {ModalInputHandler} modalInputHandler - function that handles the modal input
  */
-export async function createHandleModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
+export async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
     updateToManagePeriodsMenu(courseName, triggerInteraction, false);
 
     createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePeriodsMenu(courseName, triggerInteraction)})
 }
-
-//        refreshManagePeriodsMenu(courseName, triggerInteraction);
 
 /**
  * @interface information about the validity of a score period
