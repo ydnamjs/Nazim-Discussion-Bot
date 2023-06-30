@@ -72,11 +72,8 @@ async function rescoreCourse(client: Client, courseName: string, newPostScoringD
 
     const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
-    if(rescoredPeriods)
-        console.log(rescoredPeriods[0].studentScores.values())
-
     if(!rescoredPeriods)
-        return "rescore"
+        return "rescore error"
 
     return updateCourse(courseName, course.discussionSpecs.postSpecs, rescoredPeriods);
 }
