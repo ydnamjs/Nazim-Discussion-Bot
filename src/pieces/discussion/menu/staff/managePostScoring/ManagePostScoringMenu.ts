@@ -1,9 +1,10 @@
-import { APIEmbedField, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
+import { APIEmbedField, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
 import { NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
 import { ComponentBehavior } from "../../BaseMenu";
 import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
+import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 
 const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
 const MENU_DESCRIPTION = "replace me";
@@ -31,6 +32,56 @@ const AWARD_GIVERS_PREFIX = "\ngivers: "
 const AWARD_STAFFONLY_TEXT = "Staff Only"
 const AWARD_NOT_STAFFONLY_TEXT = "Everyone"
 
+const EDIT_SCORING_BUTTON_ID = "discussion-edit-post-scoring-button";
+const EDIT_SCORING_BUTTON_LABEL = "Edit Post Scoring";
+const EDIT_SCORING_BUTTON_DISABLED = true;
+const EDIT_SCORING_BUTTON_STYLE = ButtonStyle.Primary
+
+const ADD_AWARD_BUTTON_ID = "discussion-add-post-award-button";
+const ADD_AWARD_BUTTON_LABEL = "Add Post Award";
+const ADD_AWARD_BUTTON_DISABLED = true;
+const ADD_AWARD_BUTTON_STYLE = ButtonStyle.Primary
+
+const EDIT_AWARD_BUTTON_ID = "discussion-edit-post-award-button";
+const EDIT_AWARD_BUTTON_LABEL = "Edit Post Award";
+const EDIT_AWARD_BUTTON_DISABLED = true;
+const EDIT_AWARD_BUTTON_STYLE = ButtonStyle.Primary
+
+const DELETE_AWARD_BUTTON_ID = "discussion-delete-post-award-button";
+const DELETE_AWARD_BUTTON_LABEL = "Delete Post Award";
+const DELETE_AWARD_BUTTON_DISABLED = true;
+const DELETE_AWARD_BUTTON_STYLE = ButtonStyle.Primary
+
+const EDIT_SCORING_BUTTON_DATA = {
+    custom_id: EDIT_SCORING_BUTTON_ID,
+    label: EDIT_SCORING_BUTTON_LABEL,
+    disabled: EDIT_SCORING_BUTTON_DISABLED,
+    style: EDIT_SCORING_BUTTON_STYLE
+};
+
+const ADD_AWARD_BUTTON_DATA = {
+    custom_id: ADD_AWARD_BUTTON_ID,
+    label: ADD_AWARD_BUTTON_LABEL,
+    disabled: ADD_AWARD_BUTTON_DISABLED,
+    style: ADD_AWARD_BUTTON_STYLE
+};
+
+const EDIT_AWARD_BUTTON_DATA = {
+    custom_id: EDIT_AWARD_BUTTON_ID,
+    label: EDIT_AWARD_BUTTON_LABEL,
+    disabled: EDIT_AWARD_BUTTON_DISABLED,
+    style: EDIT_AWARD_BUTTON_STYLE
+};
+
+const DELETE_AWARD_BUTTON_DATA = {
+    custom_id: DELETE_AWARD_BUTTON_ID,
+    label: DELETE_AWARD_BUTTON_LABEL,
+    disabled: DELETE_AWARD_BUTTON_DISABLED,
+    style: DELETE_AWARD_BUTTON_STYLE
+};
+
+const SCORE_BUTTON_ROW = makeActionRowButton([EDIT_SCORING_BUTTON_DATA, ADD_AWARD_BUTTON_DATA, EDIT_AWARD_BUTTON_DATA, DELETE_AWARD_BUTTON_DATA])
+
 export async function updateToManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
@@ -54,7 +105,7 @@ export class ManagePostScoringMenu extends NavigatedMenu {
             title: TITLE_COURSE_PREFIX + courseName.toUpperCase(),
             description: MENU_DESCRIPTION,
             fields: generateFields(postSpecs),
-            additionalComponents: [],
+            additionalComponents: [SCORE_BUTTON_ROW],
             additionalComponentBehaviors: generateBehaviors(courseName),
         }
 
