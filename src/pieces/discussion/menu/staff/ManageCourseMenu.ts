@@ -5,6 +5,7 @@ import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../Navigated
 import { updateToStaffCoursesMenu } from "./StaffCoursesMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
+import { updateToManagePostScoringMenu } from "./managePostScoring/ManagePostScoringMenu";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
@@ -19,7 +20,7 @@ const GET_SCORES_BUTTON_STYLE = ButtonStyle.Primary
 
 const MANAGE_POST_SCORING_BUTTON_ID = "discussion-manage-post-scoring";
 const MANAGE_POST_SCORING_BUTTON_LABEL = "Post Scoring";
-const MANAGE_POST_SCORING_BUTTON_DISABLED = true;
+const MANAGE_POST_SCORING_BUTTON_DISABLED = false;
 const MANAGE_POST_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
 
 const MANAGE_COMMENT_SCORING_BUTTON_ID = "discussion-manage-comment-scoring";
@@ -194,7 +195,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_POST_SCORING_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                updateToManagePostScoringMenu(courseName, componentInteraction)
             }
         },
         {
