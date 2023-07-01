@@ -2,6 +2,8 @@ import { ActionRowBuilder, ButtonInteraction, TextInputBuilder, TextInputStyle }
 import { ModalInputHandler, createDiscussionModal } from "../../ModalUtilities";
 import { refreshManagePostScoringMenu, updateToManagePostScoringMenu } from "./ManagePostScoringMenu";
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
+import { PostSpecs, ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
+import { courseModel } from "../../../../../generalModels/Course";
 
 // score input component
 export const SCORE_INPUT_ID = "discussion_score_input";
@@ -78,4 +80,22 @@ export async function openPostScoringModal(idPrefix: string, titlePrefix: string
     updateToManagePostScoringMenu(courseName, triggerInteraction, false);
 
     await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePostScoringMenu(courseName, triggerInteraction)})
+}
+
+export async function updateCourse(courseName: string, newPostSpecs: PostSpecs, newScorePeriods: ScorePeriod[]) {
+    
+    try {
+        await courseModel.findOneAndUpdate( 
+            {name: courseName}, 
+            {
+                "discussionSpecs.postSpecs": newPostSpecs,
+                "discussionSpecs.scorePeriods": newScorePeriods
+            }
+        )
+    }
+    catch(error: any) {
+        console.error(error);
+        return "database error";
+    }
+    return "success";
 }

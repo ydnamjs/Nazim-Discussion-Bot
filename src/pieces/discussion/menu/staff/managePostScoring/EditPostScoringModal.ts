@@ -1,9 +1,9 @@
 import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
-import { COMMENT_SCORE_INPUT_ID, LENGTH_REQ_INPUT_ID, LINK_REQ_INPUT_ID, PARA_REQ_INPUT_ID, SCORE_INPUT_ID, commentScoreInputActionRow, lengthReqInputActionRow, linkReqInputActionRow, openPostScoringModal, paraReqInputActionRow, scoreInputActionRow } from "./ScoringModalUtilities";
+import { COMMENT_SCORE_INPUT_ID, LENGTH_REQ_INPUT_ID, LINK_REQ_INPUT_ID, PARA_REQ_INPUT_ID, SCORE_INPUT_ID, commentScoreInputActionRow, lengthReqInputActionRow, linkReqInputActionRow, openPostScoringModal, paraReqInputActionRow, scoreInputActionRow, updateCourse } from "./ScoringModalUtilities";
 import { scoreAllThreads } from "../../../../../pieces/discussion/tracking/scoreFunctions";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
-import { PostSpecs, ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
-import { courseModel } from "../../../../../generalModels/Course";
+import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
+
 
 const MODAL_ID_PREFIX = "test";
 const MODAL_TITLE_PREFIX = "";
@@ -76,22 +76,4 @@ async function rescoreCourse(client: Client, courseName: string, newPostScoringD
         return "rescore error"
 
     return updateCourse(courseName, course.discussionSpecs.postSpecs, rescoredPeriods);
-}
-
-async function updateCourse(courseName: string, newPostSpecs: PostSpecs, newScorePeriods: ScorePeriod[]) {
-    
-    try {
-        await courseModel.findOneAndUpdate( 
-            {name: courseName}, 
-            {
-                "discussionSpecs.postSpecs": newPostSpecs,
-                "discussionSpecs.scorePeriods": newScorePeriods
-            }
-        )
-    }
-    catch(error: any) {
-        console.error(error);
-        return "database error";
-    }
-    return "success";
 }
