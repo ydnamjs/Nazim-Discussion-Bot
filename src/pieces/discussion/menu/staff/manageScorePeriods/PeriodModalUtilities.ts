@@ -162,6 +162,9 @@ export async function insertOnePeriod(client: Client, courseName: string, newSco
 
     course.discussionSpecs.scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
 
+    // FIXME: This is currently broken because the rescored period isnt always the first/only one
+    // it was before the changes to rescoring done with post editing but now it isnt
+    // we likely just need to feed in discussion specs from the functions that call this instead of getting new ones from course since those dont have the removed/edited period
     const newScorePeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
     
     if(!newScorePeriods || newScorePeriods.length !== 1)
@@ -177,7 +180,7 @@ export async function insertOnePeriod(client: Client, courseName: string, newSco
  * @param {ScorePeriod[]} periods - the periods to be sorted
  * @returns {ScorePeriod[]} sorted periods - 
  */
-export function sortPeriods(periods: ScorePeriod[]) {
+export function sortPeriods(periods: ScorePeriod[]): ScorePeriod[] {
 
     return periods.sort((a, b) => {return a.start.valueOf() - b.start.valueOf()});
 }
