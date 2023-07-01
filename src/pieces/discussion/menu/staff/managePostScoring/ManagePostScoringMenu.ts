@@ -6,6 +6,7 @@ import { getCourseByName } from "../../../../../generalUtilities/getCourseByName
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { openEditPostModal } from "./EditPostScoringModal";
+import { openAddPostAwardModal } from "./AddPostAwardModal";
 
 const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
 const MENU_DESCRIPTION = "replace me";
@@ -40,7 +41,7 @@ const EDIT_SCORING_BUTTON_STYLE = ButtonStyle.Primary
 
 const ADD_AWARD_BUTTON_ID = "discussion-add-post-award-button";
 const ADD_AWARD_BUTTON_LABEL = "Add Post Award";
-const ADD_AWARD_BUTTON_DISABLED = true;
+const ADD_AWARD_BUTTON_DISABLED = false;
 const ADD_AWARD_BUTTON_STYLE = ButtonStyle.Primary
 
 const EDIT_AWARD_BUTTON_ID = "discussion-edit-post-award-button";
@@ -133,6 +134,10 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
         {
             filter: (customId) => {return customId === EDIT_SCORING_BUTTON_ID},
             resultingAction: (triggerInteraction) => { openEditPostModal(courseName, triggerInteraction as ButtonInteraction) }
+        },
+        {
+            filter: (customId) => {return customId === ADD_AWARD_BUTTON_ID},
+            resultingAction: (triggerInteraction) => { openAddPostAwardModal(courseName, triggerInteraction as ButtonInteraction) }
         }
     ];
     

@@ -75,6 +75,22 @@ const linkReqInput = new TextInputBuilder({
 
 export const linkReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [linkReqInput]});
 
+// award unicode input
+
+export const AWARD_UNICODE_INPUT_ID = "discussion_add_post_emoji_unicode_input";
+const AWARD_UNICODE_INPUT_LABEL = "award emoji unicode";
+const AWARD_UNICODE_INPUT_STYLE = TextInputStyle.Short;
+const AWARD_UNICODE_INPUT_PLACEHOLDER = "👍";
+
+const awardUnicodeInput = new TextInputBuilder({
+    customId: AWARD_UNICODE_INPUT_ID,
+    label: AWARD_UNICODE_INPUT_LABEL,
+    placeholder: AWARD_UNICODE_INPUT_PLACEHOLDER,
+    style: AWARD_UNICODE_INPUT_STYLE,
+})
+
+export const awardUnicodeInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardUnicodeInput]});
+
 export async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
     updateToManagePostScoringMenu(courseName, triggerInteraction, false);
