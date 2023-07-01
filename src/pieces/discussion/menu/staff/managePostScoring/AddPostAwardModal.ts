@@ -2,6 +2,7 @@ import { ActionRowBuilder, ButtonInteraction, Client, Emoji, ModalSubmitInteract
 import { AWARD_POINTS_INPUT_ID, AWARD_STAFF_ONLY_INPUT_ID, AWARD_UNICODE_INPUT_ID, awardPointsInputActionRow, awardStaffOnlyInputActionRow, awardUnicodeInputActionRow, openPostScoringModal, updateCourse } from "./ScoringModalUtilities";
 import { scoreAllThreads } from "../../../../../pieces/discussion/tracking/scoreFunctions";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { AwardSpecs } from "src/generalModels/DiscussionScoring";
 
 
 const MODAL_ID_PREFIX = "test2";
@@ -23,8 +24,12 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
     if(inputErrors !== "")
         return inputErrors
 
-    return "check console";
-    //return await rescoreCourse(client, courseName);
+    const newAward: AwardSpecs = {
+        points: awardPointsInput,
+        trackStudents: isStaffOnlyInput !== "True"
+    }
+
+    return await rescoreCourse(client, courseName, emojiInput, newAward);
 }
 
 function validateInput(emojiInput: string, awardPointsInput: number, isStaffOnlyInput: string): string {
@@ -49,15 +54,14 @@ function validateInput(emojiInput: string, awardPointsInput: number, isStaffOnly
     return errorReasons
 }
 
-async function rescoreCourse(client: Client, courseName: string) {
+async function rescoreCourse(client: Client, courseName: string, newAwardEmoji: string, newAwardSpecs: AwardSpecs) {
 
     const course = await getCourseByName(courseName)
 
     if(!course || !course.channels.discussion || !course.discussionSpecs)
         return "database error"
 
-    //TODO: Add new awards to course discussion specs
-    //course.discussionSpecs.postSpecs.awards.set(new emoji, new awards specs)
+    course.discussionSpecs.postSpecs.awards.set(newAwardEmoji, newAwardSpecs)
 
     const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
