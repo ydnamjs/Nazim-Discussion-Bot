@@ -80,7 +80,10 @@ export class BaseMenu {
 
             // TODO: I feel like theres a better way to do this but it will work for now
             if(error.toString().includes("Collector received no interactions before ending with reason: time")) {
-                sendDismissableReply(message, BaseMenu.MENU_EXPIRTATION_MESSAGE)
+
+                //TODO: removing await causes error but leaving it means the menu isnt deleted until the dissmissable reply expires
+                // we need to make a custom function to reply, delete the menu, and then collect the dismiss button
+                await sendDismissableReply(message, BaseMenu.MENU_EXPIRTATION_MESSAGE)
                 message.delete()
             }
         }
