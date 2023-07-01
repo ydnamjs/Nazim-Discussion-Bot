@@ -15,23 +15,29 @@ export async function openAddPostAwardModal(courseName: string, triggerInteracti
 
 async function handleModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
     
-    const emojiInput = submittedModal.fields.getTextInputValue(AWARD_UNICODE_INPUT_ID).match(/\p{Extended_Pictographic}/gu)
-
-    console.log(emojiInput);
+    const emojiInput = submittedModal.fields.getTextInputValue(AWARD_UNICODE_INPUT_ID).trim()
 
     const inputErrors =  validateInput(emojiInput);
 
     if(inputErrors !== "")
         return inputErrors
-    
 
     return "check console";
     //return await rescoreCourse(client, courseName);
 }
 
-function validateInput(emojiInput: RegExpMatchArray | null, ): string {
+function validateInput(emojiInput: string, ): string {
 
     let errorReasons = "";
+    
+    const emojiInputArray = emojiInput.match(/\p{Extended_Pictographic}/gu);
+
+    if(emojiInput.length != emojiInputArray?.length)
+        errorReasons += "\n- Non emoji character detected in emoji input. Please input one emoji in unicode form EX: 👍";
+    else if (emojiInputArray === null)
+        errorReasons += "\n- No Emoji detected. Please input one emoji in unicode form EX: 👍";
+    else if(emojiInputArray.length > 1)
+        errorReasons += "\n- Multiple Emoji detected. Please input one emoji in unicode form EX: 👍";
 
     return errorReasons
 }
