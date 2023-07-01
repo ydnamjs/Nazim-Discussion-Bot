@@ -35,7 +35,9 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
 function validateInput(emojiInput: string, awardPointsInput: number, isStaffOnlyInput: string): string {
 
     let errorReasons = "";
-    
+
+    // FIXME: This parsing currently does not support every discord emoji or even most of them
+    // for example it does support :zap: but not :hamburger:
     const emojiInputArray = emojiInput.match(/\p{Extended_Pictographic}/gu);
 
     if(emojiInput.length != emojiInputArray?.length)
