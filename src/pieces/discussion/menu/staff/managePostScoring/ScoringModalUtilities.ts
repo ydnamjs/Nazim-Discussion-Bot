@@ -77,7 +77,7 @@ export const linkReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({com
 
 // award unicode input
 
-export const AWARD_UNICODE_INPUT_ID = "discussion_add_post_emoji_unicode_input";
+export const AWARD_UNICODE_INPUT_ID = "discussion_add_post_award_unicode_input";
 const AWARD_UNICODE_INPUT_LABEL = "award emoji unicode";
 const AWARD_UNICODE_INPUT_STYLE = TextInputStyle.Short;
 const AWARD_UNICODE_INPUT_PLACEHOLDER = "👍";
@@ -90,6 +90,22 @@ const awardUnicodeInput = new TextInputBuilder({
 })
 
 export const awardUnicodeInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardUnicodeInput]});
+
+// award points input
+
+export const AWARD_POINTS_INPUT_ID = "discussion_add_post_award_points_input";
+const AWARD_POINTS_INPUT_LABEL = "award points";
+const AWARD_POINTS_INPUT_STYLE = TextInputStyle.Short;
+const AWARD_POINTS_INPUT_PLACEHOLDER = "25";
+
+const awardPointsInput = new TextInputBuilder({
+    customId: AWARD_POINTS_INPUT_ID,
+    label: AWARD_POINTS_INPUT_LABEL,
+    placeholder: AWARD_POINTS_INPUT_PLACEHOLDER,
+    style: AWARD_POINTS_INPUT_STYLE,
+})
+
+export const awardPointsInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardPointsInput]});
 
 export async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
