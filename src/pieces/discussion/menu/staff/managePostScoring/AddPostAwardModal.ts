@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonInteraction, Client, Emoji, ModalSubmitInteraction, TextInputBuilder, parseEmoji } from "discord.js";
-import { AWARD_POINTS_INPUT_ID, AWARD_UNICODE_INPUT_ID, awardPointsInputActionRow, awardUnicodeInputActionRow, openPostScoringModal, updateCourse } from "./ScoringModalUtilities";
+import { AWARD_POINTS_INPUT_ID, AWARD_STAFF_ONLY_INPUT_ID, AWARD_UNICODE_INPUT_ID, awardPointsInputActionRow, awardStaffOnlyInputActionRow, awardUnicodeInputActionRow, openPostScoringModal, updateCourse } from "./ScoringModalUtilities";
 import { scoreAllThreads } from "../../../../../pieces/discussion/tracking/scoreFunctions";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 
@@ -8,7 +8,7 @@ const MODAL_ID_PREFIX = "test2";
 const MODAL_TITLE_PREFIX = "Add Award To CISC ";
 
 export async function openAddPostAwardModal(courseName: string, triggerInteraction: ButtonInteraction) {
-    const components: ActionRowBuilder<TextInputBuilder>[] = [awardUnicodeInputActionRow, awardPointsInputActionRow];
+    const components: ActionRowBuilder<TextInputBuilder>[] = [awardUnicodeInputActionRow, awardPointsInputActionRow, awardStaffOnlyInputActionRow];
 
     openPostScoringModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput)
 }
@@ -16,9 +16,9 @@ export async function openAddPostAwardModal(courseName: string, triggerInteracti
 async function handleModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
     
     const emojiInput = submittedModal.fields.getTextInputValue(AWARD_UNICODE_INPUT_ID).trim();
-    const awardPoints = Number.parseInt(submittedModal.fields.getTextInputValue(AWARD_POINTS_INPUT_ID));
-
-    const inputErrors =  validateInput(emojiInput, awardPoints);
+    const awardPointsInput = Number.parseInt(submittedModal.fields.getTextInputValue(AWARD_POINTS_INPUT_ID));
+    const isStaffOnlyInput = submittedModal.fields.getTextInputValue(AWARD_STAFF_ONLY_INPUT_ID);
+    const inputErrors =  validateInput(emojiInput, awardPointsInput, isStaffOnlyInput);
 
     if(inputErrors !== "")
         return inputErrors
@@ -27,7 +27,7 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
     //return await rescoreCourse(client, courseName);
 }
 
-function validateInput(emojiInput: string, awardPoints: number): string {
+function validateInput(emojiInput: string, awardPointsInput: number, isStaffOnlyInput: string): string {
 
     let errorReasons = "";
     
@@ -40,9 +40,12 @@ function validateInput(emojiInput: string, awardPoints: number): string {
     else if(emojiInputArray.length > 1)
         errorReasons += "\n- Multiple Emoji detected. Please input one emoji in unicode form EX: 👍";
 
-    if(Number.isNaN(awardPoints))
+    if(Number.isNaN(awardPointsInput))
         errorReasons += "\n- Invalid Award Points Detected. Please input an integer EX: 25";
     
+    if((isStaffOnlyInput !== "True") && (isStaffOnlyInput !== "False"))
+        errorReasons += "\n- Invalid Staff Only Detected. Please input \"True\" or \"False\"";
+
     return errorReasons
 }
 

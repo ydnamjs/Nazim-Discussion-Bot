@@ -107,6 +107,22 @@ const awardPointsInput = new TextInputBuilder({
 
 export const awardPointsInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardPointsInput]});
 
+// is staff only input
+
+export const AWARD_STAFF_ONLY_INPUT_ID = "discussion_add_post_staff_only_input";
+const AWARD_STAFF_ONLY_INPUT_LABEL = "award points";
+const AWARD_STAFF_ONLY_INPUT_STYLE = TextInputStyle.Short;
+const AWARD_STAFF_ONLY_INPUT_PLACEHOLDER = "True";
+
+const awardStaffOnlyInput = new TextInputBuilder({
+    customId: AWARD_STAFF_ONLY_INPUT_ID,
+    label: AWARD_STAFF_ONLY_INPUT_LABEL,
+    placeholder: AWARD_STAFF_ONLY_INPUT_PLACEHOLDER,
+    style: AWARD_STAFF_ONLY_INPUT_STYLE,
+})
+
+export const awardStaffOnlyInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardStaffOnlyInput]});
+
 export async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
     updateToManagePostScoringMenu(courseName, triggerInteraction, false);
