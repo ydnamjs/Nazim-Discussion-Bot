@@ -78,7 +78,7 @@ const linkReqInput = new TextInputBuilder({
 const linkReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [linkReqInput]});
 
 // AWARD UNICODE INPUT COMPONENT
-const AWARD_UNICODE_INPUT_ID = "discussion_add_post_award_unicode_input";
+const AWARD_UNICODE_INPUT_ID = "discussion_post_award_unicode_input";
 const AWARD_UNICODE_INPUT_LABEL = "award emoji unicode";
 const AWARD_UNICODE_INPUT_STYLE = TextInputStyle.Short;
 const AWARD_UNICODE_INPUT_PLACEHOLDER = "👍";
@@ -93,7 +93,7 @@ const awardUnicodeInput = new TextInputBuilder({
 const awardUnicodeInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardUnicodeInput]});
 
 // AWARD POINTS INPUT COMPONENT
-const AWARD_POINTS_INPUT_ID = "discussion_add_post_award_points_input";
+const AWARD_POINTS_INPUT_ID = "discussion_post_award_points_input";
 const AWARD_POINTS_INPUT_LABEL = "award points";
 const AWARD_POINTS_INPUT_STYLE = TextInputStyle.Short;
 const AWARD_POINTS_INPUT_PLACEHOLDER = "25";
@@ -108,8 +108,8 @@ const awardPointsInput = new TextInputBuilder({
 const awardPointsInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardPointsInput]});
 
 // IS STAFF ONLY INPUT COMPONENT
-const AWARD_STAFF_ONLY_INPUT_ID = "discussion_add_post_staff_only_input";
-const AWARD_STAFF_ONLY_INPUT_LABEL = "award points";
+const AWARD_STAFF_ONLY_INPUT_ID = "discussion_post_award_staff_only_input";
+const AWARD_STAFF_ONLY_INPUT_LABEL = "is award staff only? (\"True\" or \"False\")";
 const AWARD_STAFF_ONLY_INPUT_STYLE = TextInputStyle.Short;
 const AWARD_STAFF_ONLY_INPUT_PLACEHOLDER = "True";
 
@@ -124,7 +124,7 @@ const awardStaffOnlyInputActionRow = new ActionRowBuilder<TextInputBuilder>({com
 
 // EDIT POST SCORING MODAL
 const MODAL_ID_PREFIX = "edit_post_scoring_modal";
-const MODAL_TITLE_PREFIX = "Edit Post Specs For CISC";
+const MODAL_TITLE_PREFIX = "Edit Post Specs For CISC ";
 
 export async function openEditPostModal(courseName: string, triggerInteraction: ButtonInteraction) {
     const components: ActionRowBuilder<TextInputBuilder>[] = [scoreInputActionRow, commentScoreInputActionRow, lengthReqInputActionRow, paraReqInputActionRow, linkReqInputActionRow];
@@ -172,7 +172,7 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
 }
 
 // ADD AWARD MODAL
-const ADD_AWARD_MODAL_ID_PREFIX = "add_post_award_modal";
+const ADD_AWARD_MODAL_ID_PREFIX = "add_edit_post_award_modal";
 const ADD_AWARD_MODAL_TITLE_PREFIX = "Add/Edit Award - CISC ";
 
 const ADD_AWARD_SUCCESS_MESSAGE = "Award successfully added";
