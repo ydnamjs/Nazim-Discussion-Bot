@@ -1,11 +1,12 @@
 import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
-import { NavigatedMenu, NavigatedMenuData } from "../../../../menu/NavigatedMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../../menu/NavigatedMenu";
 import { ComponentBehavior } from "../../../../menu/BaseMenu";
 import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { openAddPostAwardModal, openDeletePostAwardModal, openEditPostModal } from "./PostScoringModals";
+import { updateToManageCourseMenu } from "../ManageCourseMenu";
 
 // MENU TEXT CONSTANTS
 const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
@@ -33,6 +34,24 @@ const AWARD_POINT_PREFIX = "points: ";
 const AWARD_GIVERS_PREFIX = "\ngivers: "
 const AWARD_STAFFONLY_TEXT = "Staff Only"
 const AWARD_NOT_STAFFONLY_TEXT = "Everyone"
+
+// BACK BUTTON
+
+const BACK_BUTTON_ID = "discussion_view_students_back_button";
+const BACK_BUTTON_LABEL = "Back To Course";
+const BACK_BUTTON_DISABLED = false;
+const BACK_BUTTON_STYLE = ButtonStyle.Secondary
+
+const customNavOptions: CustomNavOptions = {
+    prevButtonOptions: {exists: true},
+    nextButtonOptions: {exists: true},
+    specialMenuButton: {
+        customId: BACK_BUTTON_ID, 
+        label: BACK_BUTTON_LABEL,
+        disabled: BACK_BUTTON_DISABLED,
+        style: BACK_BUTTON_STYLE
+    }
+};
 
 // EDIT SCORING BUTTON
 const EDIT_SCORING_BUTTON_ID = "discussion-edit-post-scoring-button";
@@ -135,7 +154,7 @@ class ManagePostScoringMenu extends NavigatedMenu {
             additionalComponentBehaviors: generateBehaviors(courseName),
         }
 
-        super(menuData, 0);
+        super(menuData, 0, customNavOptions);
     }
 }
 
@@ -154,6 +173,10 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
         {
             filter: (customId) => {return customId === DELETE_AWARD_BUTTON_ID},
             resultingAction: (triggerInteraction) => { openDeletePostAwardModal(courseName, triggerInteraction as ButtonInteraction) }
+        },
+        {
+            filter: (customId: string) => { return customId === BACK_BUTTON_ID },
+            resultingAction: (componentInteraction: MessageComponentInteraction) => { updateToManageCourseMenu(courseName, componentInteraction) }
         }
     ];
     
