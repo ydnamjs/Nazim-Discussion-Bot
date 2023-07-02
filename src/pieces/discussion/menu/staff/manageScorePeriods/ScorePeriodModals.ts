@@ -3,16 +3,16 @@ import { DateTime } from "luxon";
 import { ScorePeriod, StudentScoreData } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { sortPeriods } from "../../../../../generalUtilities/ScorePeriodUtilities";
-import { SCORING_ERROR_MESSAGE, scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
+import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
-import { recollectManagePeriodsInput, refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { recollectManagePeriodsInput, refreshManagePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
 
 // MODAL BEHAVIOR CONSTANTS
 const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
 
 // MODAL NOTIFICATION CONSTANTS
-const CONFLICTING_DATES_MESSAGE = "Score Period Has Overlap With Already Existing Score Period(s). Nothing Was Changed.";
-const INVALID_INPUT_PREFIX = "Invalid Input Format. Nothing Was Changed\n**Reasons(s):**";
+const CONFLICTING_DATES_MESSAGE = "\n- Score Period Has Overlap With Already Existing Score Period(s)";
 const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM and be before end date Ex: 1970-01-01 12:00:00 AM";
 const INVALID_END_DATE_REASON = "\n- Invalid end date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM and be after start date Ex: 2036-08-26 11:59:59 PM";
 const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 800";
@@ -140,7 +140,7 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
     const conflictsWithCurrentPeriods = hasPeriodConflict(newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
 
     if(conflictsWithCurrentPeriods) {
-        return CONFLICTING_DATES_MESSAGE;
+        return INPUT_ERROR_PREFIX + CONFLICTING_DATES_MESSAGE;
     }
 
     fetchedCourse.discussionSpecs.scorePeriods.push({

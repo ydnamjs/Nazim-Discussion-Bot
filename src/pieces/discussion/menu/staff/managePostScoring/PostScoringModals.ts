@@ -2,9 +2,10 @@ import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, Te
 import { AwardSpecs, PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
-import { SCORING_ERROR_MESSAGE, scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
+import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
 import { recollectManagePostScoringInput, refreshManagePostScoringMenu } from "./ManagePostScoringMenu";
+import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
 
 // POST SCORE INPUT COMPONENT
 const SCORE_INPUT_ID = "discussion_score_input";
@@ -192,7 +193,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
     const inputErrors =  validateAwardInput(emojiInput, awardPointsInput, isStaffOnlyInput);
 
     if(inputErrors !== "")
-        return inputErrors
+        return INVALID_INPUT_PREFIX + inputErrors
 
     const newAward: AwardSpecs = {
         points: awardPointsInput,
@@ -226,6 +227,8 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
 // DELETE AWARD MODAL
 const DELETE_AWARD_MODAL_ID_PREFIX = "delete_post_award_modal";
 const DELETE_AWARD_MODAL_TITLE_PREFIX = "Delete Award - CISC ";
+const EMOJI_NOT_FOUND_ERROR_MESSAGE = "\n- Emoji not found"
+
 
 const DELETE_AWARD_SUCCESS_MESSAGE = "Award successfully deleted";
 
@@ -245,8 +248,7 @@ async function handleDeleteAwardModalInput(client: Client, courseName: string, s
         return DATABASE_ERROR_MESSAGE
 
     if(!(course.discussionSpecs.postSpecs.awards.has(emojiInput)))
-        return "Emoji not found" // TODO: Constantify this
-
+        return INPUT_ERROR_PREFIX + EMOJI_NOT_FOUND_ERROR_MESSAGE
     course.discussionSpecs.postSpecs.awards.delete(emojiInput)
 
     const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
