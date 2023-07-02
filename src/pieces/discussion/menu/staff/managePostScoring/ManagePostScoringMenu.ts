@@ -2,7 +2,7 @@ import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions
 import { NavigatedMenu, NavigatedMenuData } from "../../../../menu/NavigatedMenu";
 import { ComponentBehavior } from "../../../../menu/BaseMenu";
 import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
-import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { openEditPostModal } from "./EditPostScoringModal";

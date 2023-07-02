@@ -1,5 +1,5 @@
 import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
-import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, periodNumActionRow } from "./ModalComponents";
 import { createHandlePeriodModal, handleIndexValidation, overwritePeriods } from "./PeriodModalUtilities";
 

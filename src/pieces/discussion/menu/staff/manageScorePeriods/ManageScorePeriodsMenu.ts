@@ -1,6 +1,6 @@
 import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
-import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { ComponentBehavior } from "../../../../menu/BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";

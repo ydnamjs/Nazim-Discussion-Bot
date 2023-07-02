@@ -6,7 +6,7 @@ import { scoreAllThreads } from "../../../scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../menu/ModalUtilities";
 import { refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { DATABASE_ERROR_MESSAGE, DATE_STRING_FORMAT, END_DATE_INPUT_ID, GOAL_POINTS_INPUT_ID, INVALID_END_DATE_REASON, INVALID_GOAL_POINTS_REASON, INVALID_INDEX_PERIOD_REASON, INVALID_MAX_POINTS_REASON, INVALID_START_DATE_REASON, MAX_POINTS_INPUT_ID, START_DATE_INPUT_ID } from "./ModalComponents";
-import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 
 /**
  * @function creates and handles a modal for managing score periods

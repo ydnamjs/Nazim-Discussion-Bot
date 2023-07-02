@@ -1,5 +1,5 @@
 import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
-import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, periodNumActionRow, startDateActionRow } from "./ModalComponents";
 import { NewPeriodData, checkAgainstCurrentPeriods, createHandlePeriodModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, sortPeriods, validatePeriodInput } from "./PeriodModalUtilities";
 

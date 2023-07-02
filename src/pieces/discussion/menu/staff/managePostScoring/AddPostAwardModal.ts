@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonInteraction, Client, Emoji, ModalSubmitInteraction, TextInputBuilder, parseEmoji } from "discord.js";
 import { AWARD_POINTS_INPUT_ID, AWARD_STAFF_ONLY_INPUT_ID, AWARD_UNICODE_INPUT_ID, awardPointsInputActionRow, awardStaffOnlyInputActionRow, awardUnicodeInputActionRow, openPostScoringModal, updateCourse } from "./ScoringModalUtilities";
 import { scoreAllThreads } from "../../../scoring/scoreFunctions";
-import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
+import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { AwardSpecs } from "src/generalModels/DiscussionScoring";
 
 
