@@ -7,6 +7,7 @@ import { sendDismissableReply } from "../../../../../generalUtilities/Dismissabl
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { openAddPostAwardModal, openDeletePostAwardModal, openEditPostModal } from "./PostScoringModals";
 
+// MENU TEXT CONSTANTS
 const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
 const MENU_DESCRIPTION = "replace me";
 
@@ -33,20 +34,11 @@ const AWARD_GIVERS_PREFIX = "\ngivers: "
 const AWARD_STAFFONLY_TEXT = "Staff Only"
 const AWARD_NOT_STAFFONLY_TEXT = "Everyone"
 
+// EDIT SCORING BUTTON
 const EDIT_SCORING_BUTTON_ID = "discussion-edit-post-scoring-button";
 const EDIT_SCORING_BUTTON_LABEL = "Edit Post Scoring";
 const EDIT_SCORING_BUTTON_DISABLED = false;
 const EDIT_SCORING_BUTTON_STYLE = ButtonStyle.Primary
-
-const ADD_EDIT_AWARD_BUTTON_ID = "discussion-add-post-award-button";
-const ADD_EDIT_AWARD_BUTTON_LABEL = "Add/Edit Post Award";
-const ADD_EDIT_AWARD_BUTTON_DISABLED = false;
-const ADD_EDIT_AWARD_BUTTON_STYLE = ButtonStyle.Primary
-
-const DELETE_AWARD_BUTTON_ID = "discussion-delete-post-award-button";
-const DELETE_AWARD_BUTTON_LABEL = "Delete Post Award";
-const DELETE_AWARD_BUTTON_DISABLED = false;
-const DELETE_AWARD_BUTTON_STYLE = ButtonStyle.Primary
 
 const EDIT_SCORING_BUTTON_DATA = {
     custom_id: EDIT_SCORING_BUTTON_ID,
@@ -55,12 +47,24 @@ const EDIT_SCORING_BUTTON_DATA = {
     style: EDIT_SCORING_BUTTON_STYLE
 };
 
+// ADD AWARD BUTTON
+const ADD_EDIT_AWARD_BUTTON_ID = "discussion-add-post-award-button";
+const ADD_EDIT_AWARD_BUTTON_LABEL = "Add/Edit Post Award";
+const ADD_EDIT_AWARD_BUTTON_DISABLED = false;
+const ADD_EDIT_AWARD_BUTTON_STYLE = ButtonStyle.Primary
+
 const ADD_EDIT_AWARD_BUTTON_DATA = {
     custom_id: ADD_EDIT_AWARD_BUTTON_ID,
     label: ADD_EDIT_AWARD_BUTTON_LABEL,
     disabled: ADD_EDIT_AWARD_BUTTON_DISABLED,
     style: ADD_EDIT_AWARD_BUTTON_STYLE
 };
+
+// DELETE AWARD BUTTON
+const DELETE_AWARD_BUTTON_ID = "discussion-delete-post-award-button";
+const DELETE_AWARD_BUTTON_LABEL = "Delete Post Award";
+const DELETE_AWARD_BUTTON_DISABLED = false;
+const DELETE_AWARD_BUTTON_STYLE = ButtonStyle.Primary
 
 const DELETE_AWARD_BUTTON_DATA = {
     custom_id: DELETE_AWARD_BUTTON_ID,
@@ -71,6 +75,7 @@ const DELETE_AWARD_BUTTON_DATA = {
 
 const SCORE_BUTTON_ROW = makeActionRowButton([EDIT_SCORING_BUTTON_DATA, ADD_EDIT_AWARD_BUTTON_DATA, DELETE_AWARD_BUTTON_DATA])
 
+// UPDATE FUNCTION
 export async function updateToManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
@@ -86,6 +91,7 @@ export async function updateToManagePostScoringMenu(courseName: string, componen
     managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
 }
 
+// RECOLLECT FUNCTION
 export async function recollectManagePostScoringInput(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
@@ -101,6 +107,7 @@ export async function recollectManagePostScoringInput(courseName: string, compon
     managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
 }
 
+// REFRESH FUNCTION
 export async function refreshManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
@@ -115,6 +122,7 @@ export async function refreshManagePostScoringMenu(courseName: string, component
     componentInteraction.message.edit({embeds: managePostScoringMenu.menuMessageData.embeds});
 }
 
+// MENU CLASS
 class ManagePostScoringMenu extends NavigatedMenu {
     
     constructor(courseName: string, postSpecs: PostSpecs) {
@@ -131,6 +139,7 @@ class ManagePostScoringMenu extends NavigatedMenu {
     }
 }
 
+// HELPER FUNCTIONS
 function generateBehaviors(courseName: string): ComponentBehavior[] {
     
     const behaviors: ComponentBehavior[] = [
