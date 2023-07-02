@@ -6,7 +6,7 @@ import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreF
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
 import { refreshManagePostScoringMenu, updateToManagePostScoringMenu } from "./ManagePostScoringMenu";
 
-// score input component
+// POST SCORE INPUT COMPONENT
 export const SCORE_INPUT_ID = "discussion_score_input";
 const SCORE_INPUT_LABEL = "points for post";
 const SCORE_INPUT_STYLE = TextInputStyle.Short;
@@ -20,7 +20,7 @@ const scoreInput = new TextInputBuilder({
 
 export const scoreInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [scoreInput]});
 
-// comment score input component
+// COMMENT SCORE INPUT COMPONENT
 export const COMMENT_SCORE_INPUT_ID = "discussion_comment_score_input";
 const COMMENT_SCORE_INPUT_LABEL = "points for comments (given to poster)";
 const COMMENT_SCORE_INPUT_STYLE = TextInputStyle.Short;
@@ -34,7 +34,7 @@ const commentScoreInput = new TextInputBuilder({
 
 export const commentScoreInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [commentScoreInput]});
 
-// length req input component
+// LENGTH REQ INPUT COMPONENT
 export const LENGTH_REQ_INPUT_ID = "discussion_length_input";
 const LENGTH_REQ_INPUT_LABEL = "post minimum length requirement";
 const LENGTH_REQ_INPUT_STYLE = TextInputStyle.Short;
@@ -48,7 +48,7 @@ const lengthReqInput = new TextInputBuilder({
 
 export const lengthReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [lengthReqInput]});
 
-// paragraph req input component
+// PARAGRAPH REQ INPUT COMPONENT
 export const PARA_REQ_INPUT_ID = "discussion_paragraph_input";
 const PARA_REQ_INPUT_LABEL = "post minimum paragraph requirement";
 const PARA_REQ_INPUT_STYLE = TextInputStyle.Short;
@@ -62,7 +62,7 @@ const paraReqInput = new TextInputBuilder({
 
 export const paraReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [paraReqInput]});
 
-// link req input component
+// LINK REQ INPUT COMPONENT
 export const LINK_REQ_INPUT_ID = "discussion_link_input";
 const LINK_REQ_INPUT_LABEL = "post minimum link requirement";
 const LINK_REQ_INPUT_STYLE = TextInputStyle.Short;
@@ -76,7 +76,7 @@ const linkReqInput = new TextInputBuilder({
 
 export const linkReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [linkReqInput]});
 
-// award unicode input
+// AWARD UNICODE INPUT COMPONENT
 
 export const AWARD_UNICODE_INPUT_ID = "discussion_add_post_award_unicode_input";
 const AWARD_UNICODE_INPUT_LABEL = "award emoji unicode";
@@ -92,7 +92,7 @@ const awardUnicodeInput = new TextInputBuilder({
 
 export const awardUnicodeInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardUnicodeInput]});
 
-// award points input
+// AWARD POINTS INPUT COMPONENT
 
 export const AWARD_POINTS_INPUT_ID = "discussion_add_post_award_points_input";
 const AWARD_POINTS_INPUT_LABEL = "award points";
@@ -108,7 +108,7 @@ const awardPointsInput = new TextInputBuilder({
 
 export const awardPointsInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardPointsInput]});
 
-// is staff only input
+// IS STAFF ONLY INPUT COMPONENT
 
 export const AWARD_STAFF_ONLY_INPUT_ID = "discussion_add_post_staff_only_input";
 const AWARD_STAFF_ONLY_INPUT_LABEL = "award points";
