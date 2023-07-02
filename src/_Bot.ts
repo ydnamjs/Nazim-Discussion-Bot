@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, Partials } from "discord.js";
 import mongoose, { ConnectOptions } from "mongoose";
 import commandListener from "./listeners/InteractionListener";
 import onlineLogger from "./listeners/ReadyListener";
+import messageListener from "./listeners/MessageCreate"
 import { DISCORD_TOKEN, MONGODB_SRV } from "./secret";
 
 main();
@@ -45,6 +46,7 @@ function addListeners(client: Client) {
     console.log("adding listeners...");
     onlineLogger(client);
     commandListener(client);
+    messageListener(client);
     console.log("listeners added!");
 }
 
