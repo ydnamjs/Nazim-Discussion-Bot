@@ -19,39 +19,26 @@ const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a n
 const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1000";
 const INVALID_INDEX_PERIOD_REASON = "\n- Invalid score period input. Please retry with a number in your menu."
 
-// INPUT FIELD CONSTANTS
+// PERIOD NUM INPUT COMPONENT
 const PERIOD_NUM_INPUT_ID = "discussion_score_period_input";
 const PERIOD_NUM_INPUT_LABEL = "score period #";
 const PERIOD_NUM_INPUT_PLACEHOLDER = "0";
 const PERIOD_NUM_INPUT_STYLE = TextInputStyle.Short;
 
-const START_DATE_INPUT_ID = "discussion_score_period_start_input";
-const START_DATE_INPUT_LABEL = "start date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
-const START_DATE_INPUT_PLACEHOLDER = "1970-01-01 12:00:00 AM";
-const START_DATE_INPUT_STYLE = TextInputStyle.Short;
-
-const END_DATE_INPUT_ID = "discussion_score_period_end_input";
-const END_DATE_INPUT_LABEL = "end date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
-const END_DATE_INPUT_PLACEHOLDER =  "2036-08-26 11:59:59 PM";
-const END_DATE_INPUT_STYLE = TextInputStyle.Short;
-
-const GOAL_POINTS_INPUT_ID = "discussion_score_period_goal_input";
-const GOAL_POINTS_INPUT_LABEL = "goal points";
-const GOAL_POINTS_INPUT_PLACEHOLDER = "";
-const GOAL_POINTS_INPUT_STYLE = TextInputStyle.Short;
-
-const MAX_POINTS_INPUT_ID = "discussion_score_period_max_input";
-const MAX_POINTS_INPUT_LABEL = "max points";
-const MAX_POINTS_INPUT_PLACEHOLDER = "";
-const MAX_POINTS_INPUT_STYLE = TextInputStyle.Short;
-
-// INPUT FIELDS
 const periodNumInput = new TextInputBuilder({
     customId: PERIOD_NUM_INPUT_ID,
     label: PERIOD_NUM_INPUT_LABEL,
     placeholder: PERIOD_NUM_INPUT_PLACEHOLDER,
     style: PERIOD_NUM_INPUT_STYLE,
 })
+
+const periodNumActionRow = new ActionRowBuilder<TextInputBuilder>({components: [periodNumInput]});
+
+// START DATE INPUT COMPONENT
+const START_DATE_INPUT_ID = "discussion_score_period_start_input";
+const START_DATE_INPUT_LABEL = "start date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
+const START_DATE_INPUT_PLACEHOLDER = "1970-01-01 12:00:00 AM";
+const START_DATE_INPUT_STYLE = TextInputStyle.Short;
 
 const startDateInput = new TextInputBuilder({
     customId: START_DATE_INPUT_ID,
@@ -60,12 +47,28 @@ const startDateInput = new TextInputBuilder({
     style: START_DATE_INPUT_STYLE,
 })
 
+const startDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [startDateInput]});
+
+// END DATE INPUT COMPONENT
+const END_DATE_INPUT_ID = "discussion_score_period_end_input";
+const END_DATE_INPUT_LABEL = "end date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
+const END_DATE_INPUT_PLACEHOLDER =  "2036-08-26 11:59:59 PM";
+const END_DATE_INPUT_STYLE = TextInputStyle.Short;
+
 const endDateInput = new TextInputBuilder({
     customId: END_DATE_INPUT_ID,
     label: END_DATE_INPUT_LABEL,
     placeholder: END_DATE_INPUT_PLACEHOLDER,
     style: END_DATE_INPUT_STYLE
 })
+
+const endDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [endDateInput]});
+
+// GOAL POINTS INPUT COMPONENT
+const GOAL_POINTS_INPUT_ID = "discussion_score_period_goal_input";
+const GOAL_POINTS_INPUT_LABEL = "goal points";
+const GOAL_POINTS_INPUT_PLACEHOLDER = "";
+const GOAL_POINTS_INPUT_STYLE = TextInputStyle.Short;
 
 const goalPointsInput = new TextInputBuilder({
     customId: GOAL_POINTS_INPUT_ID,
@@ -74,6 +77,14 @@ const goalPointsInput = new TextInputBuilder({
     style: GOAL_POINTS_INPUT_STYLE
 })
 
+const goalPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [goalPointsInput]});
+
+// MAX POINTS INPUT COMPONENT
+const MAX_POINTS_INPUT_ID = "discussion_score_period_max_input";
+const MAX_POINTS_INPUT_LABEL = "max points";
+const MAX_POINTS_INPUT_PLACEHOLDER = "";
+const MAX_POINTS_INPUT_STYLE = TextInputStyle.Short;
+
 const maxPointsInput = new TextInputBuilder({
     customId: MAX_POINTS_INPUT_ID,
     label: MAX_POINTS_INPUT_LABEL,
@@ -81,11 +92,6 @@ const maxPointsInput = new TextInputBuilder({
     style: MAX_POINTS_INPUT_STYLE
 })
 
-// ACTION ROWS
-const periodNumActionRow = new ActionRowBuilder<TextInputBuilder>({components: [periodNumInput]});
-const startDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [startDateInput]});
-const endDateActionRow = new ActionRowBuilder<TextInputBuilder>({components: [endDateInput]});
-const goalPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [goalPointsInput]});
 const maxPointsActionRow = new ActionRowBuilder<TextInputBuilder>({components: [maxPointsInput]});
 
 // ADD MODAL
