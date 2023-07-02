@@ -4,7 +4,7 @@ import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
 import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
-import { recollectManagePostScoringInput, refreshManagePostScoringMenu } from "./ManagePostScoringMenu";
+import { recollectManagePostSpecsInput, refreshManagePostSpecsMenu } from "./ManagePostScoringMenu";
 import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
 
 // POST SCORE INPUT COMPONENT
@@ -275,9 +275,9 @@ async function handleDeleteAwardModalInput(client: Client, courseName: string, s
 // HELPER FUNCTIONS
 async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
-    recollectManagePostScoringInput(courseName, triggerInteraction);
+    recollectManagePostSpecsInput(courseName, triggerInteraction);
 
-    await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePostScoringMenu(courseName, triggerInteraction)})
+    await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePostSpecsMenu(courseName, triggerInteraction)})
 }
 
 function validatePostSpecsInput(score: number, commentScore: number, length: number, para: number, link: number): string {

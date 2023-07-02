@@ -5,7 +5,7 @@ import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../men
 import { updateToStaffCoursesMenu } from "./StaffCoursesMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
-import { updateToManagePostScoringMenu } from "./managePostScoring/ManagePostScoringMenu";
+import { updateToManagePostSpecsMenu } from "./managePostScoring/ManagePostScoringMenu";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
@@ -195,7 +195,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_POST_SCORING_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToManagePostScoringMenu(courseName, componentInteraction)
+                updateToManagePostSpecsMenu(courseName, componentInteraction)
             }
         },
         {

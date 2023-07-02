@@ -9,8 +9,8 @@ import { openAddPostAwardModal, openDeletePostAwardModal, openEditPostModal } fr
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
 
 // MENU TEXT CONSTANTS
-const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
-const MENU_DESCRIPTION = "replace me";
+const TITLE_COURSE_PREFIX = "Manage Post Specs For CISC ";
+const MENU_DESCRIPTION = "**Welcome to the manage post specs menu! Below this you will find the current scoring rules for posts as well as a list of awards and penalties**";
 
 const SCORE_PREFIX = "Post Points: ";
 const SCORE_DESCRIPTION = "The number of points awarded for a post that meets the requirements specified below";
@@ -95,7 +95,7 @@ const DELETE_AWARD_BUTTON_DATA = {
 const SCORE_BUTTON_ROW = makeActionRowButton([EDIT_SCORING_BUTTON_DATA, ADD_EDIT_AWARD_BUTTON_DATA, DELETE_AWARD_BUTTON_DATA])
 
 // UPDATE FUNCTION
-export async function updateToManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function updateToManagePostSpecsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
 
@@ -111,7 +111,7 @@ export async function updateToManagePostScoringMenu(courseName: string, componen
 }
 
 // RECOLLECT FUNCTION
-export async function recollectManagePostScoringInput(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function recollectManagePostSpecsInput(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
 
@@ -127,7 +127,7 @@ export async function recollectManagePostScoringInput(courseName: string, compon
 }
 
 // REFRESH FUNCTION
-export async function refreshManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function refreshManagePostSpecsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
 
