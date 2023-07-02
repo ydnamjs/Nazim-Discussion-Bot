@@ -1,10 +1,17 @@
 import { Client, Message } from "discord.js";
+import { getDiscussionPostData } from "../pieces/discussion/scoring/handlePostCreation";
 
 export default (client: Client): void => {
+    
     client.on("messageCreate", async (message: Message) => {
         
-        console.log("recieved message");
-
-        console.log(message.content)
+        const discussionPostData = await getDiscussionPostData(message)
+    
+        if(!discussionPostData) {
+            console.log("not a new post")
+        }
+        else {
+            console.log("is new post")
+        }
     });
 };
