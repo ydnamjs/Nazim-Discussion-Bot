@@ -5,7 +5,7 @@ import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
-import { openAddPostAwardModal, openEditPostModal } from "./PostScoringModals";
+import { openAddPostAwardModal, openDeletePostAwardModal, openEditPostModal } from "./PostScoringModals";
 
 const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
 const MENU_DESCRIPTION = "replace me";
@@ -50,7 +50,7 @@ const EDIT_AWARD_BUTTON_STYLE = ButtonStyle.Primary
 
 const DELETE_AWARD_BUTTON_ID = "discussion-delete-post-award-button";
 const DELETE_AWARD_BUTTON_LABEL = "Delete Post Award";
-const DELETE_AWARD_BUTTON_DISABLED = true;
+const DELETE_AWARD_BUTTON_DISABLED = false;
 const DELETE_AWARD_BUTTON_STYLE = ButtonStyle.Primary
 
 const EDIT_SCORING_BUTTON_DATA = {
@@ -98,7 +98,7 @@ export async function updateToManagePostScoringMenu(courseName: string, componen
     managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
 }
 
-export async function recollectManagePeriodsInput(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function recollectManagePostScoringInput(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
 
@@ -152,6 +152,10 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
         {
             filter: (customId) => {return customId === ADD_AWARD_BUTTON_ID},
             resultingAction: (triggerInteraction) => { openAddPostAwardModal(courseName, triggerInteraction as ButtonInteraction) }
+        },
+        {
+            filter: (customId) => {return customId === DELETE_AWARD_BUTTON_ID},
+            resultingAction: (triggerInteraction) => { openDeletePostAwardModal(courseName, triggerInteraction as ButtonInteraction) }
         }
     ];
     

@@ -4,7 +4,7 @@ import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
 import { SCORING_ERROR_MESSAGE, scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
-import { recollectManagePeriodsInput, refreshManagePostScoringMenu, updateToManagePostScoringMenu } from "./ManagePostScoringMenu";
+import { recollectManagePostScoringInput } from "./ManagePostScoringMenu";
 
 // POST SCORE INPUT COMPONENT
 const SCORE_INPUT_ID = "discussion_score_input";
@@ -172,7 +172,10 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
 
 // ADD AWARD MODAL
 const ADD_AWARD_MODAL_ID_PREFIX = "add_post_award_modal";
-const ADD_AWARD_MODAL_TITLE_PREFIX = "Add Award To CISC ";
+const ADD_AWARD_MODAL_TITLE_PREFIX = "Add/Edit Award - CISC ";
+
+const ADD_AWARD_SUCCESS_MESSAGE = "Award successfully added";
+const EDIT_AWARD_SUCCESS_MESSAGE = "Award successfully updated";
 
 export async function openAddPostAwardModal(courseName: string, triggerInteraction: ButtonInteraction) {
     const components: ActionRowBuilder<TextInputBuilder>[] = [awardUnicodeInputActionRow, awardPointsInputActionRow, awardStaffOnlyInputActionRow];
@@ -185,6 +188,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
     const emojiInput = submittedModal.fields.getTextInputValue(AWARD_UNICODE_INPUT_ID).trim();
     const awardPointsInput = Number.parseInt(submittedModal.fields.getTextInputValue(AWARD_POINTS_INPUT_ID));
     const isStaffOnlyInput = submittedModal.fields.getTextInputValue(AWARD_STAFF_ONLY_INPUT_ID);
+    
     const inputErrors =  validateAwardInput(emojiInput, awardPointsInput, isStaffOnlyInput);
 
     if(inputErrors !== "")
@@ -210,15 +214,62 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
 
     course.discussionSpecs.scorePeriods = rescoredPeriods
 
-    return overwriteCourseDiscussionSpecs(courseName, course.discussionSpecs);
+    const awardErrors = await overwriteCourseDiscussionSpecs(courseName, course.discussionSpecs);
+
+    if(awardErrors !== "")
+        return awardErrors
+
+    return ADD_AWARD_SUCCESS_MESSAGE;
+}
+
+
+// DELETE AWARD MODAL
+const DELETE_AWARD_MODAL_ID_PREFIX = "delete_post_award_modal";
+const DELETE_AWARD_MODAL_TITLE_PREFIX = "Delete Award - CISC ";
+
+const DELETE_AWARD_SUCCESS_MESSAGE = "Award successfully deleted";
+
+export async function openDeletePostAwardModal(courseName: string, triggerInteraction: ButtonInteraction) {
+    const components: ActionRowBuilder<TextInputBuilder>[] = [awardUnicodeInputActionRow];
+
+    openPostScoringModal(DELETE_AWARD_MODAL_ID_PREFIX, DELETE_AWARD_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleDeleteAwardModalInput)
+}
+
+async function handleDeleteAwardModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
+    
+    const emojiInput = submittedModal.fields.getTextInputValue(AWARD_UNICODE_INPUT_ID).trim();
+
+    const course = await getCourseByName(courseName)
+
+    if(!course || !course.channels.discussion || !course.discussionSpecs)
+        return DATABASE_ERROR_MESSAGE
+
+    if(!(course.discussionSpecs.postSpecs.awards.has(emojiInput)))
+        return "Emoji not found" // TODO: Constantify this
+
+    course.discussionSpecs.postSpecs.awards.delete(emojiInput)
+
+    const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
+
+    if(!rescoredPeriods)
+        return SCORING_ERROR_MESSAGE
+
+    course.discussionSpecs.scorePeriods = rescoredPeriods
+
+    const awardErrors = await overwriteCourseDiscussionSpecs(courseName, course.discussionSpecs);
+
+    if(awardErrors !== "")
+    return awardErrors
+
+    return DELETE_AWARD_SUCCESS_MESSAGE;
 }
 
 // HELPER FUNCTIONS
 async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
-    recollectManagePeriodsInput(courseName, triggerInteraction);
+    recollectManagePostScoringInput(courseName, triggerInteraction); // FIXME: There seems to be an issue with returning to main menu after using a modal
 
-    await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePostScoringMenu(courseName, triggerInteraction)})
+    await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await recollectManagePostScoringInput(courseName, triggerInteraction)})
 }
 
 function validatePostSpecsInput(score: number, commentScore: number, length: number, para: number, link: number): string {
