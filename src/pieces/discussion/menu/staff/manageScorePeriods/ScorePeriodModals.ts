@@ -146,7 +146,7 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
     const rescoredPeriods = await scoreAllThreads(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
 
     if(!rescoredPeriods)
-        return "Scoring Error"
+        return "Scoring Error" // TODO: Constantify this
 
     fetchedCourse.discussionSpecs.scorePeriods = rescoredPeriods;
 
@@ -188,7 +188,7 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
 
     const fetchedCourse = await getCourseByName(courseName);
     
-    if(!fetchedCourse || fetchedCourse.discussionSpecs == null)
+    if(!fetchedCourse || fetchedCourse.discussionSpecs == null || fetchedCourse.channels.discussion === null)
         return DATABASE_ERROR_MESSAGE
 
     fetchedCourse.discussionSpecs.scorePeriods = sortPeriods(fetchedCourse.discussionSpecs.scorePeriods);
@@ -212,10 +212,22 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
     if(conflictsWithCurrentPeriods)
         return CONFLICTING_DATES_MESSAGE;
 
-    const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
-
-    if(insertErrors !== "")
-        return insertErrors
+    fetchedCourse.discussionSpecs.scorePeriods.push({
+        ...newScorePeriod,
+        studentScores: new Map<string, StudentScoreData>()
+    })
+    
+    const rescoredPeriods = await scoreAllThreads(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
+    
+    if(!rescoredPeriods)
+        return "Scoring Error" // TODO: Constantify this
+    
+    fetchedCourse.discussionSpecs.scorePeriods = rescoredPeriods;
+    
+    const updateDatabaseErrors = await overwriteCourseDiscussionSpecs(courseName, fetchedCourse.discussionSpecs);
+    
+    if(updateDatabaseErrors !== "")
+        return updateDatabaseErrors
 
     return EDIT_MODAL_SUCCESS_MESSAGE;
 }
@@ -352,44 +364,4 @@ function hasPeriodConflict(newScorePeriodData: NewPeriodData, currentScorePeriod
         }
     })
     return hasConflict;
-}
-
-async function insertOnePeriod(client: Client, courseName: string, newScorePeriodData: NewPeriodData, scorePeriods: ScorePeriod[]): Promise<string> {
-
-    // TODO: After on the fly scoring is done, add listeners to undo and pause it while scoring is being done
-    scorePeriods = scorePeriods.sort((a, b) => { return a.start.valueOf() - b.start.valueOf() })
-
-    const course = await getCourseByName(courseName);
-
-    if(!course || !course.discussionSpecs || !course.channels.discussion)
-        return "database error"
-
-    course.discussionSpecs.scorePeriods.push({ ...newScorePeriodData, studentScores: new Map() });
-
-    // FIXME: This is currently broken because the rescored period isnt always the first/only one
-    // it was before the changes to rescoring done with post editing but now it isnt
-    // we likely just need to feed in discussion specs from the functions that call this instead of getting new ones from course since those dont have the removed/edited period
-    const newScorePeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
-    
-    if(!newScorePeriods || newScorePeriods.length !== 1)
-        return "scoring error ocurred";
-
-    scorePeriods.push(newScorePeriods[0])
-    let insertErrors = await overwritePeriods(courseName, scorePeriods)
-    return insertErrors;
-}
-
-async function overwritePeriods(courseName: string, scorePeriods: ScorePeriod[]): Promise<string> {
-
-    try {
-        await courseModel.findOneAndUpdate( 
-            {name: courseName}, 
-            {"discussionSpecs.scorePeriods": scorePeriods}
-        )
-    }
-    catch(error: any) {
-        console.error(error);
-        return DATABASE_ERROR_MESSAGE;
-    }
-    return "";
 }
