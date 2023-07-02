@@ -1,9 +1,20 @@
 import { ChannelType, Message, ThreadChannel } from "discord.js";
-import { GUILDS } from "../../../secret";
 import { getCourseByDiscussionChannel } from "../../../generalUtilities/CourseUtilities";
 import { Course } from "../../../generalModels/Course";
 
-export async function getDiscussionMessageData(message: Message): Promise<undefined | DiscussionMessageData> {
+export async function handleDiscussionCreation(message: Message) {
+    
+    const discussionPostData = await getDiscussionMessageData(message)
+    
+    if(!discussionPostData)
+        return
+        
+    console.log("is new post or comment")
+
+}
+
+// HELPERS
+async function getDiscussionMessageData(message: Message): Promise<undefined | DiscussionMessageData> {
     
     const thread = message.channel;
 
@@ -33,3 +44,4 @@ export interface DiscussionMessageData {
     thread: ThreadChannel,
     isPost: boolean
 }
+
