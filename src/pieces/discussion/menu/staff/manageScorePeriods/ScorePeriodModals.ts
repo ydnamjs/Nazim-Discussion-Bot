@@ -117,9 +117,8 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
 
     const reasonsForFailure = handlePeriodValidation(periodValidationData)
 
-    if(reasonsForFailure !== "") {
+    if(reasonsForFailure !== "")
         return INVALID_INPUT_PREFIX + reasonsForFailure;
-    }
     
     const newScorePeriod: NewPeriodData = {
         start: periodValidationData.startDate as Date, 
@@ -130,20 +129,20 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
 
     const fetchedCourse = await getCourseByName(courseName)
 
-    if(fetchedCourse && fetchedCourse.discussionSpecs !== null) {
+    if(!fetchedCourse || fetchedCourse.discussionSpecs === null)
+        return DATABASE_ERROR_MESSAGE
     
-        const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
-        const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods)
+    const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
+    const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods)
 
-        if(conflictsWithCurrentPeriods) {
-            return CONFLICTING_DATES_MESSAGE;
-        }
-
-        const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, currentScorePeriods)
-
-        if(insertErrors !== "")
-            return insertErrors
+    if(conflictsWithCurrentPeriods) {
+        return CONFLICTING_DATES_MESSAGE;
     }
+
+    const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, currentScorePeriods)
+
+    if(insertErrors !== "")
+        return insertErrors
 
     return ADD_MODAL_SUCCESS_MESSAGE;
 }
@@ -178,36 +177,36 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
 
     const fetchedCourse = await getCourseByName(courseName);
     
-    if(fetchedCourse && fetchedCourse.discussionSpecs !== null) {
+    if(!fetchedCourse || fetchedCourse.discussionSpecs == null)
+        return DATABASE_ERROR_MESSAGE
 
-        const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
-        sortPeriods(currentScorePeriods)
+    const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
+    sortPeriods(currentScorePeriods)
 
-        const reasonsForFailure = handleIndexValidation(toEditIndex, currentScorePeriods.length) + handlePeriodValidation(periodValidationData)
+    const reasonsForFailure = handleIndexValidation(toEditIndex, currentScorePeriods.length) + handlePeriodValidation(periodValidationData)
 
-        if(reasonsForFailure !== "") {
-            return INVALID_INPUT_PREFIX + reasonsForFailure
-        }
-
-        const newScorePeriod: NewPeriodData = {
-            start: periodValidationData.startDate as Date, 
-            end: periodValidationData.endDate as Date, 
-            goalPoints: periodValidationData.goalPoints, 
-            maxPoints: periodValidationData.maxPoints
-        }
-
-        currentScorePeriods.splice(toEditIndex - 1, 1);
-        const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods)
-
-        if(conflictsWithCurrentPeriods) {
-            return CONFLICTING_DATES_MESSAGE;
-        }
-
-        const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, currentScorePeriods)
-
-        if(insertErrors !== "")
-            return insertErrors
+    if(reasonsForFailure !== "") {
+        return INVALID_INPUT_PREFIX + reasonsForFailure
     }
+
+    const newScorePeriod: NewPeriodData = {
+        start: periodValidationData.startDate as Date, 
+        end: periodValidationData.endDate as Date, 
+        goalPoints: periodValidationData.goalPoints, 
+        maxPoints: periodValidationData.maxPoints
+    }
+
+    currentScorePeriods.splice(toEditIndex - 1, 1);
+    const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods)
+
+    if(conflictsWithCurrentPeriods)
+        return CONFLICTING_DATES_MESSAGE;
+
+    const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, currentScorePeriods)
+
+    if(insertErrors !== "")
+        return insertErrors
+
     return EDIT_MODAL_SUCCESS_MESSAGE;
 }
 
@@ -241,9 +240,8 @@ async function handleDeletePeriodModal(_client: Client, courseName: string, subm
 
     const reasonForFailure = handleIndexValidation(toDeleteIndex, fetchedCourse.discussionSpecs.scorePeriods.length)
 
-    if(reasonForFailure !== "") {
+    if(reasonForFailure !== "")
         return INVALID_INPUT_PREFIX + reasonForFailure;
-    }
 
     fetchedCourse.discussionSpecs.scorePeriods.splice(toDeleteIndex - 1, 1);
         
