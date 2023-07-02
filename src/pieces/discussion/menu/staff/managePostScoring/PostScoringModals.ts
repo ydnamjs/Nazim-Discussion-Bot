@@ -4,7 +4,7 @@ import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
 import { SCORING_ERROR_MESSAGE, scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
-import { refreshManagePostScoringMenu, updateToManagePostScoringMenu } from "./ManagePostScoringMenu";
+import { recollectManagePeriodsInput, refreshManagePostScoringMenu, updateToManagePostScoringMenu } from "./ManagePostScoringMenu";
 
 // POST SCORE INPUT COMPONENT
 const SCORE_INPUT_ID = "discussion_score_input";
@@ -216,7 +216,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
 // HELPER FUNCTIONS
 async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
-    updateToManagePostScoringMenu(courseName, triggerInteraction, false);
+    recollectManagePeriodsInput(courseName, triggerInteraction);
 
     await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePostScoringMenu(courseName, triggerInteraction)})
 }

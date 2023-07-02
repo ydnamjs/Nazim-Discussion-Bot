@@ -195,7 +195,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_POST_SCORING_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToManagePostScoringMenu(courseName, componentInteraction, true)
+                updateToManagePostScoringMenu(courseName, componentInteraction)
             }
         },
         {
