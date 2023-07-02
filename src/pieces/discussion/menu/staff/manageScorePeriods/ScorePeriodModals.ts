@@ -1,6 +1,5 @@
 import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import { DateTime } from "luxon";
-import { courseModel } from "../../../../../generalModels/Course";
 import { ScorePeriod, StudentScoreData } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { sortPeriods } from "../../../../../generalUtilities/ScorePeriodUtilities";
@@ -19,6 +18,7 @@ const INVALID_END_DATE_REASON = "\n- Invalid end date format. Input should be of
 const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 800";
 const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1000";
 const INVALID_INDEX_PERIOD_REASON = "\n- Invalid score period input. Please retry with a number in your menu."
+const SCORING_ERROR_MESSAGE = "Scoring Error; Contact Admin";
 
 // INPUT FIELD CONSTANTS
 const PERIOD_NUM_INPUT_ID = "discussion_score_period_input";
@@ -146,7 +146,7 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
     const rescoredPeriods = await scoreAllThreads(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
 
     if(!rescoredPeriods)
-        return "Scoring Error" // TODO: Constantify this
+        return SCORING_ERROR_MESSAGE
 
     fetchedCourse.discussionSpecs.scorePeriods = rescoredPeriods;
 
@@ -220,7 +220,7 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
     const rescoredPeriods = await scoreAllThreads(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
     
     if(!rescoredPeriods)
-        return "Scoring Error" // TODO: Constantify this
+        return SCORING_ERROR_MESSAGE
     
     fetchedCourse.discussionSpecs.scorePeriods = rescoredPeriods;
     
@@ -275,7 +275,7 @@ async function handleDeletePeriodModal(_client: Client, courseName: string, subm
     return DELETE_MODAL_SUCCESS_MESSAGE;
 }
 
-// UTILITY FUNCTIONS
+// HELPER FUNCTIONS
 async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
     updateToManagePeriodsMenu(courseName, triggerInteraction, false);
@@ -348,13 +348,6 @@ function handleIndexValidation(scorePeriodIndex: number, scorePeriodsLength: num
     return "";
 }
 
-interface NewPeriodData {
-    start: Date, 
-    end: Date,  
-    goalPoints: number, 
-    maxPoints: number
-}
-
 function hasPeriodConflict(newScorePeriodData: NewPeriodData, currentScorePeriods: ScorePeriod[]): boolean {
 
     let hasConflict = false;
@@ -364,4 +357,11 @@ function hasPeriodConflict(newScorePeriodData: NewPeriodData, currentScorePeriod
         }
     })
     return hasConflict;
+}
+
+interface NewPeriodData {
+    start: Date, 
+    end: Date,  
+    goalPoints: number, 
+    maxPoints: number
 }
