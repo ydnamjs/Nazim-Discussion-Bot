@@ -5,8 +5,7 @@ import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
-import { openEditPostModal } from "./EditPostScoringModal";
-import { openAddPostAwardModal } from "./AddPostAwardModal";
+import { openAddPostAwardModal, openEditPostModal } from "./PostScoringModals";
 
 const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
 const MENU_DESCRIPTION = "replace me";
@@ -84,7 +83,7 @@ const DELETE_AWARD_BUTTON_DATA = {
 
 const SCORE_BUTTON_ROW = makeActionRowButton([EDIT_SCORING_BUTTON_DATA, ADD_AWARD_BUTTON_DATA, EDIT_AWARD_BUTTON_DATA, DELETE_AWARD_BUTTON_DATA])
 
-export async function updateToManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
+export async function updateToManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
     
     let course = await getCourseByName(courseName)
 
@@ -95,7 +94,22 @@ export async function updateToManagePostScoringMenu(courseName: string, componen
     }
 
     const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
-    isInteractionUpdate ? componentInteraction.update(managePostScoringMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
+    componentInteraction.update(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
+    managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
+}
+
+export async function recollectManagePeriodsInput(courseName: string, componentInteraction: MessageComponentInteraction) {
+    
+    let course = await getCourseByName(courseName)
+
+    if(!course || !course.discussionSpecs) {
+        await sendDismissableReply(componentInteraction.message, "Database error. Please message admin");
+        await componentInteraction.message.delete()
+        return;
+    }
+
+    const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
+    componentInteraction.message.edit(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
     managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
 }
 

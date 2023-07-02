@@ -195,7 +195,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_POST_SCORING_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToManagePostScoringMenu(courseName, componentInteraction, true)
+                updateToManagePostScoringMenu(courseName, componentInteraction)
             }
         },
         {
@@ -211,7 +211,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToManagePeriodsMenu(courseName, componentInteraction, true);
+                updateToManagePeriodsMenu(courseName, componentInteraction);
             }
         },
         {
