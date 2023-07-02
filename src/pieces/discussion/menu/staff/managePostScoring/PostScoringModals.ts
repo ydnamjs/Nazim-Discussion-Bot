@@ -205,7 +205,8 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
     if(!course || !course.channels.discussion || !course.discussionSpecs)
         return DATABASE_ERROR_MESSAGE
 
-    // TODO: add check to determine if emoji is being added or edited and make return dependent on that 
+    const edited = course.discussionSpecs.postSpecs.awards.has(emojiInput)
+
     course.discussionSpecs.postSpecs.awards.set(emojiInput, newAward)
 
     const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
@@ -220,7 +221,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
     if(awardErrors !== "")
         return awardErrors
 
-    return ADD_AWARD_SUCCESS_MESSAGE;
+    return edited ? EDIT_AWARD_SUCCESS_MESSAGE : ADD_AWARD_SUCCESS_MESSAGE;
 }
 
 
