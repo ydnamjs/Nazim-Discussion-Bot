@@ -1,5 +1,5 @@
 import { ButtonInteraction, Client, ModalSubmitInteraction } from "discord.js";
-import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
+import { getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { CONFLICTING_DATES_MESSAGE, INVALID_INPUT_PREFIX, PERIOD_NUM_INPUT_ID, endDateActionRow, goalPointsActionRow, maxPointsActionRow, periodNumActionRow, startDateActionRow } from "./ModalComponents";
 import { NewPeriodData, checkAgainstCurrentPeriods, createHandlePeriodModal, handleIndexValidation, handlePeriodValidation, insertOnePeriod, overwritePeriods, sortPeriods, validatePeriodInput } from "./PeriodModalUtilities";
 
@@ -148,18 +148,16 @@ async function handleDeletePeriodModal(_client: Client, courseName: string, subm
     const fetchedCourse = await getCourseByName(courseName);
 
     if(fetchedCourse && fetchedCourse.discussionSpecs !== null) {
-    
-        let scorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
 
-        const reasonForFailure = handleIndexValidation(toDeleteIndex, scorePeriods.length)
+        const reasonForFailure = handleIndexValidation(toDeleteIndex, fetchedCourse.discussionSpecs.scorePeriods.length)
 
         if(reasonForFailure !== "") {
             return INVALID_INPUT_PREFIX + reasonForFailure;
         }
 
-        scorePeriods.splice(toDeleteIndex - 1, 1);
+        fetchedCourse.discussionSpecs.scorePeriods.splice(toDeleteIndex - 1, 1);
         
-        const deleteErrors = await overwritePeriods(courseName, scorePeriods);
+        const deleteErrors = await overwriteCourseDiscussionSpecs(courseName, fetchedCourse.discussionSpecs);
 
         if(deleteErrors !== "")
             return deleteErrors
