@@ -10,25 +10,25 @@ import { updateToManageCourseMenu } from "../ManageCourseMenu";
 
 // MENU TEXT CONSTANTS
 const TITLE_COURSE_PREFIX = "Manage Post Specs For CISC ";
-const MENU_DESCRIPTION = "**Welcome to the manage post specs menu! Below this you will find the current scoring rules for posts as well as a list of awards and penalties**";
+const MENU_DESCRIPTION = "**Welcome to the manage post specs menu! Below this you will find the current scoring rules for posts as well as a list of awards and penalties.**";
 
 const SCORE_PREFIX = "Post Points: ";
-const SCORE_DESCRIPTION = "The number of points awarded for a post that meets the requirements specified below";
+const SCORE_DESCRIPTION = "The number of points awarded for a post that meets the length, paragraph, and link requirements below.";
 
 const COMMENT_POINTS_PREFIX = "Comment Points: ";
-const COMMENT_POINTS_DESCRIPTION = "The number of points awarded to the poster for comments others leave on their post";
+const COMMENT_POINTS_DESCRIPTION = "The number of points awarded to the poster for comments others leave on their post.";
 
-const LENGTH_REQ_PREFIX = "Length Requirement: ";
-const LENGTH_REQ_DESCRIPTION = "The minimum number of non white space characters required to recieve score points for a post";
+const LENGTH_REQ_PREFIX = "Minimum Length Requirement: ";
+const LENGTH_REQ_DESCRIPTION = "The minimum number of non white space characters required to recieve score points for a post.";
 
-const PARAGRAPH_REQ_PREFIX = "Paragraph Requirement: ";
-const PARAGRAPH_REQ_DESCRIPTION = "The minimum number of paragraphs required to recieve points for a post";
+const PARAGRAPH_REQ_PREFIX = "Minimum Paragraph Requirement: ";
+const PARAGRAPH_REQ_DESCRIPTION = "The minimum number of paragraphs required to recieve points for a post.";
 
-const LINK_REQ_PREFIX = "Link Requirement: ";
-const LINK_REQ_DESCRIPTION = "The minimum number of links required to recieve points for a post";
+const LINK_REQ_PREFIX = "Minimum Link Requirement: ";
+const LINK_REQ_DESCRIPTION = "The minimum number of links required to recieve points for a post.";
 
 const AWARD_NAME = "Awards & Penalties"
-const AWARD_DESCRIPTION = "Below this you will find a list of all awards/penalities and basic info about them";
+const AWARD_DESCRIPTION = "Below this you will find a list of all awards/penalities. Points is the number of points given to the reciever of the award. Givers is who can give the award.";
 
 const AWARD_POINT_PREFIX = "points: ";
 const AWARD_GIVERS_PREFIX = "\ngivers: "
