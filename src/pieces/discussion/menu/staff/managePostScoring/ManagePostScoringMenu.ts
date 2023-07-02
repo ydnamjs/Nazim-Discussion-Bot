@@ -9,7 +9,7 @@ import { openAddPostAwardModal, openDeletePostAwardModal, openEditPostModal } fr
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
 
 // MENU TEXT CONSTANTS
-const TITLE_COURSE_PREFIX = "Manage Post Specs For CISC ";
+const TITLE_COURSE_PREFIX = "Manage Post Specs - CISC ";
 const MENU_DESCRIPTION = "**Welcome to the manage post specs menu! Below this you will find the current scoring rules for posts as well as a list of awards and penalties.**";
 
 const SCORE_PREFIX = "Post Points: ";
@@ -36,7 +36,6 @@ const AWARD_STAFFONLY_TEXT = "Staff Only"
 const AWARD_NOT_STAFFONLY_TEXT = "Everyone"
 
 // BACK BUTTON
-
 const BACK_BUTTON_ID = "discussion_view_students_back_button";
 const BACK_BUTTON_LABEL = "Back To Course";
 const BACK_BUTTON_DISABLED = false;
