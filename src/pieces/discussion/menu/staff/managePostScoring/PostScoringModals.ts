@@ -77,7 +77,6 @@ const linkReqInput = new TextInputBuilder({
 const linkReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [linkReqInput]});
 
 // AWARD UNICODE INPUT COMPONENT
-
 const AWARD_UNICODE_INPUT_ID = "discussion_add_post_award_unicode_input";
 const AWARD_UNICODE_INPUT_LABEL = "award emoji unicode";
 const AWARD_UNICODE_INPUT_STYLE = TextInputStyle.Short;
@@ -93,7 +92,6 @@ const awardUnicodeInput = new TextInputBuilder({
 const awardUnicodeInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardUnicodeInput]});
 
 // AWARD POINTS INPUT COMPONENT
-
 const AWARD_POINTS_INPUT_ID = "discussion_add_post_award_points_input";
 const AWARD_POINTS_INPUT_LABEL = "award points";
 const AWARD_POINTS_INPUT_STYLE = TextInputStyle.Short;
@@ -109,7 +107,6 @@ const awardPointsInput = new TextInputBuilder({
 const awardPointsInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardPointsInput]});
 
 // IS STAFF ONLY INPUT COMPONENT
-
 const AWARD_STAFF_ONLY_INPUT_ID = "discussion_add_post_staff_only_input";
 const AWARD_STAFF_ONLY_INPUT_LABEL = "award points";
 const AWARD_STAFF_ONLY_INPUT_STYLE = TextInputStyle.Short;
