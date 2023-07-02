@@ -121,8 +121,8 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
         return INVALID_INPUT_PREFIX + reasonsForFailure;
     
     const newScorePeriod: NewPeriodData = {
-        start: periodValidationData.startDate as Date, 
-        end: periodValidationData.endDate as Date, 
+        start: periodValidationData.start as Date, 
+        end: periodValidationData.end as Date, 
         goalPoints: periodValidationData.goalPoints, 
         maxPoints: periodValidationData.maxPoints
     }
@@ -200,8 +200,8 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
     }
 
     const newScorePeriod: NewPeriodData = {
-        start: periodValidationData.startDate as Date, 
-        end: periodValidationData.endDate as Date, 
+        start: periodValidationData.start as Date, 
+        end: periodValidationData.end as Date, 
         goalPoints: periodValidationData.goalPoints, 
         maxPoints: periodValidationData.maxPoints
     }
@@ -283,13 +283,6 @@ async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, co
     createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePeriodsMenu(courseName, triggerInteraction)})
 }
 
-interface PeriodValidationData {
-    startDate: Date | undefined, 
-    endDate: Date | undefined,  
-    goalPoints: number, 
-    maxPoints: number
-}
-
 function validatePeriodInput(submittedModal: ModalSubmitInteraction): PeriodValidationData {
     
     const startDateString = submittedModal.fields.getTextInputValue(START_DATE_INPUT_ID);
@@ -319,16 +312,16 @@ function validatePeriodInput(submittedModal: ModalSubmitInteraction): PeriodVali
         maxPoints = NaN;
     }
 
-    return {startDate: startDate, endDate: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
+    return {start: startDate, end: endDate, goalPoints: goalPoints, maxPoints: maxPoints};
 }
 
 function handlePeriodValidation(modalData: PeriodValidationData): string { 
     
     let reasonsForFailure = "";
-    if(!modalData.startDate){
+    if(!modalData.start){
         reasonsForFailure += INVALID_START_DATE_REASON;
     }
-    if(!modalData.endDate){
+    if(!modalData.end){
         reasonsForFailure += INVALID_END_DATE_REASON;
     }
     if(Number.isNaN(modalData.goalPoints)){
@@ -338,6 +331,13 @@ function handlePeriodValidation(modalData: PeriodValidationData): string {
         reasonsForFailure += INVALID_MAX_POINTS_REASON;
     }
     return reasonsForFailure;
+}
+
+interface PeriodValidationData {
+    start: Date | undefined, 
+    end: Date | undefined,  
+    goalPoints: number, 
+    maxPoints: number
 }
 
 function handleIndexValidation(scorePeriodIndex: number, scorePeriodsLength: number): string {
