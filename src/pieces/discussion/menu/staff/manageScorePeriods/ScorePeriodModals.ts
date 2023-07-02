@@ -9,34 +9,34 @@ import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/
 import { refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 
 // MODAL BEHAVIOR CONSTANTS
-export const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
+const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
 
 // MODAL NOTIFICATION CONSTANTS
-export const CONFLICTING_DATES_MESSAGE = "Score Period Has Overlap With Already Existing Score Period(s). Nothing Was Changed.";
-export const INVALID_INPUT_PREFIX = "Invalid Input Format. Nothing Was Changed\n**Reasons(s):**";
-export const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM and be before end date Ex: 1970-01-01 12:00:00 AM";
-export const INVALID_END_DATE_REASON = "\n- Invalid end date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM and be after start date Ex: 2036-08-26 11:59:59 PM";
-export const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 800";
-export const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1000";
-export const INVALID_INDEX_PERIOD_REASON = "\n- Invalid score period input. Please retry with a number in your menu."
+const CONFLICTING_DATES_MESSAGE = "Score Period Has Overlap With Already Existing Score Period(s). Nothing Was Changed.";
+const INVALID_INPUT_PREFIX = "Invalid Input Format. Nothing Was Changed\n**Reasons(s):**";
+const INVALID_START_DATE_REASON = "\n- Invalid start date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM and be before end date Ex: 1970-01-01 12:00:00 AM";
+const INVALID_END_DATE_REASON = "\n- Invalid end date format. Input should be of the form: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM and be after start date Ex: 2036-08-26 11:59:59 PM";
+const INVALID_GOAL_POINTS_REASON = "\n- Invalid goal points. Input should be a non negative integer less than or equal to max points. Ex: 800";
+const INVALID_MAX_POINTS_REASON = "\n- Invalid maximum points. Input should be a non negative integer greater than or equal to goal points. Ex: 1000";
+const INVALID_INDEX_PERIOD_REASON = "\n- Invalid score period input. Please retry with a number in your menu."
 
 // INPUT FIELD CONSTANTS
-export const PERIOD_NUM_INPUT_ID = "discussion_score_period_input";
+const PERIOD_NUM_INPUT_ID = "discussion_score_period_input";
 const PERIOD_NUM_INPUT_LABEL = "score period #";
 const PERIOD_NUM_INPUT_PLACEHOLDER = "0";
 const PERIOD_NUM_INPUT_STYLE = TextInputStyle.Short;
 
-export const START_DATE_INPUT_ID = "discussion_score_period_start_input";
+const START_DATE_INPUT_ID = "discussion_score_period_start_input";
 const START_DATE_INPUT_LABEL = "start date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
 const START_DATE_INPUT_PLACEHOLDER = "1970-01-01 12:00:00 AM";
 const START_DATE_INPUT_STYLE = TextInputStyle.Short;
 
-export const END_DATE_INPUT_ID = "discussion_score_period_end_input";
+const END_DATE_INPUT_ID = "discussion_score_period_end_input";
 const END_DATE_INPUT_LABEL = "end date/time: " + DATE_STRING_FORMAT.toUpperCase() + "M/PM";
 const END_DATE_INPUT_PLACEHOLDER =  "2036-08-26 11:59:59 PM";
 const END_DATE_INPUT_STYLE = TextInputStyle.Short;
 
-export const GOAL_POINTS_INPUT_ID = "discussion_score_period_goal_input";
+const GOAL_POINTS_INPUT_ID = "discussion_score_period_goal_input";
 const GOAL_POINTS_INPUT_LABEL = "goal points";
 const GOAL_POINTS_INPUT_PLACEHOLDER = "";
 const GOAL_POINTS_INPUT_STYLE = TextInputStyle.Short;
@@ -132,14 +132,13 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
     if(!fetchedCourse || fetchedCourse.discussionSpecs === null)
         return DATABASE_ERROR_MESSAGE
     
-    const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
-    const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods)
+    const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
 
     if(conflictsWithCurrentPeriods) {
         return CONFLICTING_DATES_MESSAGE;
     }
 
-    const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, currentScorePeriods)
+    const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
 
     if(insertErrors !== "")
         return insertErrors
@@ -180,10 +179,9 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
     if(!fetchedCourse || fetchedCourse.discussionSpecs == null)
         return DATABASE_ERROR_MESSAGE
 
-    const currentScorePeriods = fetchedCourse.discussionSpecs.scorePeriods;
-    sortPeriods(currentScorePeriods)
+    fetchedCourse.discussionSpecs.scorePeriods = sortPeriods(fetchedCourse.discussionSpecs.scorePeriods);
 
-    const reasonsForFailure = handleIndexValidation(toEditIndex, currentScorePeriods.length) + handlePeriodValidation(periodValidationData)
+    const reasonsForFailure = handleIndexValidation(toEditIndex, fetchedCourse.discussionSpecs.scorePeriods.length) + handlePeriodValidation(periodValidationData)
 
     if(reasonsForFailure !== "") {
         return INVALID_INPUT_PREFIX + reasonsForFailure
@@ -196,13 +194,13 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
         maxPoints: periodValidationData.maxPoints
     }
 
-    currentScorePeriods.splice(toEditIndex - 1, 1);
-    const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, currentScorePeriods)
+    fetchedCourse.discussionSpecs.scorePeriods.splice(toEditIndex - 1, 1);
+    const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
 
     if(conflictsWithCurrentPeriods)
         return CONFLICTING_DATES_MESSAGE;
 
-    const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, currentScorePeriods)
+    const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
 
     if(insertErrors !== "")
         return insertErrors
@@ -254,7 +252,7 @@ async function handleDeletePeriodModal(_client: Client, courseName: string, subm
 }
 
 // UTILITY FUNCTIONS
-export async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
+async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
     updateToManagePeriodsMenu(courseName, triggerInteraction, false);
 
