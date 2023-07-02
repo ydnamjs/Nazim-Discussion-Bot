@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import { DateTime } from "luxon";
 import { courseModel } from "../../../../../generalModels/Course";
-import { ScorePeriod } from "../../../../../generalModels/DiscussionScoring";
+import { ScorePeriod, StudentScoreData } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { sortPeriods } from "../../../../../generalUtilities/ScorePeriodUtilities";
 import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
@@ -129,7 +129,7 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
 
     const fetchedCourse = await getCourseByName(courseName)
 
-    if(!fetchedCourse || fetchedCourse.discussionSpecs === null)
+    if(!fetchedCourse || fetchedCourse.discussionSpecs === null || fetchedCourse.channels.discussion === null)
         return DATABASE_ERROR_MESSAGE
     
     const conflictsWithCurrentPeriods = hasPeriodConflict(newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
@@ -138,10 +138,22 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
         return CONFLICTING_DATES_MESSAGE;
     }
 
-    const insertErrors = await insertOnePeriod(client, courseName, newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
+    fetchedCourse.discussionSpecs.scorePeriods.push({
+        ...newScorePeriod,
+        studentScores: new Map<string, StudentScoreData>()
+    })
 
-    if(insertErrors !== "")
-        return insertErrors
+    const rescoredPeriods = await scoreAllThreads(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
+
+    if(!rescoredPeriods)
+        return "Scoring Error"
+
+    fetchedCourse.discussionSpecs.scorePeriods = rescoredPeriods;
+
+    const updateDatabaseErrors = await overwriteCourseDiscussionSpecs(courseName, fetchedCourse.discussionSpecs);
+
+    if(updateDatabaseErrors !== "")
+        return updateDatabaseErrors
 
     return ADD_MODAL_SUCCESS_MESSAGE;
 }
