@@ -132,7 +132,7 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
     if(!fetchedCourse || fetchedCourse.discussionSpecs === null)
         return DATABASE_ERROR_MESSAGE
     
-    const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
+    const conflictsWithCurrentPeriods = hasPeriodConflict(newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
 
     if(conflictsWithCurrentPeriods) {
         return CONFLICTING_DATES_MESSAGE;
@@ -195,7 +195,7 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
     }
 
     fetchedCourse.discussionSpecs.scorePeriods.splice(toEditIndex - 1, 1);
-    const conflictsWithCurrentPeriods = await checkAgainstCurrentPeriods(newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
+    const conflictsWithCurrentPeriods = hasPeriodConflict(newScorePeriod, fetchedCourse.discussionSpecs.scorePeriods)
 
     if(conflictsWithCurrentPeriods)
         return CONFLICTING_DATES_MESSAGE;
@@ -331,7 +331,7 @@ interface NewPeriodData {
     maxPoints: number
 }
 
-async function checkAgainstCurrentPeriods(newScorePeriodData: NewPeriodData, currentScorePeriods: ScorePeriod[]): Promise<boolean> {
+function hasPeriodConflict(newScorePeriodData: NewPeriodData, currentScorePeriods: ScorePeriod[]): boolean {
 
     let hasConflict = false;
     currentScorePeriods.forEach((scorePeriod) => {
