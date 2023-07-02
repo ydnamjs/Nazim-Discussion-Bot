@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, Te
 import { AwardSpecs, PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
-import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
+import { SCORING_ERROR_MESSAGE, scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
 import { refreshManagePostScoringMenu, updateToManagePostScoringMenu } from "./ManagePostScoringMenu";
 
@@ -166,7 +166,7 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
     const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
     if(!rescoredPeriods)
-        return "rescore error" //TODO: Constantify this / bring the constant from score period modals out
+        return SCORING_ERROR_MESSAGE
 
     course.discussionSpecs.scorePeriods = rescoredPeriods
 
@@ -201,7 +201,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
     const course = await getCourseByName(courseName)
 
     if(!course || !course.channels.discussion || !course.discussionSpecs)
-        return "database error"
+        return DATABASE_ERROR_MESSAGE
 
     // FIXME: Add check to make sure award does not already exist
     course.discussionSpecs.postSpecs.awards.set(emojiInput, newAward)
@@ -209,7 +209,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
     const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
     if(!rescoredPeriods)
-        return "rescore error" //TODO: Constantify this / bring the constant from score period modals out
+        return SCORING_ERROR_MESSAGE
 
     course.discussionSpecs.scorePeriods = rescoredPeriods
 
