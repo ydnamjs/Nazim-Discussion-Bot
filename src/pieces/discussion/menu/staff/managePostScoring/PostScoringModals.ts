@@ -143,7 +143,7 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
     const inputErrors =  validatePostSpecsInput(scoreInput, commentScoreInput, lengthInput, paraInput, linkInput);
 
     if(inputErrors !== "")
-        return inputErrors
+        return INVALID_INPUT_PREFIX + inputErrors
     
     const newPostSpecs: Partial<PostSpecs> = {
         points: scoreInput,
@@ -205,7 +205,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
     if(!course || !course.channels.discussion || !course.discussionSpecs)
         return DATABASE_ERROR_MESSAGE
 
-    // FIXME: Add check to make sure award does not already exist
+    // TODO: add check to determine if emoji is being added or edited and make return dependent on that 
     course.discussionSpecs.postSpecs.awards.set(emojiInput, newAward)
 
     const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
@@ -227,8 +227,8 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
 // DELETE AWARD MODAL
 const DELETE_AWARD_MODAL_ID_PREFIX = "delete_post_award_modal";
 const DELETE_AWARD_MODAL_TITLE_PREFIX = "Delete Award - CISC ";
-const EMOJI_NOT_FOUND_ERROR_MESSAGE = "\n- Emoji not found"
 
+const EMOJI_NOT_FOUND_ERROR_MESSAGE = "\n- Emoji not found"
 
 const DELETE_AWARD_SUCCESS_MESSAGE = "Award successfully deleted";
 
@@ -246,6 +246,11 @@ async function handleDeleteAwardModalInput(client: Client, courseName: string, s
 
     if(!course || !course.channels.discussion || !course.discussionSpecs)
         return DATABASE_ERROR_MESSAGE
+
+    const inputErrors = validateEmojiInput(emojiInput)
+
+    if(inputErrors !== "")
+        return INVALID_INPUT_PREFIX + inputErrors;
 
     if(!(course.discussionSpecs.postSpecs.awards.has(emojiInput)))
         return INPUT_ERROR_PREFIX + EMOJI_NOT_FOUND_ERROR_MESSAGE
@@ -296,8 +301,8 @@ function validatePostSpecsInput(score: number, commentScore: number, length: num
     return errorReasons
 }
 
-function validateAwardInput(emojiInput: string, awardPointsInput: number, isStaffOnlyInput: string): string {
-
+function validateEmojiInput(emojiInput: string) {
+    
     let errorReasons = "";
 
     // FIXME: This parsing currently does not support every discord emoji or even most of them
@@ -310,7 +315,16 @@ function validateAwardInput(emojiInput: string, awardPointsInput: number, isStaf
         errorReasons += "\n- No Emoji detected. Please input one emoji in unicode form EX: 👍";
     else if(emojiInputArray.length > 1)
         errorReasons += "\n- Multiple Emoji detected. Please input one emoji in unicode form EX: 👍";
+    
+    return errorReasons;
+}
 
+function validateAwardInput(emojiInput: string, awardPointsInput: number, isStaffOnlyInput: string): string {
+
+    let errorReasons = "";
+
+    errorReasons += validateEmojiInput(emojiInput);
+    
     if(Number.isNaN(awardPointsInput))
         errorReasons += "\n- Invalid Award Points Detected. Please input an integer EX: 25";
     
