@@ -3,20 +3,16 @@ import loadDash from "lodash";
 import { AwardSpecs, CommentSpecs, DiscussionSpecs, PostSpecs, ScorePeriod, StudentScoreData } from "../../../generalModels/DiscussionScoring";
 import { userHasRoleWithId } from "../../../generalUtilities/RoleUtilities";
 import { getChannelInMainGuild } from "../../../generalUtilities/getChannelInMain";
-import { getCourseByName } from "../../../generalUtilities/getCourseByName";
 import { wait } from "../../../generalUtilities/wait";
 
-export async function scoreAllThreadsInCourse(client: Client, courseName: string, customPeriods?: ScorePeriod[], options?: Partial<ScoreThreadOptions>) {
+export async function scoreAllThreads(client: Client, forumId: string, discussionSpecs: DiscussionSpecs, staffId: string) {
 
-    const threads = await getAllDiscussionThreads(client, courseName);
+    const threads = await getAllDiscussionThreads(client, forumId);
 
-    const course = await getCourseByName(courseName);
+    if(!threads)
+        return
 
-    if(!threads || !course || !course.discussionSpecs) {
-        return undefined;
-    }
-
-    let totalScorePeriods: ScorePeriod[] = loadDash.cloneDeep( customPeriods? customPeriods : course.discussionSpecs.scorePeriods);
+    let totalScorePeriods: ScorePeriod[] = loadDash.cloneDeep(discussionSpecs.scorePeriods);
     totalScorePeriods.forEach((scorePeriod) => {
         wipeStudentScores(scorePeriod);
     })
@@ -30,7 +26,7 @@ export async function scoreAllThreadsInCourse(client: Client, courseName: string
 
     for(const thread of threads) {
 
-        const threadScoresPeriods = await scoreThread(client, thread.id, course.discussionSpecs, course.roles.staff, customPeriods, options);
+        const threadScoresPeriods = await scoreThread(client, thread.id, discussionSpecs, staffId);
         totalScorePeriods = addScorePeriodArrays(totalScorePeriods, threadScoresPeriods);
     }
 
@@ -42,17 +38,9 @@ export async function scoreAllThreadsInCourse(client: Client, courseName: string
     return totalScorePeriods;
 }
 
-async function getAllDiscussionThreads(client: Client, courseName: string) {
-    
-    const course = await getCourseByName(courseName);
+async function getAllDiscussionThreads(client: Client, channelId: string) {
 
-    if(!course || !course.channels.discussion) {
-        return undefined;
-    }
-
-    const forumChannelId = course.channels.discussion;
-
-    const forumChannel = await getChannelInMainGuild(client, forumChannelId);
+    const forumChannel = await getChannelInMainGuild(client, channelId);
 
     if(!forumChannel || !(forumChannel instanceof ForumChannel)) {
         return undefined;

@@ -1,10 +1,11 @@
 import { APIEmbedField, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
 import { makeActionRowButton } from "../../../../generalUtilities/MakeActionRow";
-import { ComponentBehavior } from "../BaseMenu";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { ComponentBehavior } from "../../../menu/BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../menu/NavigatedMenu";
 import { updateToStaffCoursesMenu } from "./StaffCoursesMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
+import { updateToManagePostSpecsMenu } from "./managePostScoring/ManagePostScoringMenu";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
@@ -18,8 +19,8 @@ const GET_SCORES_BUTTON_DISABLED = true;
 const GET_SCORES_BUTTON_STYLE = ButtonStyle.Primary
 
 const MANAGE_POST_SCORING_BUTTON_ID = "discussion-manage-post-scoring";
-const MANAGE_POST_SCORING_BUTTON_LABEL = "Post Scoring";
-const MANAGE_POST_SCORING_BUTTON_DISABLED = true;
+const MANAGE_POST_SCORING_BUTTON_LABEL = "Manage Post Specs";
+const MANAGE_POST_SCORING_BUTTON_DISABLED = false;
 const MANAGE_POST_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
 
 const MANAGE_COMMENT_SCORING_BUTTON_ID = "discussion-manage-comment-scoring";
@@ -194,7 +195,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_POST_SCORING_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                // TODO: IMPLEMENT ME ONCE MENU IS COMPLETE
+                updateToManagePostSpecsMenu(courseName, componentInteraction)
             }
         },
         {
@@ -210,7 +211,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToManagePeriodsMenu(courseName, componentInteraction, true);
+                updateToManagePeriodsMenu(courseName, componentInteraction);
             }
         },
         {

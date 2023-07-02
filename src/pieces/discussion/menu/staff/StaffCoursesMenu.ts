@@ -2,8 +2,8 @@ import { ActionRowBuilder, ButtonStyle, Client, InteractionUpdateOptions, Messag
 import { Course, courseModel } from "../../../../generalModels/Course";
 import { getRolesOfUserInGuild as getRolesOfUser } from "../../../../generalUtilities/RoleUtilities";
 import { GUILDS } from "../../../../secret";
-import { ComponentBehavior } from "../BaseMenu";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { ComponentBehavior } from "../../../menu/BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
 import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
 import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";

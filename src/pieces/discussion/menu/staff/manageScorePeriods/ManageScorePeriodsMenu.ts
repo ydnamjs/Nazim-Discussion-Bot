@@ -1,12 +1,10 @@
-import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
+import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
+import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
-import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
-import { ComponentBehavior } from "../../BaseMenu";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
+import { ComponentBehavior } from "../../../../menu/BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
-import { openAddPeriodModal } from "./AddScorePeriodModal";
-import { openDeletePeriodModal } from "./DeleteScorePeriodModal";
-import { openEditPeriodModal } from "./EditScorePeriodModal";
+import { openAddPeriodModal, openDeletePeriodModal, openEditPeriodModal } from "./ScorePeriodModals";
 
 const MENU_TITLE_SUFFIX = " Manage Score Periods";
 const MENU_DESCRIPTION = "replace me";
@@ -71,23 +69,36 @@ const DELETE_PERIOD_BUTTON_DATA = {
 const MANAGE_PERIODS_BUTTON_ROW = makeActionRowButton([ADD_PERIOD_BUTTON_DATA, EDIT_PERIOD_BUTTON_DATA, DELETE_PERIOD_BUTTON_DATA]);
 
 /**
- * @function updates a menu so that it is now a staff menu (updates the interaction if supplied, otherwise just updates the message)
- * @param {string} courseName - the title of the course whose students are to be viewed
+ * @function updates a menu so that it is now a manage period menu
+ * @param {string} courseName - the title of the course whose periods will be managed
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
- * @param {boolean} isInteractionUpdate - whether to update the interaction (true) or just edit the message (false)
  */
-export async function updateToManagePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
+export async function updateToManagePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
 
     const periodData = await getPeriodData(courseName)
 
     const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
-    isInteractionUpdate ? componentInteraction.update(managePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(managePeriodsMenu.menuMessageData as InteractionUpdateOptions);
+    componentInteraction.update(managePeriodsMenu.menuMessageData as InteractionUpdateOptions)
     managePeriodsMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 /**
- * @function refreshes the manage periods menu on the interaction provided's message
- * @param courseName - the name of the course that the menu is for
+ * @function recollects input on a menus message components (intended to be used after a menu button that opens a modal is pressed)
+ * @param {string} courseName - the name of the course whose periods are being managed
+ * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered the recollecting of the menu (intended to be the button on this menu that opened the modal)
+ */
+export async function recollectManagePeriodsInput(courseName: string, componentInteraction: MessageComponentInteraction) {
+
+    const periodData = await getPeriodData(courseName)
+
+    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
+    await componentInteraction.message.edit(managePeriodsMenu.menuMessageData as InteractionUpdateOptions);
+    managePeriodsMenu.collectMenuInteraction(componentInteraction.message);
+}
+
+/**
+ * @function refreshes the manage periods menu's contents on the interaction provided's message
+ * @param courseName - the name of the course that the manage periods menu is for
  * @param interaction - the interaction that the menu belongs to
  */
 export async function refreshManagePeriodsMenu(courseName: string, interaction: MessageComponentInteraction) {

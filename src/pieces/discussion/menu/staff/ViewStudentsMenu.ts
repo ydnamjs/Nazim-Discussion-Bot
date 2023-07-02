@@ -2,11 +2,11 @@ import { APIEmbedField, ButtonStyle, Guild, GuildMember, InteractionUpdateOption
 import { Course } from "../../../../generalModels/Course";
 import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
 import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
-import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
+import { getCourseByName } from "../../../../generalUtilities/CourseUtilities";
 import { GUILDS } from "../../../../secret";
-import { addScorePeriods } from "../../tracking/scoreFunctions";
-import { ComponentBehavior } from "../BaseMenu";
-import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../NavigatedMenu";
+import { addScorePeriods } from "../../scoring/scoreFunctions";
+import { ComponentBehavior } from "../../../menu/BaseMenu";
+import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
 
 const TITLE_COURSE_PREFIX = "Students of CISC ";
