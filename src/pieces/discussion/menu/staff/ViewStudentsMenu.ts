@@ -4,7 +4,7 @@ import { ScorePeriod, StudentScoreData } from "../../../../generalModels/Discuss
 import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
 import { getCourseByName } from "../../../../generalUtilities/getCourseByName";
 import { GUILDS } from "../../../../secret";
-import { addScorePeriods } from "../../tracking/scoreFunctions";
+import { addScorePeriods } from "../../scoring/scoreFunctions";
 import { ComponentBehavior } from "../../../menu/BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";

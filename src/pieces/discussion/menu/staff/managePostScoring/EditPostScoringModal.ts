@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
 import { COMMENT_SCORE_INPUT_ID, LENGTH_REQ_INPUT_ID, LINK_REQ_INPUT_ID, PARA_REQ_INPUT_ID, SCORE_INPUT_ID, commentScoreInputActionRow, lengthReqInputActionRow, linkReqInputActionRow, openPostScoringModal, paraReqInputActionRow, scoreInputActionRow, updateCourse } from "./ScoringModalUtilities";
-import { scoreAllThreads } from "../../../../../pieces/discussion/tracking/scoreFunctions";
+import { scoreAllThreads } from "../../../scoring/scoreFunctions";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 
