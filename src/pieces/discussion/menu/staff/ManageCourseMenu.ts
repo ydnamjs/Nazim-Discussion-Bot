@@ -19,7 +19,7 @@ const GET_SCORES_BUTTON_DISABLED = true;
 const GET_SCORES_BUTTON_STYLE = ButtonStyle.Primary
 
 const MANAGE_POST_SCORING_BUTTON_ID = "discussion-manage-post-scoring";
-const MANAGE_POST_SCORING_BUTTON_LABEL = "Post Scoring";
+const MANAGE_POST_SCORING_BUTTON_LABEL = "Manage Post Specs";
 const MANAGE_POST_SCORING_BUTTON_DISABLED = false;
 const MANAGE_POST_SCORING_BUTTON_STYLE = ButtonStyle.Secondary
 
