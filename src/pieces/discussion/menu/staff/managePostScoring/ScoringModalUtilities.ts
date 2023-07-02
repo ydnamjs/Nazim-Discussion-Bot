@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
-import { ModalInputHandler, createDiscussionModal } from "../../ModalUtilities";
+import { ModalInputHandler, createDiscussionModal } from "../../../../menu/ModalUtilities";
 import { refreshManagePostScoringMenu, updateToManagePostScoringMenu } from "./ManagePostScoringMenu";
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
 import { PostSpecs, ScorePeriod } from "../../../../../generalModels/DiscussionScoring";

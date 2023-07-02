@@ -1,6 +1,6 @@
 import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
-import { NavigatedMenu, NavigatedMenuData } from "../../NavigatedMenu";
-import { ComponentBehavior } from "../../BaseMenu";
+import { NavigatedMenu, NavigatedMenuData } from "../../../../menu/NavigatedMenu";
+import { ComponentBehavior } from "../../../../menu/BaseMenu";
 import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { getCourseByName } from "../../../../../generalUtilities/getCourseByName";
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";

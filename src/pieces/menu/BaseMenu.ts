@@ -1,5 +1,5 @@
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageComponentInteraction, MessageCreateOptions, StringSelectMenuBuilder, User } from "discord.js";
-import { sendDismissableReply } from "../../../generalUtilities/DismissableMessage";
+import { sendDismissableReply } from "../../generalUtilities/DismissableMessage";
 
 /**  
  * @interface interface of filter and action function

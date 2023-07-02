@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonInteraction, Client, ModalBuilder, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
-import { sendDismissableFollowUp } from "../../../generalUtilities/DismissableMessage";
+import { sendDismissableFollowUp } from "../../generalUtilities/DismissableMessage";
 
 export const MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
 

@@ -1,5 +1,5 @@
 import { BaseInteraction, ButtonComponentData, ButtonStyle, Client, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
-import { BaseMenu, ComponentBehavior } from "./BaseMenu";
+import { BaseMenu, ComponentBehavior } from "../../menu/BaseMenu";
 import { makeActionRowButton } from "../../../generalUtilities/MakeActionRow";
 import { updateToStaffCoursesMenu } from "./staff/StaffCoursesMenu";
 

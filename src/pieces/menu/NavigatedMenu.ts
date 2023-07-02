@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions, StringSelectMenuBuilder } from "discord.js";
 import { BaseMenu, buttonData, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData } from "./BaseMenu";
-import { makeActionRowButton } from "../../../generalUtilities/MakeActionRow";
-import { mainMenu } from "./DiscussionMainMenu";
+import { makeActionRowButton } from "../../generalUtilities/MakeActionRow";
+import { mainMenu } from "../discussion/menu/DiscussionMainMenu";
 
 /**
  * @interface NavigatedMenuData
