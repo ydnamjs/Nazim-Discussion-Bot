@@ -74,12 +74,21 @@ const MANAGE_PERIODS_BUTTON_ROW = makeActionRowButton([ADD_PERIOD_BUTTON_DATA, E
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  * @param {boolean} isInteractionUpdate - whether to update the interaction (true) or just edit the message (false)
  */
-export async function updateToManagePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction, isInteractionUpdate: boolean) {
+export async function updateToManagePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
 
     const periodData = await getPeriodData(courseName)
 
     const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
-    isInteractionUpdate ? componentInteraction.update(managePeriodsMenu.menuMessageData as InteractionUpdateOptions) : componentInteraction.message.edit(managePeriodsMenu.menuMessageData as InteractionUpdateOptions);
+    componentInteraction.update(managePeriodsMenu.menuMessageData as InteractionUpdateOptions)
+    managePeriodsMenu.collectMenuInteraction(componentInteraction.message);
+}
+
+export async function recollectManagePeriodsInput(courseName: string, componentInteraction: MessageComponentInteraction) {
+
+    const periodData = await getPeriodData(courseName)
+
+    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
+    componentInteraction.message.edit(managePeriodsMenu.menuMessageData as InteractionUpdateOptions);
     managePeriodsMenu.collectMenuInteraction(componentInteraction.message);
 }
 

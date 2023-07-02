@@ -5,7 +5,7 @@ import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs
 import { sortPeriods } from "../../../../../generalUtilities/ScorePeriodUtilities";
 import { SCORING_ERROR_MESSAGE, scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
-import { refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
+import { recollectManagePeriodsInput, refreshManagePeriodsMenu, updateToManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 
 // MODAL BEHAVIOR CONSTANTS
 const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
@@ -283,7 +283,7 @@ async function handleDeletePeriodModal(_client: Client, courseName: string, subm
 // HELPER FUNCTIONS
 async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
-    updateToManagePeriodsMenu(courseName, triggerInteraction, false);
+    recollectManagePeriodsInput(courseName, triggerInteraction);
 
     createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePeriodsMenu(courseName, triggerInteraction)})
 }
