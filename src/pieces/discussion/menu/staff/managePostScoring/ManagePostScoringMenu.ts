@@ -109,7 +109,7 @@ export async function recollectManagePostScoringInput(courseName: string, compon
     }
 
     const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
-    componentInteraction.message.edit(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
+    await componentInteraction.message.edit(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
     managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
 }
 
@@ -123,7 +123,7 @@ export async function refreshManagePostScoringMenu(courseName: string, component
     }
 
     const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
-    componentInteraction.message.edit(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
+    componentInteraction.message.edit({embeds: managePostScoringMenu.menuMessageData.embeds});
 }
 
 export class ManagePostScoringMenu extends NavigatedMenu {

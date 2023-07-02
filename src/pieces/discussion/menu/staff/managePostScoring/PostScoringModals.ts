@@ -4,7 +4,7 @@ import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
 import { SCORING_ERROR_MESSAGE, scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
-import { recollectManagePostScoringInput } from "./ManagePostScoringMenu";
+import { recollectManagePostScoringInput, refreshManagePostScoringMenu } from "./ManagePostScoringMenu";
 
 // POST SCORE INPUT COMPONENT
 const SCORE_INPUT_ID = "discussion_score_input";
@@ -267,9 +267,9 @@ async function handleDeleteAwardModalInput(client: Client, courseName: string, s
 // HELPER FUNCTIONS
 async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
     
-    recollectManagePostScoringInput(courseName, triggerInteraction); // FIXME: There seems to be an issue with returning to main menu after using a modal
+    recollectManagePostScoringInput(courseName, triggerInteraction);
 
-    await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await recollectManagePostScoringInput(courseName, triggerInteraction)})
+    await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePostScoringMenu(courseName, triggerInteraction)})
 }
 
 function validatePostSpecsInput(score: number, commentScore: number, length: number, para: number, link: number): string {
