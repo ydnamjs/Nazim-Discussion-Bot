@@ -1,12 +1,10 @@
-import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, MessageComponentInteraction } from "discord.js";
-import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
+import { APIEmbedField, ButtonInteraction, ButtonStyle, InteractionUpdateOptions, MessageComponentInteraction } from "discord.js";
 import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
+import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { ComponentBehavior } from "../../../../menu/BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
-import { openAddPeriodModal } from "./AddScorePeriodModal";
-import { openDeletePeriodModal } from "./DeleteScorePeriodModal";
-import { openEditPeriodModal } from "./EditScorePeriodModal";
+import { openAddPeriodModal, openDeletePeriodModal, openEditPeriodModal } from "./ScorePeriodModals";
 
 const MENU_TITLE_SUFFIX = " Manage Score Periods";
 const MENU_DESCRIPTION = "replace me";

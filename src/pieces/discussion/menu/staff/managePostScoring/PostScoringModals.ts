@@ -7,7 +7,7 @@ import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/
 import { refreshManagePostScoringMenu, updateToManagePostScoringMenu } from "./ManagePostScoringMenu";
 
 // POST SCORE INPUT COMPONENT
-export const SCORE_INPUT_ID = "discussion_score_input";
+const SCORE_INPUT_ID = "discussion_score_input";
 const SCORE_INPUT_LABEL = "points for post";
 const SCORE_INPUT_STYLE = TextInputStyle.Short;
 
@@ -18,10 +18,10 @@ const scoreInput = new TextInputBuilder({
     style: SCORE_INPUT_STYLE,
 })
 
-export const scoreInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [scoreInput]});
+const scoreInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [scoreInput]});
 
 // COMMENT SCORE INPUT COMPONENT
-export const COMMENT_SCORE_INPUT_ID = "discussion_comment_score_input";
+const COMMENT_SCORE_INPUT_ID = "discussion_comment_score_input";
 const COMMENT_SCORE_INPUT_LABEL = "points for comments (given to poster)";
 const COMMENT_SCORE_INPUT_STYLE = TextInputStyle.Short;
 
@@ -32,10 +32,10 @@ const commentScoreInput = new TextInputBuilder({
     style: COMMENT_SCORE_INPUT_STYLE,
 })
 
-export const commentScoreInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [commentScoreInput]});
+const commentScoreInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [commentScoreInput]});
 
 // LENGTH REQ INPUT COMPONENT
-export const LENGTH_REQ_INPUT_ID = "discussion_length_input";
+const LENGTH_REQ_INPUT_ID = "discussion_length_input";
 const LENGTH_REQ_INPUT_LABEL = "post minimum length requirement";
 const LENGTH_REQ_INPUT_STYLE = TextInputStyle.Short;
 
@@ -46,10 +46,10 @@ const lengthReqInput = new TextInputBuilder({
     style: LENGTH_REQ_INPUT_STYLE,
 })
 
-export const lengthReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [lengthReqInput]});
+const lengthReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [lengthReqInput]});
 
 // PARAGRAPH REQ INPUT COMPONENT
-export const PARA_REQ_INPUT_ID = "discussion_paragraph_input";
+const PARA_REQ_INPUT_ID = "discussion_paragraph_input";
 const PARA_REQ_INPUT_LABEL = "post minimum paragraph requirement";
 const PARA_REQ_INPUT_STYLE = TextInputStyle.Short;
 
@@ -60,10 +60,10 @@ const paraReqInput = new TextInputBuilder({
     style: PARA_REQ_INPUT_STYLE,
 })
 
-export const paraReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [paraReqInput]});
+const paraReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [paraReqInput]});
 
 // LINK REQ INPUT COMPONENT
-export const LINK_REQ_INPUT_ID = "discussion_link_input";
+const LINK_REQ_INPUT_ID = "discussion_link_input";
 const LINK_REQ_INPUT_LABEL = "post minimum link requirement";
 const LINK_REQ_INPUT_STYLE = TextInputStyle.Short;
 
@@ -74,11 +74,11 @@ const linkReqInput = new TextInputBuilder({
     style: LINK_REQ_INPUT_STYLE,
 })
 
-export const linkReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [linkReqInput]});
+const linkReqInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [linkReqInput]});
 
 // AWARD UNICODE INPUT COMPONENT
 
-export const AWARD_UNICODE_INPUT_ID = "discussion_add_post_award_unicode_input";
+const AWARD_UNICODE_INPUT_ID = "discussion_add_post_award_unicode_input";
 const AWARD_UNICODE_INPUT_LABEL = "award emoji unicode";
 const AWARD_UNICODE_INPUT_STYLE = TextInputStyle.Short;
 const AWARD_UNICODE_INPUT_PLACEHOLDER = "👍";
@@ -90,11 +90,11 @@ const awardUnicodeInput = new TextInputBuilder({
     style: AWARD_UNICODE_INPUT_STYLE,
 })
 
-export const awardUnicodeInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardUnicodeInput]});
+const awardUnicodeInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardUnicodeInput]});
 
 // AWARD POINTS INPUT COMPONENT
 
-export const AWARD_POINTS_INPUT_ID = "discussion_add_post_award_points_input";
+const AWARD_POINTS_INPUT_ID = "discussion_add_post_award_points_input";
 const AWARD_POINTS_INPUT_LABEL = "award points";
 const AWARD_POINTS_INPUT_STYLE = TextInputStyle.Short;
 const AWARD_POINTS_INPUT_PLACEHOLDER = "25";
@@ -106,11 +106,11 @@ const awardPointsInput = new TextInputBuilder({
     style: AWARD_POINTS_INPUT_STYLE,
 })
 
-export const awardPointsInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardPointsInput]});
+const awardPointsInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardPointsInput]});
 
 // IS STAFF ONLY INPUT COMPONENT
 
-export const AWARD_STAFF_ONLY_INPUT_ID = "discussion_add_post_staff_only_input";
+const AWARD_STAFF_ONLY_INPUT_ID = "discussion_add_post_staff_only_input";
 const AWARD_STAFF_ONLY_INPUT_LABEL = "award points";
 const AWARD_STAFF_ONLY_INPUT_STYLE = TextInputStyle.Short;
 const AWARD_STAFF_ONLY_INPUT_PLACEHOLDER = "True";
@@ -122,12 +122,12 @@ const awardStaffOnlyInput = new TextInputBuilder({
     style: AWARD_STAFF_ONLY_INPUT_STYLE,
 })
 
-export const awardStaffOnlyInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardStaffOnlyInput]});
-
-const MODAL_ID_PREFIX = "test";
-const MODAL_TITLE_PREFIX = "";
+const awardStaffOnlyInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardStaffOnlyInput]});
 
 // EDIT POST SCORING MODAL
+const MODAL_ID_PREFIX = "edit_post_scoring_modal";
+const MODAL_TITLE_PREFIX = "Edit Post Specs For CISC";
+
 export async function openEditPostModal(courseName: string, triggerInteraction: ButtonInteraction) {
     const components: ActionRowBuilder<TextInputBuilder>[] = [scoreInputActionRow, commentScoreInputActionRow, lengthReqInputActionRow, paraReqInputActionRow, linkReqInputActionRow];
 
@@ -174,7 +174,7 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
 }
 
 // ADD AWARD MODAL
-const ADD_AWARD_MODAL_ID_PREFIX = "test2";
+const ADD_AWARD_MODAL_ID_PREFIX = "add_post_award_modal";
 const ADD_AWARD_MODAL_TITLE_PREFIX = "Add Award To CISC ";
 
 export async function openAddPostAwardModal(courseName: string, triggerInteraction: ButtonInteraction) {

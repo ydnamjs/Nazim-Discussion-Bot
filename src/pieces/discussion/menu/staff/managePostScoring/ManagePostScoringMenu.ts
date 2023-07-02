@@ -5,8 +5,7 @@ import { PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { getCourseByName } from "../../../../../generalUtilities/CourseUtilities";
 import { sendDismissableReply } from "../../../../../generalUtilities/DismissableMessage";
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
-import { openEditPostModal } from "./EditPostScoringModal";
-import { openAddPostAwardModal } from "./AddPostAwardModal";
+import { openAddPostAwardModal, openEditPostModal } from "./PostScoringModals";
 
 const TITLE_COURSE_PREFIX = "Manage Post Scoring For CISC ";
 const MENU_DESCRIPTION = "replace me";
