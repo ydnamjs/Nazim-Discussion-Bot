@@ -270,6 +270,7 @@ async function handleDeletePeriodModal(_client: Client, courseName: string, subm
     if(reasonForFailure !== "")
         return INVALID_INPUT_PREFIX + reasonForFailure;
 
+    fetchedCourse.discussionSpecs.scorePeriods = sortPeriods(fetchedCourse.discussionSpecs.scorePeriods);
     fetchedCourse.discussionSpecs.scorePeriods.splice(toDeleteIndex - 1, 1);
         
     const deleteErrors = await overwriteCourseDiscussionSpecs(courseName, fetchedCourse.discussionSpecs);
