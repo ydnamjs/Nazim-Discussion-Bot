@@ -1,7 +1,7 @@
 import { DiscussionSpecs, StudentScoreData } from "../generalModels/DiscussionScoring";
 import { Course, courseModel } from "../generalModels/Course";
 
-const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
+export const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
 
 export async function getCourseByName(courseName: string) {
     let course: Course | null = null;
