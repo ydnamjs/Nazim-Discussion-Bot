@@ -38,15 +38,10 @@ const EDIT_SCORING_BUTTON_LABEL = "Edit Post Scoring";
 const EDIT_SCORING_BUTTON_DISABLED = false;
 const EDIT_SCORING_BUTTON_STYLE = ButtonStyle.Primary
 
-const ADD_AWARD_BUTTON_ID = "discussion-add-post-award-button";
-const ADD_AWARD_BUTTON_LABEL = "Add Post Award";
-const ADD_AWARD_BUTTON_DISABLED = false;
-const ADD_AWARD_BUTTON_STYLE = ButtonStyle.Primary
-
-const EDIT_AWARD_BUTTON_ID = "discussion-edit-post-award-button";
-const EDIT_AWARD_BUTTON_LABEL = "Edit Post Award";
-const EDIT_AWARD_BUTTON_DISABLED = true;
-const EDIT_AWARD_BUTTON_STYLE = ButtonStyle.Primary
+const ADD_EDIT_AWARD_BUTTON_ID = "discussion-add-post-award-button";
+const ADD_EDIT_AWARD_BUTTON_LABEL = "Add/Edit Post Award";
+const ADD_EDIT_AWARD_BUTTON_DISABLED = false;
+const ADD_EDIT_AWARD_BUTTON_STYLE = ButtonStyle.Primary
 
 const DELETE_AWARD_BUTTON_ID = "discussion-delete-post-award-button";
 const DELETE_AWARD_BUTTON_LABEL = "Delete Post Award";
@@ -60,18 +55,11 @@ const EDIT_SCORING_BUTTON_DATA = {
     style: EDIT_SCORING_BUTTON_STYLE
 };
 
-const ADD_AWARD_BUTTON_DATA = {
-    custom_id: ADD_AWARD_BUTTON_ID,
-    label: ADD_AWARD_BUTTON_LABEL,
-    disabled: ADD_AWARD_BUTTON_DISABLED,
-    style: ADD_AWARD_BUTTON_STYLE
-};
-
-const EDIT_AWARD_BUTTON_DATA = {
-    custom_id: EDIT_AWARD_BUTTON_ID,
-    label: EDIT_AWARD_BUTTON_LABEL,
-    disabled: EDIT_AWARD_BUTTON_DISABLED,
-    style: EDIT_AWARD_BUTTON_STYLE
+const ADD_EDIT_AWARD_BUTTON_DATA = {
+    custom_id: ADD_EDIT_AWARD_BUTTON_ID,
+    label: ADD_EDIT_AWARD_BUTTON_LABEL,
+    disabled: ADD_EDIT_AWARD_BUTTON_DISABLED,
+    style: ADD_EDIT_AWARD_BUTTON_STYLE
 };
 
 const DELETE_AWARD_BUTTON_DATA = {
@@ -81,7 +69,7 @@ const DELETE_AWARD_BUTTON_DATA = {
     style: DELETE_AWARD_BUTTON_STYLE
 };
 
-const SCORE_BUTTON_ROW = makeActionRowButton([EDIT_SCORING_BUTTON_DATA, ADD_AWARD_BUTTON_DATA, EDIT_AWARD_BUTTON_DATA, DELETE_AWARD_BUTTON_DATA])
+const SCORE_BUTTON_ROW = makeActionRowButton([EDIT_SCORING_BUTTON_DATA, ADD_EDIT_AWARD_BUTTON_DATA, DELETE_AWARD_BUTTON_DATA])
 
 export async function updateToManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
     
@@ -114,6 +102,7 @@ export async function recollectManagePostScoringInput(courseName: string, compon
 }
 
 export async function refreshManagePostScoringMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+    
     let course = await getCourseByName(courseName)
 
     if(!course || !course.discussionSpecs) {
@@ -126,7 +115,7 @@ export async function refreshManagePostScoringMenu(courseName: string, component
     componentInteraction.message.edit({embeds: managePostScoringMenu.menuMessageData.embeds});
 }
 
-export class ManagePostScoringMenu extends NavigatedMenu {
+class ManagePostScoringMenu extends NavigatedMenu {
     
     constructor(courseName: string, postSpecs: PostSpecs) {
 
@@ -150,7 +139,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             resultingAction: (triggerInteraction) => { openEditPostModal(courseName, triggerInteraction as ButtonInteraction) }
         },
         {
-            filter: (customId) => {return customId === ADD_AWARD_BUTTON_ID},
+            filter: (customId) => {return customId === ADD_EDIT_AWARD_BUTTON_ID},
             resultingAction: (triggerInteraction) => { openAddPostAwardModal(courseName, triggerInteraction as ButtonInteraction) }
         },
         {
