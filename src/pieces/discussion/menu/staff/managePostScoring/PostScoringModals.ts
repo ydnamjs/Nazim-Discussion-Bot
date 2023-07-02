@@ -124,7 +124,7 @@ const awardStaffOnlyInputActionRow = new ActionRowBuilder<TextInputBuilder>({com
 
 // EDIT POST SCORING MODAL
 const MODAL_ID_PREFIX = "edit_post_scoring_modal";
-const MODAL_TITLE_PREFIX = "Edit Post Specs For CISC ";
+const MODAL_TITLE_PREFIX = "Edit Post Scoring - CISC ";
 
 export async function openEditPostModal(courseName: string, triggerInteraction: ButtonInteraction) {
     const components: ActionRowBuilder<TextInputBuilder>[] = [scoreInputActionRow, commentScoreInputActionRow, lengthReqInputActionRow, paraReqInputActionRow, linkReqInputActionRow];
