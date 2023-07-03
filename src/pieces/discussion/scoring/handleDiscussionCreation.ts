@@ -65,12 +65,19 @@ async function handleScoreComment(message: Message, courseName: string) {
         
     const commentScoreData = scoreDiscussionContent(message.content, course.discussionSpecs.commentSpecs)
 
+
+
+    await handleCommenterNotification(message, commentScoreData)
+}
+
+async function handleCommenterNotification(message: Message, commentScoreData: MessageScoreData) {
+
     const incompleteReasons = handleRequirementChecking(commentScoreData);
 
     if(incompleteReasons !== "")
-        sendDismissableMessage(message.author, "Message: " + message.url + " earned 0 points. Reasons: " + incompleteReasons); // TODO: constantify these
+        await sendDismissableMessage(message.author, "Message: " + message.url + " earned 0 points. Reasons: " + incompleteReasons); // TODO: constantify these
     else
-        sendDismissableMessage(message.author, "Message: " + message.url + " successfully scored"); // TODO: constantify these
+        await sendDismissableMessage(message.author, "Message: " + message.url + " successfully scored"); // TODO: constantify these
 
 }
 
