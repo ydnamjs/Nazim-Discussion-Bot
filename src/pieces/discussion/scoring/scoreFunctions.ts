@@ -52,6 +52,7 @@ async function getAllDiscussionThreads(client: Client, channelId: string) {
 }
 
 function addScorePeriodArrays(scorePeriodsA: ScorePeriod[], scorePeriodsB: ScorePeriod[]) {
+
     if(scorePeriodsA.length !== scorePeriodsB.length) {
         throw new Error("ERROR CANNOT ADD TWO SCORE PERIOD ARRAYS OF DIFFERENT LENGTH");
     }

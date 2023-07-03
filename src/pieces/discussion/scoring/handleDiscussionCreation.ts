@@ -1,9 +1,8 @@
 import { ChannelType, Message, ThreadChannel } from "discord.js";
-import { DATABASE_ERROR_MESSAGE, getCourseByDiscussionChannel, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../generalUtilities/CourseUtilities";
 import { Course } from "../../../generalModels/Course";
-import { MessageScoreData, scoreComment, scoreDiscussionContent, scoreDiscussionMessage } from "./scoreFunctions";
-import { sendDismissableMessage, sendDismissableReply } from "../../../generalUtilities/DismissableMessage";
-import { DiscussionSpecs } from "src/generalModels/DiscussionScoring";
+import { DATABASE_ERROR_MESSAGE, getCourseByDiscussionChannel, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../generalUtilities/CourseUtilities";
+import { sendDismissableMessage } from "../../../generalUtilities/DismissableMessage";
+import { MessageScoreData, scoreComment, scoreDiscussionContent } from "./scoreFunctions";
 
 export async function handleDiscussionCreation(message: Message) {
     
