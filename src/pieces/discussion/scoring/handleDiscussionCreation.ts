@@ -1,8 +1,9 @@
 import { ChannelType, Message, ThreadChannel } from "discord.js";
-import { DATABASE_ERROR_MESSAGE, getCourseByDiscussionChannel, getCourseByName } from "../../../generalUtilities/CourseUtilities";
+import { DATABASE_ERROR_MESSAGE, getCourseByDiscussionChannel, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../generalUtilities/CourseUtilities";
 import { Course } from "../../../generalModels/Course";
-import { MessageScoreData, scoreDiscussionContent, scoreDiscussionMessage } from "./scoreFunctions";
+import { MessageScoreData, scoreComment, scoreDiscussionContent, scoreDiscussionMessage } from "./scoreFunctions";
 import { sendDismissableMessage, sendDismissableReply } from "../../../generalUtilities/DismissableMessage";
+import { DiscussionSpecs } from "src/generalModels/DiscussionScoring";
 
 export async function handleDiscussionCreation(message: Message) {
     
@@ -65,7 +66,7 @@ async function handleScoreComment(message: Message, courseName: string) {
         
     const commentScoreData = scoreDiscussionContent(message.content, course.discussionSpecs.commentSpecs)
 
-
+    updateCommenterScore(message, commentScoreData, course)
 
     await handleCommenterNotification(message, commentScoreData)
 }
@@ -93,4 +94,16 @@ function handleRequirementChecking(messageScoreData: MessageScoreData) {
         incompleteReasons += "\n- Did not meet minimum link requirement"
 
     return incompleteReasons
+}
+
+async function updateCommenterScore(message: Message, commentScoreData: MessageScoreData, course: Course) {
+    
+    // TODO: The whole flow of this should probably change when we rework score fucntions
+
+    if(!course.discussionSpecs)
+        return
+
+    await scoreComment(message, course.discussionSpecs.scorePeriods, course.discussionSpecs.commentSpecs, course.roles.staff)
+
+    overwriteCourseDiscussionSpecs(course.name, course.discussionSpecs)
 }
