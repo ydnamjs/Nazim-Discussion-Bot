@@ -1,4 +1,4 @@
-import { BaseInteraction, ButtonStyle, Message } from "discord.js";
+import { BaseInteraction, ButtonStyle, Message, User } from "discord.js";
 import { makeActionRowButton } from "./MakeActionRow";
 
 const DISMISSABLE_MESSAGE_DURATION = 600_000;
@@ -15,6 +15,20 @@ const dismissRow = makeActionRowButton([{
     disabled: DISMISS_BUTTON_DISABLED,
     style: DISMISS_BUTTON_STYLE
 }])
+
+export async function sendDismissableMessage(user: User, text: string) {
+
+    const replyMessage = await user.send({
+        content: text,
+        components: [dismissRow]
+    });
+        
+    try {
+        await replyMessage.awaitMessageComponent( {time: DISMISSABLE_MESSAGE_DURATION } );
+    } catch {}
+
+    replyMessage.delete()
+}
 
 /**
  * @function replies to a message with a dismissable message. useful for creating notifications that can be dismissed

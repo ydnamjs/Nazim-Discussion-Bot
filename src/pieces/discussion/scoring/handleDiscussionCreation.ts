@@ -1,16 +1,24 @@
 import { ChannelType, Message, ThreadChannel } from "discord.js";
-import { getCourseByDiscussionChannel } from "../../../generalUtilities/CourseUtilities";
+import { DATABASE_ERROR_MESSAGE, getCourseByDiscussionChannel, getCourseByName } from "../../../generalUtilities/CourseUtilities";
 import { Course } from "../../../generalModels/Course";
+import { MessageScoreData, scoreDiscussionContent, scoreDiscussionMessage } from "./scoreFunctions";
+import { sendDismissableMessage, sendDismissableReply } from "../../../generalUtilities/DismissableMessage";
 
 export async function handleDiscussionCreation(message: Message) {
     
-    const discussionPostData = await getDiscussionMessageData(message)
+    const discussionMessageData = await getDiscussionMessageData(message)
     
-    if(!discussionPostData)
+    if(!discussionMessageData)
         return
-        
-    console.log("is new post or comment")
+    
+    if(!discussionMessageData.course.discussionSpecs)
+        return
 
+    if(discussionMessageData.isPost)
+        console.log("isPost"); // TODO: replace me with post scoring functionality
+    else {
+        handleScoreComment(message, discussionMessageData.course.name)
+    }
 }
 
 // HELPERS
@@ -39,9 +47,43 @@ async function getDiscussionMessageData(message: Message): Promise<undefined | D
     return {course: postCourse, thread: thread as ThreadChannel, isPost: false}
 }
 
-export interface DiscussionMessageData {
+interface DiscussionMessageData {
     course: Course,
     thread: ThreadChannel,
     isPost: boolean
 }
 
+async function handleScoreComment(message: Message, courseName: string) {
+
+    const course = await getCourseByName(courseName)
+
+    if(!course || !course.discussionSpecs) {
+        
+        sendDismissableMessage(message.author, "Message: " + message.url + " could not be scored. Reasons: " + DATABASE_ERROR_MESSAGE) // TODO: constantify these
+        return;
+    }
+        
+    const commentScoreData = scoreDiscussionContent(message.content, course.discussionSpecs.commentSpecs)
+
+    const incompleteReasons = handleRequirementChecking(commentScoreData);
+
+    if(incompleteReasons !== "")
+        sendDismissableMessage(message.author, "Message: " + message.url + " earned 0 points. Reasons: " + incompleteReasons); // TODO: constantify these
+    else
+        sendDismissableMessage(message.author, "Message: " + message.url + " successfully scored"); // TODO: constantify these
+
+}
+
+function handleRequirementChecking(messageScoreData: MessageScoreData) {
+
+    let incompleteReasons = "";
+    
+    if(!messageScoreData.passedLength)
+        incompleteReasons += "\n- Did not meet minimum length requirement"
+    if(!messageScoreData.passedParagraph)
+        incompleteReasons += "\n- Did not meet minimum paragraph requirement"
+    if(!messageScoreData.passedLinks)
+        incompleteReasons += "\n- Did not meet minimum link requirement"
+
+    return incompleteReasons
+}

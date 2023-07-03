@@ -288,7 +288,7 @@ async function scoreComments(messages: Message[], periods: ScorePeriod[], commen
     return periods;
 }
 
-async function scoreComment(message: Message, periods: ScorePeriod[], commentSpecs: CommentSpecs, staffId: string) {
+export async function scoreComment(message: Message, periods: ScorePeriod[], commentSpecs: CommentSpecs, staffId: string) {
 
     const author = message.author
     const scoreData = await scoreDiscussionMessage(message, commentSpecs, staffId);
