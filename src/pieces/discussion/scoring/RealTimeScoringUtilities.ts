@@ -29,7 +29,6 @@ export async function sendDiscussionScoreNotification(message: Message, commentS
         await sendDismissableMessage(message.author, "Message: " + message.url + " earned 0 points. Reasons: " + incompleteReasons); // TODO: constantify these
     else
         await sendDismissableMessage(message.author, "Message: " + message.url + " successfully scored"); // TODO: constantify these
-
 }
 
 function handleRequirementChecking(messageScoreData: MessageScoreData) {
