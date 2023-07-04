@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, Te
 import { AwardSpecs, PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
-import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
+import { rescorePeriods } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
 import { recollectManagePostSpecsInput, refreshManagePostSpecsMenu } from "./ManagePostScoringMenu";
 import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
@@ -161,7 +161,7 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
     // we unpack the course's post specs to preserve awards/penalties
     course.discussionSpecs.postSpecs = {...course.discussionSpecs.postSpecs, ...newPostSpecs};
 
-    const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
+    const rescoredPeriods = await rescorePeriods(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE
@@ -209,7 +209,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
 
     course.discussionSpecs.postSpecs.awards.set(emojiInput, newAward)
 
-    const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
+    const rescoredPeriods = await rescorePeriods(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE
@@ -257,7 +257,7 @@ async function handleDeleteAwardModalInput(client: Client, courseName: string, s
         return INPUT_ERROR_PREFIX + EMOJI_NOT_FOUND_ERROR_MESSAGE
     course.discussionSpecs.postSpecs.awards.delete(emojiInput)
 
-    const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
+    const rescoredPeriods = await rescorePeriods(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE

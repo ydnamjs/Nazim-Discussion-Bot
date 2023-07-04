@@ -5,7 +5,7 @@ import { userHasRoleWithId } from "../../../generalUtilities/RoleUtilities";
 import { getChannelInMainGuild } from "../../../generalUtilities/getChannelInMain";
 import { wait } from "../../../generalUtilities/wait";
 
-export async function scoreAllThreads(client: Client, forumId: string, discussionSpecs: DiscussionSpecs, staffId: string) {
+export async function rescorePeriods(client: Client, forumId: string, discussionSpecs: DiscussionSpecs, staffId: string) {
 
     const threads = await getAllDiscussionThreads(client, forumId);
 

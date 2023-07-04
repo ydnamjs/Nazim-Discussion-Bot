@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { ScorePeriod, StudentScoreData } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { sortPeriods } from "../../../../../generalUtilities/ScorePeriodUtilities";
-import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
+import { rescorePeriods } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
 import { recollectManagePeriodsInput, refreshManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
@@ -148,7 +148,7 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
         studentScores: new Map<string, StudentScoreData>()
     })
 
-    const rescoredPeriods = await scoreAllThreads(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
+    const rescoredPeriods = await rescorePeriods(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
 
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE
@@ -222,7 +222,7 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
         studentScores: new Map<string, StudentScoreData>()
     })
     
-    const rescoredPeriods = await scoreAllThreads(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
+    const rescoredPeriods = await rescorePeriods(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
     
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE
