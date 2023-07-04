@@ -4,8 +4,9 @@ import { DATABASE_ERROR_MESSAGE, getCourseByDiscussionChannel, getCourseByName, 
 import { sendDismissableMessage } from "../../../generalUtilities/DismissableMessage";
 import { scoreNewComment, sendDiscussionScoreNotification } from "./RealTimeScoringUtilities";
 import { SCORING_ERROR_MESSAGE } from "./scoreActionUtilities";
+import { courseQueue } from "./courseQueue";
 
-export async function handleDiscussionCreation(message: Message) {
+export async function handleDiscussionCreation(message: Message, courseQueues: Map<string, courseQueue>) {
     
     const discussionMessageData = await getDiscussionMessageData(message)
     
@@ -18,7 +19,13 @@ export async function handleDiscussionCreation(message: Message) {
     if(discussionMessageData.isPost)
         console.log("isPost"); // TODO: replace me with post scoring functionality
     else {
-        handleNewComment(message, discussionMessageData.course.name, discussionMessageData.thread.ownerId)
+        
+        const courseQueue = courseQueues.get(discussionMessageData.course.name);
+        
+        if(!courseQueue)
+            return
+
+        courseQueue.push( () => { handleNewComment(message, discussionMessageData.course.name, discussionMessageData.thread.ownerId) })
     }
 }
 

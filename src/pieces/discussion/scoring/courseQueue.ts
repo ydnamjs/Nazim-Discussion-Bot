@@ -24,12 +24,13 @@ export class courseQueue {
 
     async startProcessingActions() {
         while(this.head) {
+            console.log("processing action")
             await this.head.action();
             this.head = this.head.next;
         }
     }
 
-    constructor(courseName: string) {
+    constructor() {
 
         this.head = undefined;
     }

@@ -4,6 +4,8 @@ import commandListener from "./listeners/InteractionListener";
 import onlineLogger from "./listeners/ReadyListener";
 import messageListener from "./listeners/MessageCreate"
 import { DISCORD_TOKEN, MONGODB_SRV } from "./secret";
+import { courseQueue } from "./pieces/discussion/scoring/courseQueue";
+import { getAllCourses } from "./generalUtilities/CourseUtilities";
 
 main();
 
@@ -35,18 +37,30 @@ async function main() {
         console.log("Successfully connected to the database!")
     }).catch((err: Error) => {
         console.log(err);
+        return;
     });
 
-    addListeners(client);
+    const courseQueues = new Map<string, courseQueue>();
+
+    const courses = await getAllCourses()
+
+    if(courses) {
+
+        courses.forEach((course) => {
+            courseQueues.set(course.name, new courseQueue())
+        })
+    }
+
+    addListeners(client, courseQueues);
 
     client.login(DISCORD_TOKEN);
 }
 
-function addListeners(client: Client) {
+function addListeners(client: Client, courseQueues: Map<string, courseQueue>) {
     console.log("adding listeners...");
     onlineLogger(client);
     commandListener(client);
-    messageListener(client);
+    messageListener(client, courseQueues);
     console.log("listeners added!");
 }
 
