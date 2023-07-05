@@ -15,8 +15,7 @@ export function scoreNewComment(message: Message, discussionSpecs: DiscussionSpe
 
     addCommentScoreToPeriod(commentScoreData, commentPeriod, message.author.id);
     
-    // TODO: add check to make sure commenter is not poster
-    if(posterId !== null)
+    if(posterId !== null && posterId !== message.author.id)
         addCommentToPosterScore(commentPeriod, posterId, discussionSpecs.postSpecs.commentPoints)
 
     return commentScoreData;
