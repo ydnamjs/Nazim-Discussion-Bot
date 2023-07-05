@@ -188,7 +188,7 @@ async function rescorePost(message: Message, discussionSpecs: DiscussionSpecs, s
     if(!commentPeriod)
         return undefined
     
-    const commentScoreData = await rescoreDiscussionMessage(message, discussionSpecs.commentSpecs, staffId);
+    const commentScoreData = await rescoreDiscussionMessage(message, discussionSpecs.postSpecs, staffId);
 
     addPostScoreToPeriod(commentScoreData, commentPeriod, message.author.id);
 
