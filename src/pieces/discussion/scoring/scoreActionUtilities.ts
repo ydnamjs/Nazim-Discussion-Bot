@@ -1,16 +1,42 @@
 import { Message } from "discord.js";
 import { ScorePeriod } from "../../../generalModels/DiscussionScoring";
-import { MessageScoreData } from "./discussionScoring";
+import { MessageScoreData } from "./scoringUtilities";
 
 export const SCORING_ERROR_MESSAGE = "Scoring Error; Contact Admin";
 
 // SECTION TEXT TODO: Rename me
 export function findMessagePeriod(message: Message, periods: ScorePeriod[]): ScorePeriod | undefined {
-    
     return periods.find( (period) => { return message.createdAt.valueOf() > period.start.valueOf() && message.createdAt.valueOf() < period.end.valueOf() })
 }
 
 // SECTION TEXT TODO: Rename me
+export function addPostScoreToPeriod(postScoreData: MessageScoreData, period: ScorePeriod, posterId: string ) {
+        
+    let studentScoreData = period.studentScores.get(posterId)
+        
+    if(studentScoreData) {
+    
+        studentScoreData.score = Math.min(studentScoreData.score + postScoreData.score, period.maxPoints);
+        studentScoreData.numPosts += 1;
+        studentScoreData.numIncomPost += isIncomplete(postScoreData) ? 1 : 0;
+        studentScoreData.awardsRecieved += postScoreData.numAwards;
+        studentScoreData.penaltiesRecieved+= postScoreData.numPenalties;
+        return
+    }
+        
+    period.studentScores.set(posterId,
+        {
+            score: postScoreData.score,
+            numPosts: 1,
+            numIncomPost: isIncomplete(postScoreData) ? 1 : 0,
+            numComments: 0,
+            numIncomComment: 0,
+            awardsRecieved: postScoreData.numAwards,
+            penaltiesRecieved: postScoreData.numPenalties
+        }
+    )
+}
+
 export function addCommentScoreToPeriod(commentScoreData: MessageScoreData, period: ScorePeriod, commenterId: string ) {
         
     let studentScoreData = period.studentScores.get(commenterId)
@@ -38,7 +64,7 @@ export function addCommentScoreToPeriod(commentScoreData: MessageScoreData, peri
     )
 }
 
-function isIncomplete(scoreData: MessageScoreData): boolean {
+export function isIncomplete(scoreData: MessageScoreData): boolean {
     
     return (!scoreData.passedLength || !scoreData.passedLinks || !scoreData.passedParagraph)
 }
