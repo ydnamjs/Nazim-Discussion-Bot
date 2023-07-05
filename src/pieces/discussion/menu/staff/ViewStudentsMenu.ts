@@ -4,10 +4,10 @@ import { ScorePeriod, StudentScoreData } from "../../../../generalModels/Discuss
 import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
 import { getCourseByName } from "../../../../generalUtilities/CourseUtilities";
 import { GUILDS } from "../../../../secret";
-import { addScorePeriods } from "../../scoring/scoreFunctions";
 import { ComponentBehavior } from "../../../menu/BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
+import { addScorePeriods } from "../../../../generalUtilities/ScorePeriodUtilities";
 
 const TITLE_COURSE_PREFIX = "Students of CISC ";
 const MENU_DESCRIPTION = "replace me";

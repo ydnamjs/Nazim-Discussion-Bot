@@ -3,10 +3,10 @@ import { DateTime } from "luxon";
 import { ScorePeriod, StudentScoreData } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { sortPeriods } from "../../../../../generalUtilities/ScorePeriodUtilities";
-import { rescorePeriods } from "../../../../../pieces/discussion/scoring/scoreFunctions";
 import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
 import { recollectManagePeriodsInput, refreshManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
+import { rescoreDiscussion } from "../../../../../pieces/discussion/scoring/rescorePeriods";
 
 // MODAL BEHAVIOR CONSTANTS
 const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
@@ -148,7 +148,7 @@ async function handleAddPeriodModal(client: Client, courseName: string, submitte
         studentScores: new Map<string, StudentScoreData>()
     })
 
-    const rescoredPeriods = await rescorePeriods(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
+    const rescoredPeriods = await rescoreDiscussion(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
 
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE
@@ -222,7 +222,7 @@ async function handleEditPeriodModal(client: Client, courseName: string, submitt
         studentScores: new Map<string, StudentScoreData>()
     })
     
-    const rescoredPeriods = await rescorePeriods(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
+    const rescoredPeriods = await rescoreDiscussion(client, fetchedCourse.channels.discussion, fetchedCourse.discussionSpecs, fetchedCourse.roles.staff)
     
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE

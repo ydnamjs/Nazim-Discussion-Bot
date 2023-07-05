@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { DiscussionSpecs } from "../../../generalModels/DiscussionScoring";
 import { sendDismissableMessage } from "../../../generalUtilities/DismissableMessage";
 import { addCommentScoreToPeriod, addCommentToPosterScore, findMessagePeriod } from "./scoreActionUtilities";
-import { MessageScoreData, scoreDiscussionContent } from "./scoreFunctions";
+import { MessageScoreData, scoreDiscussionContent } from "./scoringUtilities";
 
 export function scoreNewComment(message: Message, discussionSpecs: DiscussionSpecs, posterId: string | null): MessageScoreData | undefined {
     
@@ -15,6 +15,7 @@ export function scoreNewComment(message: Message, discussionSpecs: DiscussionSpe
 
     addCommentScoreToPeriod(commentScoreData, commentPeriod, message.author.id);
     
+    // TODO: add check to make sure commenter is not poster
     if(posterId !== null)
         addCommentToPosterScore(commentPeriod, posterId, discussionSpecs.postSpecs.commentPoints)
 
