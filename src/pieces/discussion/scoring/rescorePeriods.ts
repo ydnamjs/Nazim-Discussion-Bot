@@ -62,7 +62,8 @@ async function scoreThread(client: Client, threadId: string, discussionSpecs: Di
     clonedSpecs.scorePeriods.forEach((period) => wipeStudentScores(period));
 
     // TODO: Add before and after consideration to not fetch unnecessary thread messages
-    const messages = await getThreadMessages(client, threadId)
+    let messages = await getThreadMessages(client, threadId)
+    messages = messages.filter((message) => {return message.id !== threadId}) // removes the post message so that it is not scored as a comment
 
     //console.log(messages.length);
 
