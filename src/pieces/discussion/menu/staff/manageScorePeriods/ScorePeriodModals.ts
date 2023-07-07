@@ -3,11 +3,10 @@ import { DateTime } from "luxon";
 import { ScorePeriod, StudentScoreData } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { sortPeriods } from "../../../../../generalUtilities/ScorePeriodUtilities";
-import { DiscussionModalData, DiscussionModalHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
-import { recollectManagePeriodsInput, refreshManagePeriodsMenu } from "./ManageScorePeriodsMenu";
-import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
-import { rescoreDiscussion } from "../../../../../pieces/discussion/scoring/rescorePeriods";
 import { CourseQueue } from "../../../../../pieces/discussion/scoring/courseQueue";
+import { rescoreDiscussion } from "../../../../../pieces/discussion/scoring/rescorePeriods";
+import { DiscussionModalData, DiscussionModalHandler, INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE, createDiscussionModal } from "../../DiscussionModalUtilities";
+import { recollectManagePeriodsInput, refreshManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 
 // MODAL BEHAVIOR CONSTANTS
 const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
