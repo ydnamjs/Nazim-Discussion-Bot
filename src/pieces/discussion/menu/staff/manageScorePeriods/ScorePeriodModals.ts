@@ -3,11 +3,11 @@ import { DateTime } from "luxon";
 import { ScorePeriod, StudentScoreData } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { sortPeriods } from "../../../../../generalUtilities/ScorePeriodUtilities";
-import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
+import { DiscussionModalHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
 import { recollectManagePeriodsInput, refreshManagePeriodsMenu } from "./ManageScorePeriodsMenu";
 import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
 import { rescoreDiscussion } from "../../../../../pieces/discussion/scoring/rescorePeriods";
-import { CourseQueue } from "src/pieces/discussion/scoring/courseQueue";
+import { CourseQueue } from "../../../../../pieces/discussion/scoring/courseQueue";
 
 // MODAL BEHAVIOR CONSTANTS
 const DATE_STRING_FORMAT = "yyyy-MM-dd hh:mm:ss a";
@@ -117,7 +117,7 @@ export async function openAddPeriodModal(courseName: string, triggerInteraction:
     await createHandlePeriodModal(ADD_MODAL_ID_PREFIX, ADD_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleAddPeriodModal, courseQueues);
 }
 
-async function handleAddPeriodModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
+async function handleAddPeriodModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
 
     const periodValidationData = validatePeriodInput(submittedModal);
 
@@ -187,7 +187,7 @@ export async function openEditPeriodModal(courseName: string, triggerInteraction
     await createHandlePeriodModal(EDIT_MODAL_ID_PREFIX, EDIT_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleEditPeriodModal, courseQueues);
 }
 
-async function handleEditPeriodModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
+async function handleEditPeriodModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
 
     const toEditIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
     const periodValidationData = validatePeriodInput(submittedModal);
@@ -257,7 +257,7 @@ export async function openDeletePeriodModal(courseName: string, triggerInteracti
     await createHandlePeriodModal(DELETE_MODAL_ID_PREFIX, DELETE_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleDeletePeriodModal, courseQueues);
 }
 
-async function handleDeletePeriodModal(_client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
+async function handleDeletePeriodModal(_client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
 
     const toDeleteIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
 
@@ -283,7 +283,7 @@ async function handleDeletePeriodModal(_client: Client, courseName: string, subm
 }
 
 // HELPER FUNCTIONS
-async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler, courseQueues: Map<string, CourseQueue>) {
+async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: DiscussionModalHandler, courseQueues: Map<string, CourseQueue>) {
     
     recollectManagePeriodsInput(courseName, triggerInteraction, courseQueues);
 

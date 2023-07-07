@@ -86,7 +86,7 @@ async function getThreadMessages(client: Client, threadId: string) {
     // Im not sure if it's possible but if we could make this depend on message count of a thread it might be faster to do many threads at once?
     // perhaps also a number that is passed in that keeps track of the number of requests made so that smaller threads dont eat up a whole thread delay for 3 messages?
     const MESSAGE_FETCH_LIMIT = 10; // this is the limit enforced by discord
-    const MESSAGE_FETCH_DELAY = 100 // TODO: Make this not 0 when done testing 
+    const MESSAGE_FETCH_DELAY = 2500 // TODO: Make this not 0 when done testing 
 
     const ERROR_RETURN: never[] = [];
 

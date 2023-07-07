@@ -2,11 +2,11 @@ import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, Te
 import { AwardSpecs, PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
-import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
+import { DiscussionModalHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
 import { recollectManagePostSpecsInput, refreshManagePostSpecsMenu } from "./ManagePostScoringMenu";
 import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
 import { rescoreDiscussion } from "../../../../../pieces/discussion/scoring/rescorePeriods";
-import { CourseQueue } from "src/pieces/discussion/scoring/courseQueue";
+import { CourseQueue } from "../../../../../pieces/discussion/scoring/courseQueue";
 
 // POST SCORE INPUT COMPONENT
 const SCORE_INPUT_ID = "discussion_score_input";
@@ -133,7 +133,7 @@ export async function openEditPostModal(courseName: string, triggerInteraction: 
     openPostScoringModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleEditPostSpecsModalInput, courseQueues)
 }
 
-async function handleEditPostSpecsModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
+async function handleEditPostSpecsModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
     
     const scoreInput = Number.parseInt(submittedModal.fields.getTextInputValue(SCORE_INPUT_ID))
     const commentScoreInput = Number.parseInt(submittedModal.fields.getTextInputValue(COMMENT_SCORE_INPUT_ID))
@@ -185,7 +185,7 @@ export async function openAddPostAwardModal(courseName: string, triggerInteracti
     openPostScoringModal(ADD_AWARD_MODAL_ID_PREFIX, ADD_AWARD_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleAddAwardModalInput, courseQueues)
 }
 
-async function handleAddAwardModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
+async function handleAddAwardModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
     
     const emojiInput = submittedModal.fields.getTextInputValue(AWARD_UNICODE_INPUT_ID).trim();
     const awardPointsInput = Number.parseInt(submittedModal.fields.getTextInputValue(AWARD_POINTS_INPUT_ID));
@@ -240,7 +240,7 @@ export async function openDeletePostAwardModal(courseName: string, triggerIntera
     openPostScoringModal(DELETE_AWARD_MODAL_ID_PREFIX, DELETE_AWARD_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleDeleteAwardModalInput, courseQueues)
 }
 
-async function handleDeleteAwardModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
+async function handleDeleteAwardModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
     
     const emojiInput = submittedModal.fields.getTextInputValue(AWARD_UNICODE_INPUT_ID).trim();
 
@@ -274,7 +274,7 @@ async function handleDeleteAwardModalInput(client: Client, courseName: string, s
 }
 
 // HELPER FUNCTIONS
-async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler, courseQueues: Map<string, CourseQueue>) {
+async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: DiscussionModalHandler, courseQueues: Map<string, CourseQueue>) {
     
     recollectManagePostSpecsInput(courseName, triggerInteraction, courseQueues);
 
