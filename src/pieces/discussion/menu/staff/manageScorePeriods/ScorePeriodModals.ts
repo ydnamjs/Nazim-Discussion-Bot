@@ -117,7 +117,7 @@ export async function openAddPeriodModal(courseName: string, triggerInteraction:
     await createHandlePeriodModal(ADD_MODAL_ID_PREFIX, ADD_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleAddPeriodModal, courseQueues);
 }
 
-async function handleAddPeriodModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
+async function handleAddPeriodModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
 
     const periodValidationData = validatePeriodInput(submittedModal);
 
@@ -187,7 +187,7 @@ export async function openEditPeriodModal(courseName: string, triggerInteraction
     await createHandlePeriodModal(EDIT_MODAL_ID_PREFIX, EDIT_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleEditPeriodModal, courseQueues);
 }
 
-async function handleEditPeriodModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
+async function handleEditPeriodModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
 
     const toEditIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
     const periodValidationData = validatePeriodInput(submittedModal);
@@ -257,7 +257,7 @@ export async function openDeletePeriodModal(courseName: string, triggerInteracti
     await createHandlePeriodModal(DELETE_MODAL_ID_PREFIX, DELETE_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleDeletePeriodModal, courseQueues);
 }
 
-async function handleDeletePeriodModal(_client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
+async function handleDeletePeriodModal(_client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>): Promise<string> {
 
     const toDeleteIndex = Number.parseInt(submittedModal.fields.getTextInputValue(PERIOD_NUM_INPUT_ID));
 
@@ -287,7 +287,7 @@ async function createHandlePeriodModal(idPrefix: string, titlePrefix: string, co
     
     recollectManagePeriodsInput(courseName, triggerInteraction, courseQueues);
 
-    createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePeriodsMenu(courseName, triggerInteraction, courseQueues)})
+    createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, courseQueues, async () => {await refreshManagePeriodsMenu(courseName, triggerInteraction, courseQueues)})
 }
 
 function validatePeriodInput(submittedModal: ModalSubmitInteraction): PeriodValidationData {

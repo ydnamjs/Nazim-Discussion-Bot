@@ -1,12 +1,13 @@
 import { ActionRowBuilder, ButtonInteraction, Client, ModalBuilder, ModalSubmitInteraction, TextInputBuilder } from "discord.js";
 import { sendDismissableFollowUp } from "../../generalUtilities/DismissableMessage";
+import { CourseQueue } from "../discussion/scoring/courseQueue";
 
 export const MODAL_EXPIRATION_TIME = 600_000; // 10 minutes
 
 /**
  * @type function that will handle a modals input data and return the interaction response message as a string
  */
-export type ModalInputHandler = (client: Client, courseName: string, submittedModal: ModalSubmitInteraction) => Promise<string>;
+export type ModalInputHandler = (client: Client, courseName: string, submittedModal: ModalSubmitInteraction, courseQueues: Map<string, CourseQueue>) => Promise<string>;
 
 /**
  * @function creates and handles a modal for managing score periods
@@ -17,7 +18,7 @@ export type ModalInputHandler = (client: Client, courseName: string, submittedMo
  * @param {ActionRowBuilder<TextInputBuilder>[]} components - the components that on the modal
  * @param {ModalInputHandler} modalInputHandler - function that handles the modal input
  */
-export async function createDiscussionModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler, refreshFunction?: ()=>Promise<void>) {
+export async function createDiscussionModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler, courseQueues: Map<string, CourseQueue>, refreshFunction?: ()=>Promise<void>) {
 
     // the modal id has to be generated based on time 
     // because if it isnt and the user cancels the modal and opens another one
@@ -45,7 +46,7 @@ export async function createDiscussionModal(idPrefix: string, titlePrefix: strin
 
     if (submittedModal !== undefined) {
         await submittedModal.deferReply()
-        const replyText = await modalInputHandler(triggerInteraction.client, courseName, submittedModal);
+        const replyText = await modalInputHandler(triggerInteraction.client, courseName, submittedModal, courseQueues);
         refreshFunction? await refreshFunction() : 0;
         sendDismissableFollowUp(submittedModal, replyText);
     }
