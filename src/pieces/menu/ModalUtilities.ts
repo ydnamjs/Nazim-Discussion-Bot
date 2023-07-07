@@ -39,6 +39,8 @@ export interface DiscussionModalData {
  */
 export async function createDiscussionModal(triggerInteraction: ButtonInteraction, discussionModalData: DiscussionModalData) {
 
+    discussionModalData.recollectFunction();
+
     // the modal id has to be generated based on time 
     // because if it isnt and the user cancels the modal and opens another one
     // we have to filter that it matches the id otherwise the canceled modal will also be processed
