@@ -195,7 +195,7 @@ export async function openAddPostAwardModal(courseName: string, triggerInteracti
         titlePrefix: ADD_AWARD_MODAL_TITLE_PREFIX,
         courseName: courseName,
         courseQueues: courseQueues,
-        modalInputHandler: handleEditPostModal
+        modalInputHandler: handleAddAwardModalInput
     }
 
     openPostScoringModal(triggerInteraction, postScoringModalData)
@@ -258,7 +258,7 @@ export async function openDeletePostAwardModal(courseName: string, triggerIntera
         titlePrefix: DELETE_AWARD_MODAL_TITLE_PREFIX,
         courseName: courseName,
         courseQueues: courseQueues,
-        modalInputHandler: handleEditPostModal
+        modalInputHandler: handleDeleteAwardModalInput
     }
 
     openPostScoringModal(triggerInteraction, postScoringModalData)
