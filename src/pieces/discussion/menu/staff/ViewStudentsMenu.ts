@@ -4,10 +4,11 @@ import { ScorePeriod, StudentScoreData } from "../../../../generalModels/Discuss
 import { sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
 import { getCourseByName } from "../../../../generalUtilities/CourseUtilities";
 import { GUILDS } from "../../../../secret";
-import { addScorePeriods } from "../../scoring/scoreFunctions";
 import { ComponentBehavior } from "../../../menu/BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
+import { addScorePeriods } from "../../../../generalUtilities/ScorePeriodUtilities";
+import { CourseQueue } from "../../scoring/courseQueue";
 
 const TITLE_COURSE_PREFIX = "Students of CISC ";
 const MENU_DESCRIPTION = "replace me";
@@ -34,7 +35,7 @@ const STUDENT_NUM_PENALTIES_PREFIX = "\n# penalties recieved: ";
  * @param {Message} message - the message to have the menu be replaced on
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  */
-export async function updateToViewStudentsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function updateToViewStudentsMenu(courseName: string, componentInteraction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
 
     let course = await getCourseByName(courseName)
 
@@ -71,7 +72,7 @@ export async function updateToViewStudentsMenu(courseName: string, componentInte
         studentsData.push(getTotalStudentData(student, totalPeriod));
     }
 
-    const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData, totalGoalScore, totalMaxScore);
+    const viewStudentsMenu = new ViewStudentsMenu(courseName, studentsData, totalGoalScore, totalMaxScore, courseQueues);
     componentInteraction.update(viewStudentsMenu.menuMessageData as InteractionUpdateOptions);
     viewStudentsMenu.collectMenuInteraction(componentInteraction.message);
 }
@@ -141,7 +142,7 @@ const customNavOptions: CustomNavOptions = {
 
 export class ViewStudentsMenu extends NavigatedMenu {
     
-    constructor(courseName: string, studentData: DiscussionStudentStats[], goalScore: number, maxScore: number) {
+    constructor(courseName: string, studentData: DiscussionStudentStats[], goalScore: number, maxScore: number, courseQueues: Map<string, CourseQueue>) {
 
         let fields: APIEmbedField[] = [];
         studentData.forEach(student => {
@@ -153,10 +154,10 @@ export class ViewStudentsMenu extends NavigatedMenu {
             description: MENU_DESCRIPTION,
             fields: fields,
             additionalComponents: [],
-            additionalComponentBehaviors: generateBehaviors(courseName),
+            additionalComponentBehaviors: generateBehaviors(courseName, courseQueues),
         }
 
-        super(menuData, 0, customNavOptions);
+        super(menuData, 0, courseQueues, customNavOptions);
     }
 }
 
@@ -171,7 +172,7 @@ function makeStudentField(studentData: DiscussionStudentStats, goalScore: number
     }
 }
 
-function generateBehaviors(courseName: string): ComponentBehavior[] {
+function generateBehaviors(courseName: string, courseQueues: Map<string, CourseQueue>): ComponentBehavior[] {
     
     const behaviors = [
         {
@@ -179,7 +180,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === BACK_BUTTON_ID;
             },
             resultingAction: (componentInteraction: MessageComponentInteraction) => {
-                updateToManageCourseMenu(courseName, componentInteraction);
+                updateToManageCourseMenu(courseName, componentInteraction, courseQueues);
             }
         }
     ]

@@ -5,6 +5,7 @@ import { ComponentBehavior } from "../../../../menu/BaseMenu";
 import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../../menu/NavigatedMenu";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
 import { openAddPeriodModal, openDeletePeriodModal, openEditPeriodModal } from "./ScorePeriodModals";
+import { CourseQueue } from "src/pieces/discussion/scoring/courseQueue";
 
 const MENU_TITLE_SUFFIX = " Manage Score Periods";
 const MENU_DESCRIPTION = "replace me";
@@ -73,11 +74,11 @@ const MANAGE_PERIODS_BUTTON_ROW = makeActionRowButton([ADD_PERIOD_BUTTON_DATA, E
  * @param {string} courseName - the title of the course whose periods will be managed
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  */
-export async function updateToManagePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function updateToManagePeriodsMenu(courseName: string, componentInteraction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
 
     const periodData = await getPeriodData(courseName)
 
-    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
+    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData, courseQueues);
     componentInteraction.update(managePeriodsMenu.menuMessageData as InteractionUpdateOptions)
     managePeriodsMenu.collectMenuInteraction(componentInteraction.message);
 }
@@ -87,11 +88,11 @@ export async function updateToManagePeriodsMenu(courseName: string, componentInt
  * @param {string} courseName - the name of the course whose periods are being managed
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered the recollecting of the menu (intended to be the button on this menu that opened the modal)
  */
-export async function recollectManagePeriodsInput(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function recollectManagePeriodsInput(courseName: string, componentInteraction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
 
     const periodData = await getPeriodData(courseName)
 
-    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
+    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData, courseQueues);
     await componentInteraction.message.edit(managePeriodsMenu.menuMessageData as InteractionUpdateOptions);
     managePeriodsMenu.collectMenuInteraction(componentInteraction.message);
 }
@@ -101,11 +102,11 @@ export async function recollectManagePeriodsInput(courseName: string, componentI
  * @param courseName - the name of the course that the manage periods menu is for
  * @param interaction - the interaction that the menu belongs to
  */
-export async function refreshManagePeriodsMenu(courseName: string, interaction: MessageComponentInteraction) {
+export async function refreshManagePeriodsMenu(courseName: string, interaction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
 
     const periodData = await getPeriodData(courseName)
     
-    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData);
+    const managePeriodsMenu = new ManagePeriodsMenu(courseName, periodData, courseQueues);
     interaction.message.edit({embeds: managePeriodsMenu.menuMessageData.embeds});
 }
 
@@ -141,17 +142,17 @@ async function getPeriodData (courseName: string) {
 }
 
 class ManagePeriodsMenu extends NavigatedMenu {
-    constructor(courseName: string, periodDisplayData: PeriodDisplayData[]) {
+    constructor(courseName: string, periodDisplayData: PeriodDisplayData[], courseQueues: Map<string, CourseQueue>) {
 
         const menuData: NavigatedMenuData = {
             title: courseName.toUpperCase() + MENU_TITLE_SUFFIX,
             description: MENU_DESCRIPTION,
             fields: makePeriodFields(periodDisplayData),
             additionalComponents: [MANAGE_PERIODS_BUTTON_ROW],
-            additionalComponentBehaviors: generateBehaviors(courseName),
+            additionalComponentBehaviors: generateBehaviors(courseName, courseQueues),
         }
 
-        super(menuData, 0, customNavOptions);
+        super(menuData, 0, courseQueues, customNavOptions);
     }
 }
 
@@ -177,7 +178,7 @@ function makePeriodField(periodDisplayData: PeriodDisplayData, index: number): A
     }
 }
 
-function generateBehaviors(courseName: string): ComponentBehavior[] {
+function generateBehaviors(courseName: string, courseQueues: Map<string, CourseQueue>): ComponentBehavior[] {
     
     const behaviors = [
         {
@@ -185,7 +186,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === BACK_BUTTON_ID;
             },
             resultingAction: (componentInteraction: MessageComponentInteraction) => {
-                updateToManageCourseMenu(courseName, componentInteraction);
+                updateToManageCourseMenu(courseName, componentInteraction, courseQueues);
             }
         },
         {
@@ -194,7 +195,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             },
             resultingAction: (componentInteraction: MessageComponentInteraction) => {
                 if(componentInteraction instanceof ButtonInteraction)
-                openAddPeriodModal(courseName, componentInteraction);
+                openAddPeriodModal(courseName, componentInteraction, courseQueues);
             }
         },
         {
@@ -203,7 +204,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             },
             resultingAction: (componentInteraction: MessageComponentInteraction) => {
                 if(componentInteraction instanceof ButtonInteraction)
-                openEditPeriodModal(courseName, componentInteraction);
+                openEditPeriodModal(courseName, componentInteraction, courseQueues);
             }
         },
         {
@@ -212,7 +213,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
             },
             resultingAction: (componentInteraction: MessageComponentInteraction) => {
                 if(componentInteraction instanceof ButtonInteraction)
-                openDeletePeriodModal(courseName, componentInteraction);
+                openDeletePeriodModal(courseName, componentInteraction, courseQueues);
             }
         }
     ]

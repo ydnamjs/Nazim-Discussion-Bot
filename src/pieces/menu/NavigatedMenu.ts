@@ -1,7 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions, MessageCreateOptions, StringSelectMenuBuilder } from "discord.js";
 import { BaseMenu, buttonData, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData } from "./BaseMenu";
 import { makeActionRowButton } from "../../generalUtilities/MakeActionRow";
-import { mainMenu } from "../discussion/menu/DiscussionMainMenu";
+import { makeMainMenu } from "../discussion/menu/DiscussionMainMenu";
+import { CourseQueue } from "../discussion/scoring/courseQueue";
 
 /**
  * @interface NavigatedMenuData
@@ -109,26 +110,7 @@ function makeNavigationRow(customNavOptions: CustomNavOptions): ActionRowBuilder
     return makeActionRowButton(navButtonData);
 }
 
-const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
-    
-    filter: (customId: string) => {
-        return customId === MAIN_MENU_CUSTOMID;
-    },
-    resultingAction: async (componentInteraction) => {
-        componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
-        mainMenu.collectMenuInteraction(componentInteraction.message);
-    }
-}
 
-const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
-    filter: (customId: string) => {
-        return customId === CLOSE_MENU_CUSTOMID;
-    },
-    resultingAction: async (componentInteraction) => {
-        await componentInteraction.message.reply("Discussion menu closed");
-        componentInteraction.message.delete();
-    }
-}
 
 const MAX_ADDITIONAL_COMPONENT_ROWS_EXCEEDED_ERROR = "ERROR: TRIED TO CREATE A NAVIAGTIONMENU WITH MORE ADDITIONAL COMPONENT ROWS THAN ALLOWED";
 
@@ -139,7 +121,7 @@ const MAX_ADDITIONAL_COMPONENT_ROWS_EXCEEDED_ERROR = "ERROR: TRIED TO CREATE A N
  */
 export class NavigatedMenu extends BaseMenu{
 
-    constructor(menuData: NavigatedMenuData, pageNumber: number, customNavOptions?: CustomNavOptions) {
+    constructor(menuData: NavigatedMenuData, pageNumber: number, courseQueues: Map<string, CourseQueue>, customNavOptions?: CustomNavOptions) {
         
         if(menuData.additionalComponents && menuData.additionalComponents.length > MAX_NUMBER_OF_COMPONENT_ROWS - 1) {
             throw new Error(MAX_ADDITIONAL_COMPONENT_ROWS_EXCEEDED_ERROR);
@@ -162,9 +144,36 @@ export class NavigatedMenu extends BaseMenu{
             description: menuData.description,
             fields: menuData.fields,
             components: [navigationRow, ...menuData.additionalComponents],
-            componentBehaviors: [MAIN_MENU_BUTTON_BEHAVIOR, CLOSE_MENU_BUTTON_BEHAVIOR , ...menuData.additionalComponentBehaviors]
+            componentBehaviors: [...generateBehaviors(courseQueues) , ...menuData.additionalComponentBehaviors]
         }
 
         super(superMenuData);
     }
+}
+
+function generateBehaviors(courseQueues: Map<string, CourseQueue>) {
+    const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
+    
+        filter: (customId: string) => {
+            return customId === MAIN_MENU_CUSTOMID;
+        },
+        resultingAction: async (componentInteraction) => {
+
+            const mainMenu = makeMainMenu(courseQueues)
+            componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
+            mainMenu.collectMenuInteraction(componentInteraction.message);
+        }
+    }
+    
+    const CLOSE_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
+        filter: (customId: string) => {
+            return customId === CLOSE_MENU_CUSTOMID;
+        },
+        resultingAction: async (componentInteraction) => {
+            await componentInteraction.message.reply("Discussion menu closed");
+            componentInteraction.message.delete();
+        }
+    }
+
+    return [MAIN_MENU_BUTTON_BEHAVIOR, CLOSE_MENU_BUTTON_BEHAVIOR]
 }

@@ -3,6 +3,19 @@ import { Course, courseModel } from "../generalModels/Course";
 
 export const DATABASE_ERROR_MESSAGE = "Database error. Please message admin";
 
+export async function getAllCourses() {
+    
+    let courses: Course[] | null = null;
+    try {
+        courses = await courseModel.find();
+    }
+    catch(error: any) {
+        console.error(error);
+    }
+
+    return courses !== null ? courses : undefined;
+}
+
 export async function getCourseByName(courseName: string) {
     let course: Course | null = null;
     try {

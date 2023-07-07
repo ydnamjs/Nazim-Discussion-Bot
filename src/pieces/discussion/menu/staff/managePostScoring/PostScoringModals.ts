@@ -2,10 +2,10 @@ import { ActionRowBuilder, ButtonInteraction, Client, ModalSubmitInteraction, Te
 import { AwardSpecs, PostSpecs } from "../../../../../generalModels/DiscussionScoring";
 import { DATABASE_ERROR_MESSAGE, getCourseByName, overwriteCourseDiscussionSpecs } from "../../../../../generalUtilities/CourseUtilities";
 import { DEFAULT_POST_SPECS } from "../../../../../pieces/courseManagement/DiscussionRulesDefaults";
-import { scoreAllThreads } from "../../../../../pieces/discussion/scoring/scoreFunctions";
-import { ModalInputHandler, createDiscussionModal } from "../../../../../pieces/menu/ModalUtilities";
+import { CourseQueue } from "../../../../../pieces/discussion/scoring/courseQueue";
+import { rescoreDiscussion } from "../../../../../pieces/discussion/scoring/rescorePeriods";
+import { DiscussionModalData, DiscussionModalHandler, INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE, createDiscussionModal } from "../../DiscussionModalUtilities";
 import { recollectManagePostSpecsInput, refreshManagePostSpecsMenu } from "./ManagePostScoringMenu";
-import { INPUT_ERROR_PREFIX, INVALID_INPUT_PREFIX, SCORING_ERROR_MESSAGE } from "../../DiscussionModalUtilities";
 
 // POST SCORE INPUT COMPONENT
 const SCORE_INPUT_ID = "discussion_score_input";
@@ -123,16 +123,24 @@ const awardStaffOnlyInput = new TextInputBuilder({
 const awardStaffOnlyInputActionRow = new ActionRowBuilder<TextInputBuilder>({components: [awardStaffOnlyInput]});
 
 // EDIT POST SCORING MODAL
-const MODAL_ID_PREFIX = "edit_post_scoring_modal";
-const MODAL_TITLE_PREFIX = "Edit Post Scoring - CISC ";
+const EDIT_POST_MODAL_ID_PREFIX = "edit_post_scoring_modal";
+const EDIT_POST_MODAL_TITLE_PREFIX = "Edit Post Scoring - CISC ";
 
-export async function openEditPostModal(courseName: string, triggerInteraction: ButtonInteraction) {
-    const components: ActionRowBuilder<TextInputBuilder>[] = [scoreInputActionRow, commentScoreInputActionRow, lengthReqInputActionRow, paraReqInputActionRow, linkReqInputActionRow];
+export async function openEditPostModal(courseName: string, triggerInteraction: ButtonInteraction, courseQueues: Map<string, CourseQueue>) {
 
-    openPostScoringModal(MODAL_ID_PREFIX, MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleModalInput)
+    const postScoringModalData: PostScoringModalData = {
+        components: [scoreInputActionRow, commentScoreInputActionRow, lengthReqInputActionRow, paraReqInputActionRow, linkReqInputActionRow],
+        idPrefix: EDIT_POST_MODAL_ID_PREFIX,
+        titlePrefix: EDIT_POST_MODAL_TITLE_PREFIX,
+        courseName: courseName,
+        courseQueues: courseQueues,
+        modalInputHandler: handleEditPostModal
+    }
+
+    openPostScoringModal(triggerInteraction, postScoringModalData)
 }
 
-async function handleModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
+async function handleEditPostModal(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
     
     const scoreInput = Number.parseInt(submittedModal.fields.getTextInputValue(SCORE_INPUT_ID))
     const commentScoreInput = Number.parseInt(submittedModal.fields.getTextInputValue(COMMENT_SCORE_INPUT_ID))
@@ -161,7 +169,7 @@ async function handleModalInput(client: Client, courseName: string, submittedMod
     // we unpack the course's post specs to preserve awards/penalties
     course.discussionSpecs.postSpecs = {...course.discussionSpecs.postSpecs, ...newPostSpecs};
 
-    const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
+    const rescoredPeriods = await rescoreDiscussion(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE
@@ -178,10 +186,18 @@ const ADD_AWARD_MODAL_TITLE_PREFIX = "Add/Edit Award - CISC ";
 const ADD_AWARD_SUCCESS_MESSAGE = "Award successfully added";
 const EDIT_AWARD_SUCCESS_MESSAGE = "Award successfully updated";
 
-export async function openAddPostAwardModal(courseName: string, triggerInteraction: ButtonInteraction) {
-    const components: ActionRowBuilder<TextInputBuilder>[] = [awardUnicodeInputActionRow, awardPointsInputActionRow, awardStaffOnlyInputActionRow];
+export async function openAddPostAwardModal(courseName: string, triggerInteraction: ButtonInteraction, courseQueues: Map<string, CourseQueue>) {
+    
+    const postScoringModalData: PostScoringModalData = {
+        components: [awardUnicodeInputActionRow, awardPointsInputActionRow, awardStaffOnlyInputActionRow],
+        idPrefix: ADD_AWARD_MODAL_ID_PREFIX,
+        titlePrefix: ADD_AWARD_MODAL_TITLE_PREFIX,
+        courseName: courseName,
+        courseQueues: courseQueues,
+        modalInputHandler: handleAddAwardModalInput
+    }
 
-    openPostScoringModal(ADD_AWARD_MODAL_ID_PREFIX, ADD_AWARD_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleAddAwardModalInput)
+    openPostScoringModal(triggerInteraction, postScoringModalData)
 }
 
 async function handleAddAwardModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
@@ -209,7 +225,7 @@ async function handleAddAwardModalInput(client: Client, courseName: string, subm
 
     course.discussionSpecs.postSpecs.awards.set(emojiInput, newAward)
 
-    const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
+    const rescoredPeriods = await rescoreDiscussion(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE
@@ -233,10 +249,18 @@ const EMOJI_NOT_FOUND_ERROR_MESSAGE = "\n- Emoji not found"
 
 const DELETE_AWARD_SUCCESS_MESSAGE = "Award successfully deleted";
 
-export async function openDeletePostAwardModal(courseName: string, triggerInteraction: ButtonInteraction) {
-    const components: ActionRowBuilder<TextInputBuilder>[] = [awardUnicodeInputActionRow];
+export async function openDeletePostAwardModal(courseName: string, triggerInteraction: ButtonInteraction, courseQueues: Map<string, CourseQueue>) {
+    
+    const postScoringModalData: PostScoringModalData = {
+        components: [awardUnicodeInputActionRow],
+        idPrefix: DELETE_AWARD_MODAL_ID_PREFIX,
+        titlePrefix: DELETE_AWARD_MODAL_TITLE_PREFIX,
+        courseName: courseName,
+        courseQueues: courseQueues,
+        modalInputHandler: handleDeleteAwardModalInput
+    }
 
-    openPostScoringModal(DELETE_AWARD_MODAL_ID_PREFIX, DELETE_AWARD_MODAL_TITLE_PREFIX, courseName, triggerInteraction, components, handleDeleteAwardModalInput)
+    openPostScoringModal(triggerInteraction, postScoringModalData)
 }
 
 async function handleDeleteAwardModalInput(client: Client, courseName: string, submittedModal: ModalSubmitInteraction): Promise<string> {
@@ -257,7 +281,7 @@ async function handleDeleteAwardModalInput(client: Client, courseName: string, s
         return INPUT_ERROR_PREFIX + EMOJI_NOT_FOUND_ERROR_MESSAGE
     course.discussionSpecs.postSpecs.awards.delete(emojiInput)
 
-    const rescoredPeriods = await scoreAllThreads(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
+    const rescoredPeriods = await rescoreDiscussion(client, course.channels.discussion, course.discussionSpecs, course.roles.staff)
 
     if(!rescoredPeriods)
         return SCORING_ERROR_MESSAGE
@@ -273,11 +297,29 @@ async function handleDeleteAwardModalInput(client: Client, courseName: string, s
 }
 
 // HELPER FUNCTIONS
-async function openPostScoringModal(idPrefix: string, titlePrefix: string, courseName: string, triggerInteraction: ButtonInteraction, components: ActionRowBuilder<TextInputBuilder>[], modalInputHandler: ModalInputHandler) {
+async function openPostScoringModal(triggerInteraction: ButtonInteraction, postScoringModalData: PostScoringModalData) {
     
-    recollectManagePostSpecsInput(courseName, triggerInteraction);
+    const discussionModalData: DiscussionModalData = {
+        components: postScoringModalData.components,
+        idPrefix: postScoringModalData.idPrefix,
+        titlePrefix: postScoringModalData.titlePrefix,
+        courseName: postScoringModalData.courseName,
+        courseQueues: postScoringModalData.courseQueues,
+        modalInputHandler: postScoringModalData.modalInputHandler,
+        recollectFunction: async () => { recollectManagePostSpecsInput(postScoringModalData.courseName, triggerInteraction, postScoringModalData.courseQueues) },
+        refreshFunction: async () => { await refreshManagePostSpecsMenu(postScoringModalData.courseName, triggerInteraction, postScoringModalData.courseQueues) }
+    }
 
-    await createDiscussionModal(idPrefix, titlePrefix, courseName, triggerInteraction, components, modalInputHandler, async () => {await refreshManagePostSpecsMenu(courseName, triggerInteraction)})
+    await createDiscussionModal(triggerInteraction, discussionModalData)
+}
+
+interface PostScoringModalData {
+    components: ActionRowBuilder<TextInputBuilder>[], 
+    idPrefix: string, 
+    titlePrefix: string, 
+    courseName: string,
+    courseQueues: Map<string, CourseQueue>,
+    modalInputHandler: DiscussionModalHandler
 }
 
 function validatePostSpecsInput(score: number, commentScore: number, length: number, para: number, link: number): string {

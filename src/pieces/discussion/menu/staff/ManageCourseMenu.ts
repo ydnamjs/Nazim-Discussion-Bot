@@ -6,6 +6,7 @@ import { updateToStaffCoursesMenu } from "./StaffCoursesMenu";
 import { updateToViewStudentsMenu } from "./ViewStudentsMenu";
 import { updateToManagePeriodsMenu } from "./manageScorePeriods/ManageScorePeriodsMenu";
 import { updateToManagePostSpecsMenu } from "./managePostScoring/ManagePostScoringMenu";
+import { CourseQueue } from "../../scoring/courseQueue";
 
 // BUTTON CONSTANTS
 const BACK_BUTTON_ID = "discussion_staff_menu_button";
@@ -107,9 +108,9 @@ const VIEW_STAFF_BUTTON_DATA = {
 const PEOPLE_BUTTON_ROW = makeActionRowButton([VIEW_STUDENTS_BUTTON_DATA, VIEW_STAFF_BUTTON_DATA]);
 
 // UPDATE FUNCTION
-export async function updateToManageCourseMenu(name: string, componentInteraction: MessageComponentInteraction) {
+export async function updateToManageCourseMenu(name: string, componentInteraction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
 
-    const manageCourseMenu = new ManageCourseMenu(name);
+    const manageCourseMenu = new ManageCourseMenu(name, courseQueues);
     await componentInteraction.update(manageCourseMenu.menuMessageData as InteractionUpdateOptions);
     manageCourseMenu.collectMenuInteraction(componentInteraction.message);
 }
@@ -157,21 +158,21 @@ const ADDITIONAL_COMPONENTS = [SCORE_BUTTON_ROW, PEOPLE_BUTTON_ROW];
 
 class ManageCourseMenu extends NavigatedMenu {
     
-    constructor(courseTitle: string) {
+    constructor(courseTitle: string, courseQueues: Map<string, CourseQueue>) {
 
         const menuData: NavigatedMenuData = {
             title: COURSE_NAME_PREFIX + courseTitle.toUpperCase() + COURSE_NAME_SUFFIX,
             description: MENU_DESCRIPTION,
             fields: menuFields,
             additionalComponents: ADDITIONAL_COMPONENTS,
-            additionalComponentBehaviors: generateBehaviors(courseTitle)
+            additionalComponentBehaviors: generateBehaviors(courseTitle, courseQueues)
         }
 
-        super(menuData, 0, customNavOptions);
+        super(menuData, 0, courseQueues, customNavOptions);
     }
 }
 
-function generateBehaviors(courseName: string): ComponentBehavior[] {
+function generateBehaviors(courseName: string, courseQueues: Map<string, CourseQueue>): ComponentBehavior[] {
     
     return [
         {
@@ -179,7 +180,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === BACK_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToStaffCoursesMenu(componentInteraction);
+                updateToStaffCoursesMenu(componentInteraction, courseQueues);
             }
         },
         {
@@ -195,7 +196,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_POST_SCORING_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToManagePostSpecsMenu(courseName, componentInteraction)
+                updateToManagePostSpecsMenu(courseName, componentInteraction, courseQueues)
             }
         },
         {
@@ -211,7 +212,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === MANAGE_SCORE_PERIODS_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToManagePeriodsMenu(courseName, componentInteraction);
+                updateToManagePeriodsMenu(courseName, componentInteraction, courseQueues);
             }
         },
         {
@@ -219,7 +220,7 @@ function generateBehaviors(courseName: string): ComponentBehavior[] {
                 return customId === VIEW_STUDENTS_BUTTON_ID;
             },
             resultingAction: (componentInteraction) => {
-                updateToViewStudentsMenu(courseName, componentInteraction);
+                updateToViewStudentsMenu(courseName, componentInteraction, courseQueues);
             }
         },
         {

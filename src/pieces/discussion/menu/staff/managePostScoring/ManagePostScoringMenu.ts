@@ -7,6 +7,7 @@ import { sendDismissableReply } from "../../../../../generalUtilities/Dismissabl
 import { makeActionRowButton } from "../../../../../generalUtilities/MakeActionRow";
 import { openAddPostAwardModal, openDeletePostAwardModal, openEditPostModal } from "./PostScoringModals";
 import { updateToManageCourseMenu } from "../ManageCourseMenu";
+import { CourseQueue } from "src/pieces/discussion/scoring/courseQueue";
 
 // MENU TEXT CONSTANTS
 const TITLE_COURSE_PREFIX = "Manage Post Specs - CISC ";
@@ -94,7 +95,7 @@ const DELETE_AWARD_BUTTON_DATA = {
 const SCORE_BUTTON_ROW = makeActionRowButton([EDIT_SCORING_BUTTON_DATA, ADD_EDIT_AWARD_BUTTON_DATA, DELETE_AWARD_BUTTON_DATA])
 
 // UPDATE FUNCTION
-export async function updateToManagePostSpecsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function updateToManagePostSpecsMenu(courseName: string, componentInteraction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
     
     let course = await getCourseByName(courseName)
 
@@ -104,13 +105,13 @@ export async function updateToManagePostSpecsMenu(courseName: string, componentI
         return;
     }
 
-    const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
+    const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs, courseQueues);
     componentInteraction.update(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
     managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 // RECOLLECT FUNCTION
-export async function recollectManagePostSpecsInput(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function recollectManagePostSpecsInput(courseName: string, componentInteraction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
     
     let course = await getCourseByName(courseName)
 
@@ -120,13 +121,13 @@ export async function recollectManagePostSpecsInput(courseName: string, componen
         return;
     }
 
-    const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
+    const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs, courseQueues);
     await componentInteraction.message.edit(managePostScoringMenu.menuMessageData as InteractionUpdateOptions);
     managePostScoringMenu.collectMenuInteraction(componentInteraction.message);
 }
 
 // REFRESH FUNCTION
-export async function refreshManagePostSpecsMenu(courseName: string, componentInteraction: MessageComponentInteraction) {
+export async function refreshManagePostSpecsMenu(courseName: string, componentInteraction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
     
     let course = await getCourseByName(courseName)
 
@@ -136,46 +137,46 @@ export async function refreshManagePostSpecsMenu(courseName: string, componentIn
         return;
     }
 
-    const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs);
+    const managePostScoringMenu = new ManagePostScoringMenu(courseName, course.discussionSpecs.postSpecs, courseQueues);
     componentInteraction.message.edit({embeds: managePostScoringMenu.menuMessageData.embeds});
 }
 
 // MENU CLASS
 class ManagePostScoringMenu extends NavigatedMenu {
     
-    constructor(courseName: string, postSpecs: PostSpecs) {
+    constructor(courseName: string, postSpecs: PostSpecs, courseQueues: Map<string, CourseQueue>) {
 
         const menuData: NavigatedMenuData = {
             title: TITLE_COURSE_PREFIX + courseName.toUpperCase(),
             description: MENU_DESCRIPTION,
             fields: generateFields(postSpecs),
             additionalComponents: [SCORE_BUTTON_ROW],
-            additionalComponentBehaviors: generateBehaviors(courseName),
+            additionalComponentBehaviors: generateBehaviors(courseName, courseQueues),
         }
 
-        super(menuData, 0, customNavOptions);
+        super(menuData, 0, courseQueues, customNavOptions);
     }
 }
 
 // HELPER FUNCTIONS
-function generateBehaviors(courseName: string): ComponentBehavior[] {
+function generateBehaviors(courseName: string, courseQueues: Map<string, CourseQueue>): ComponentBehavior[] {
     
     const behaviors: ComponentBehavior[] = [
         {
             filter: (customId) => {return customId === EDIT_SCORING_BUTTON_ID},
-            resultingAction: (triggerInteraction) => { openEditPostModal(courseName, triggerInteraction as ButtonInteraction) }
+            resultingAction: (triggerInteraction) => { openEditPostModal(courseName, triggerInteraction as ButtonInteraction, courseQueues) }
         },
         {
             filter: (customId) => {return customId === ADD_EDIT_AWARD_BUTTON_ID},
-            resultingAction: (triggerInteraction) => { openAddPostAwardModal(courseName, triggerInteraction as ButtonInteraction) }
+            resultingAction: (triggerInteraction) => { openAddPostAwardModal(courseName, triggerInteraction as ButtonInteraction, courseQueues) }
         },
         {
             filter: (customId) => {return customId === DELETE_AWARD_BUTTON_ID},
-            resultingAction: (triggerInteraction) => { openDeletePostAwardModal(courseName, triggerInteraction as ButtonInteraction) }
+            resultingAction: (triggerInteraction) => { openDeletePostAwardModal(courseName, triggerInteraction as ButtonInteraction, courseQueues) }
         },
         {
             filter: (customId: string) => { return customId === BACK_BUTTON_ID },
-            resultingAction: (componentInteraction: MessageComponentInteraction) => { updateToManageCourseMenu(courseName, componentInteraction) }
+            resultingAction: (componentInteraction: MessageComponentInteraction) => { updateToManageCourseMenu(courseName, componentInteraction, courseQueues) }
         }
     ];
     
