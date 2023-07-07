@@ -1,4 +1,5 @@
 import { CommandInteraction, ChatInputApplicationCommandData, Client } from "discord.js";
+import { CourseQueue } from "../pieces/discussion/scoring/courseQueue";
 
 /**
  * @interface Interface that extends discords default ChatInputApplicationCommandData
@@ -6,7 +7,7 @@ import { CommandInteraction, ChatInputApplicationCommandData, Client } from "dis
  * @property {Function} run - the function to be run when the command is called
  */
 export interface Command extends ChatInputApplicationCommandData {
-    run: (client: Client, interaction: CommandInteraction) => void;
+    run: (client: Client, interaction: CommandInteraction, courseQueues: Map<string, CourseQueue>) => void;
 }
 
 //code taken from https://sabe.io/tutorials/how-to-build-discord-bot-typescript

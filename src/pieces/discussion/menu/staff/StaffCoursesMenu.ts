@@ -7,13 +7,14 @@ import { CustomNavOptions, NavigatedMenu, NavigatedMenuData } from "../../../men
 import { updateToManageCourseMenu } from "./ManageCourseMenu";
 import { ScorePeriod, StudentScoreData } from "../../../../generalModels/DiscussionScoring";
 import { sendDismissableInteractionReply, sendDismissableReply } from "../../../../generalUtilities/DismissableMessage";
+import { CourseQueue } from "../../scoring/courseQueue";
 
 /**
  * @function updates a menu so that it is now a staff menu
  * @param {Message} message - the message to have the menu be replaced on
  * @param {MessageComponentInteraction} componentInteraction - the interaction that triggered this menu replacement
  */
-export async function updateToStaffCoursesMenu(componentInteraction: MessageComponentInteraction) {
+export async function updateToStaffCoursesMenu(componentInteraction: MessageComponentInteraction, courseQueues: Map<string, CourseQueue>) {
 
     const staffsCourses = await getStaffsDiscussionCourses(componentInteraction.client, componentInteraction.user);
 
@@ -43,7 +44,7 @@ export async function updateToStaffCoursesMenu(componentInteraction: MessageComp
         });
     }
 
-    const staffMenu = new StaffCoursesMenu(discussionCoursesData);
+    const staffMenu = new StaffCoursesMenu(discussionCoursesData, courseQueues);
     componentInteraction.update(staffMenu.menuMessageData as InteractionUpdateOptions);
     staffMenu.collectMenuInteraction(componentInteraction.message);
 }
@@ -110,21 +111,6 @@ const SELECT_MENU_ERROR_MESSAGE = "An error occurred. Expected a select menu int
 
 const DROP_DOWN_ID = "discussion-course-select";
 
-const EXTRA_BEHAVIORS: ComponentBehavior[] = [
-    {
-        filter: (custom_id: string) => {
-            return custom_id === DROP_DOWN_ID;
-        },
-        resultingAction: async (componentInteraction: MessageComponentInteraction) => {
-            if(componentInteraction.isStringSelectMenu() && componentInteraction.values.length > 0){
-                updateToManageCourseMenu(componentInteraction.values[0], componentInteraction);
-            }
-            else {
-                await sendDismissableInteractionReply(componentInteraction, SELECT_MENU_ERROR_MESSAGE);
-            }
-        }
-    }
-]
 
 /**
  * @class menu that displays basic info about a user's courses
@@ -132,7 +118,7 @@ const EXTRA_BEHAVIORS: ComponentBehavior[] = [
  */
 export class StaffCoursesMenu extends NavigatedMenu {
     
-    constructor(courseInfo: DiscussionCourseBasicData[]) {
+    constructor(courseInfo: DiscussionCourseBasicData[], courseQueues: Map<string, CourseQueue>) {
         
         let fields: { name: string; value: string; }[] = [];
         let selectMenuOptions: {value: string, label: string}[] = []; 
@@ -164,7 +150,7 @@ export class StaffCoursesMenu extends NavigatedMenu {
             description: STAFF_MENU_DESCRIPTION,
             fields: fields,
             additionalComponents: [courseSelectRow],
-            additionalComponentBehaviors: EXTRA_BEHAVIORS
+            additionalComponentBehaviors: generateBehaviors(courseQueues)
         }
 
         const customNavOptions: CustomNavOptions = {
@@ -172,6 +158,22 @@ export class StaffCoursesMenu extends NavigatedMenu {
             nextButtonOptions: { exists: true },
         };
         
-        super(menuData, 0, customNavOptions);
+        super(menuData, 0, courseQueues, customNavOptions);
     }
+}
+
+function generateBehaviors(courseQueues: Map<string, CourseQueue>) {
+    return [{
+        filter: (custom_id: string) => {
+            return custom_id === DROP_DOWN_ID;
+        },
+        resultingAction: async (componentInteraction: MessageComponentInteraction) => {
+            if(componentInteraction.isStringSelectMenu() && componentInteraction.values.length > 0){
+                updateToManageCourseMenu(componentInteraction.values[0], componentInteraction, courseQueues);
+            }
+            else {
+                await sendDismissableInteractionReply(componentInteraction, SELECT_MENU_ERROR_MESSAGE);
+            }
+        }
+    }]
 }

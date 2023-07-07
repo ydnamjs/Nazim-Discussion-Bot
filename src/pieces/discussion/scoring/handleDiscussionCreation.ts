@@ -4,9 +4,9 @@ import { DATABASE_ERROR_MESSAGE, getCourseByDiscussionChannel, getCourseByName, 
 import { sendDismissableMessage } from "../../../generalUtilities/DismissableMessage";
 import { scoreNewComment, sendDiscussionScoreNotification } from "./RealTimeScoringUtilities";
 import { SCORING_ERROR_MESSAGE } from "./scoreActionUtilities";
-import { courseQueue } from "./courseQueue";
+import { CourseQueue } from "./courseQueue";
 
-export async function handleDiscussionCreation(message: Message, courseQueues: Map<string, courseQueue>) {
+export async function handleDiscussionCreation(message: Message, courseQueues: Map<string, CourseQueue>) {
     
     const discussionMessageData = await getDiscussionMessageData(message)
     

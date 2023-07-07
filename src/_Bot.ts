@@ -4,7 +4,7 @@ import commandListener from "./listeners/InteractionListener";
 import onlineLogger from "./listeners/ReadyListener";
 import messageListener from "./listeners/MessageCreate"
 import { DISCORD_TOKEN, MONGODB_SRV } from "./secret";
-import { courseQueue } from "./pieces/discussion/scoring/courseQueue";
+import { CourseQueue } from "./pieces/discussion/scoring/courseQueue";
 import { getAllCourses } from "./generalUtilities/CourseUtilities";
 
 main();
@@ -40,14 +40,14 @@ async function main() {
         return;
     });
 
-    const courseQueues = new Map<string, courseQueue>();
+    const courseQueues = new Map<string, CourseQueue>();
 
     const courses = await getAllCourses()
 
     if(courses) {
 
         courses.forEach((course) => {
-            courseQueues.set(course.name, new courseQueue())
+            courseQueues.set(course.name, new CourseQueue())
         })
     }
 
@@ -56,10 +56,10 @@ async function main() {
     client.login(DISCORD_TOKEN);
 }
 
-function addListeners(client: Client, courseQueues: Map<string, courseQueue>) {
+function addListeners(client: Client, courseQueues: Map<string, CourseQueue>) {
     console.log("adding listeners...");
     onlineLogger(client);
-    commandListener(client);
+    commandListener(client, courseQueues);
     messageListener(client, courseQueues);
     console.log("listeners added!");
 }

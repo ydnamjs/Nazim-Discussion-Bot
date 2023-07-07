@@ -4,7 +4,7 @@ interface courseQueueNode {
     next: courseQueueNode | undefined,
 }
 
-export class courseQueue {
+export class CourseQueue {
 
     head: courseQueueNode | undefined;
     tail: courseQueueNode | undefined;
