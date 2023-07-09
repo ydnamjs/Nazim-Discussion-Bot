@@ -13,7 +13,7 @@ export const removeCourse: Command = {
 		required: true
 	}],
 
-    run: async (client: Client, interaction: CommandInteraction) => {
+    run: async (interaction: CommandInteraction) => {
         // check for course name and guild
         const courseOp = interaction.options.get('course')?.value;
         if (!courseOp || !interaction.guild) {
@@ -37,7 +37,7 @@ export const removeCourse: Command = {
         const courseCategory = await interaction.guild.channels.fetch(course.channels.category) as CategoryChannel;
         const courseChannels = [...courseCategory.children.cache.keys()];
         courseChannels.forEach(async channelID => {
-            const channel = await client.channels.fetch(channelID);
+            const channel = await interaction.client.channels.fetch(channelID);
             channel?.delete(reason);
         });
         courseCategory.delete();

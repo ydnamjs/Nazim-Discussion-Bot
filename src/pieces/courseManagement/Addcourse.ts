@@ -24,7 +24,7 @@ export const addCourse: Command = {
         }
     ],
 
-	run: async (client: Client, interaction: CommandInteraction) => {
+	run: async (interaction: CommandInteraction) => {
 		//interaction.reply('<a:loading:755121200929439745> working...');
 
         // check for course name and guild

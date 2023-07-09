@@ -28,7 +28,7 @@ async function handleSlashCommand(client: Client, interaction: CommandInteractio
     }
 
     await interaction.deferReply();
-    slashCommand.run(client, interaction, courseQueues);
+    slashCommand.run(interaction, courseQueues);
 };
 
 //some code taken from https://sabe.io/tutorials/how-to-build-discord-bot-typescript
