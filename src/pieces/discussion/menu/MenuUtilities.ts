@@ -1,6 +1,6 @@
 import { ActionRowBuilder, EmbedBuilder, Message, MessageCreateOptions, User } from "discord.js";
-import { sendDismissableReply } from "src/generalUtilities/DismissableMessage";
-import { ComponentBehavior } from "src/pieces/menu/BaseMenu";
+import { sendDismissableReply } from "../../../generalUtilities/DismissableMessage";
+import { ComponentBehavior } from "../../../pieces/menu/BaseMenu";
 
 export async function sendMenu(user: User, menuData: MenuCreationData, componentBehaviors: ComponentBehavior[]): Promise<Message> {
     const menuMessageData = CreateMenuMessageData(menuData);
