@@ -1,8 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionUpdateOptions, MessageCreateOptions, StringSelectMenuBuilder } from "discord.js";
-import { BaseMenu, buttonData, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData } from "./BaseMenu";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } from "discord.js";
 import { makeActionRowButton } from "../../generalUtilities/MakeActionRow";
-import { makeMainMenu } from "../discussion/menu/DiscussionMainMenu";
+import { UpdateDiscussionMainMenu } from "../discussion/menu/DiscussionMainMenu";
 import { CourseQueue } from "../discussion/scoring/courseQueue";
+import { BaseMenu, ComponentBehavior, MAX_NUMBER_OF_COMPONENT_ROWS, MenuData, buttonData } from "./BaseMenu";
 
 /**
  * @interface NavigatedMenuData
@@ -144,24 +144,21 @@ export class NavigatedMenu extends BaseMenu{
             description: menuData.description,
             fields: menuData.fields,
             components: [navigationRow, ...menuData.additionalComponents],
-            componentBehaviors: [...generateBehaviors(courseQueues) , ...menuData.additionalComponentBehaviors]
+            componentBehaviors: [...GenerateMainBehaviors(courseQueues) , ...menuData.additionalComponentBehaviors]
         }
 
         super(superMenuData);
     }
 }
 
-function generateBehaviors(courseQueues: Map<string, CourseQueue>) {
+function GenerateMainBehaviors(courseQueues: Map<string, CourseQueue>) {
     const MAIN_MENU_BUTTON_BEHAVIOR: ComponentBehavior = {
     
         filter: (customId: string) => {
             return customId === MAIN_MENU_CUSTOMID;
         },
         resultingAction: async (componentInteraction) => {
-
-            const mainMenu = makeMainMenu(courseQueues)
-            componentInteraction.update(mainMenu.menuMessageData as InteractionUpdateOptions);
-            mainMenu.collectMenuInteraction(componentInteraction.message);
+            UpdateDiscussionMainMenu(componentInteraction, courseQueues)
         }
     }
     

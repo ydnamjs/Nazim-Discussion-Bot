@@ -1,12 +1,24 @@
-import { ActionRowBuilder, EmbedBuilder, Message, MessageCreateOptions, User } from "discord.js";
+import { ActionRowBuilder, EmbedBuilder, InteractionUpdateOptions, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, User } from "discord.js";
 import { sendDismissableReply } from "../../../generalUtilities/DismissableMessage";
 import { ComponentBehavior } from "../../../pieces/menu/BaseMenu";
+
+// send update collect refresh
 
 export async function sendMenu(user: User, menuData: MenuCreationData, componentBehaviors: ComponentBehavior[]): Promise<Message> {
     const menuMessageData = CreateMenuMessageData(menuData);
     const sentMenuMessage = await user.send(menuMessageData);
     CollectMenuInteraction(sentMenuMessage, componentBehaviors)
     return sentMenuMessage;
+}
+
+export async function updateMenu(interaction: MessageComponentInteraction, menuData: MenuCreationData, componentBehaviors: ComponentBehavior[]): Promise<void> {
+    const menuMessageData = CreateMenuMessageData(menuData);
+    interaction.update(menuMessageData as InteractionUpdateOptions);
+    CollectMenuInteraction(interaction.message, componentBehaviors);
+}
+
+export async function refreshMenu(menuMessage: Message, newMenuData: MenuCreationData) {
+    menuMessage.edit(CreateMenuMessageData(newMenuData) as MessageEditOptions)
 }
 
 export const MAX_NUMBER_OF_COMPONENT_ROWS = 5; 
@@ -33,7 +45,7 @@ function CreateMenuMessageData(menuData: MenuCreationData): MessageCreateOptions
     return newMenu;
 }
 
-interface MenuCreationData {
+export interface MenuCreationData {
     title: string,
     description: string,
     fields: {name: string, value: string}[],
@@ -44,7 +56,7 @@ const COLLECTOR_EXPIRATION_MESSAGE = "Collector received no interactions before 
 const MENU_EXPIRTATION_NOTIFICATION = "Your discussion menu expired due to inactivity";
 const MENU_EXPIRATION_TIME = 600_000;
 
-async function CollectMenuInteraction(message: Message, componentBehaviors: ComponentBehavior[]): Promise<void> {
+export async function CollectMenuInteraction(message: Message, componentBehaviors: ComponentBehavior[]): Promise<void> {
 
     try {
         const componentUsed = await message.awaitMessageComponent({time: MENU_EXPIRATION_TIME});
